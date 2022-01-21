@@ -66,13 +66,13 @@ data_set[15,wahr] <- 1
 
 # sechzehnte Zeile alles auf 0
 
-#print(data_set)
+setwd("..") # Ausgabe soll in uebergeordneten Ordner erzeugt werden
 
 sink(file = "r_output.txt") # Ausgabe werden ab hier in Datei gespeichert
 
 print(cna(data_set, # unserer Datensatz
   rm.dup.factors=FALSE, # verwerfe Spalten mit identischen Eintraegen nicht
-  maxstep=c(5,5,10), # maximal 3 Konjunkte, 4 Disjunkte und 11 Faktoren
+  maxstep=c(5,5,10), # maximal 5 Konjunkte, 5 Disjunkte und 10 Faktoren
   what = "a", # zeige nur atomare Loesungsformeln
   details = FALSE,
   ordering = list(c("D","E","F","G","H","I","J"),c("A", "B","C"))), # ordering(e_1,e_2,...) setzt e_2 downstream bezueglich e_1, hier werden die Ebenen separiert
