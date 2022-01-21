@@ -1,0 +1,32 @@
+% evtl. hilfreich:
+% - Subgraph (vgl. 28.10.2 in pgf Handbuch)
+\documentclass[11pt]{standalone}
+\usepackage{tikz}
+\usetikzlibrary{arrows, backgrounds, fit, positioning, shapes, graphs, quotes, calc} %%, graphdrawing}
+%%\usegdlibrary{layered}
+
+\tikzset{>=latex}
+
+\begin{document}
+\def\hilightsource#1{\draw[densely dashed,-latex] ($(#1)-(8mm,0)$) -> ($(#1)-(3mm,0)$);
+  \fill [green, opacity=.25] (#1) circle [radius=3mm]; }
+\def\hilighttarget#1{\draw[densely dashed,-latex] ($(#1)+(3mm,0)$) -> ($(#1)+(8mm,0)$);
+  \fill [red, opacity=.25] (#1) circle [radius=3mm]; }
+
+\tikz[every node/.style={circle, draw, minimum size=6mm, text width=5.5mm, align=center, inner sep = 0pt},
+  line join=round,
+  every new -!-/.style = {width=211mm},
+  every new --/.style = {dotted,thin,bend left=20},
+  every new ->/.style = {densely dotted},
+  every new <->/.style = {densely dotted}]
+\graph[math nodes,
+  grow right=20mm, branch up = 14mm, 
+%layered layout,
+%%grow=up, components go right,
+%%level distance=18mm, sibling sep=1mm, sibling distance=12mm,
+  operator=\tikzgraphforeachcolorednode{source}{\hilightsource},
+  operator=\tikzgraphforeachcolorednode{target}{\hilighttarget},
+]
+% Include formula from file
+\VAR{tex_formula}
+\end{document}
