@@ -6,20 +6,28 @@ import re                                        # Regex fuer Suche in Strings
 
 # erst einmal nur Hilfsfunktionen:
 def find_causal_factors(st):
-    # sucht in String st nach durch ", ", " < " oder "*" separierten Bezeichnern fuer Kausalfaktoren
+    # sucht in String st nach durch ", " oder " < " separierten Bezeichnern fuer Kausalfaktoren
     # gibt die Liste an Kausalfaktoren zurueck
     
     # loesche "Factors: " aus Textzeile (sofern auftretend)
     st = st.replace("Factors: ","")
     # loesche Zeilenendensymbol und ggf. Leerzeichen am Zeilenende
     st = re.sub("\r?\n","",st).rstrip()
-    # gib Liste der durch ", ", "< " oder "*" separierten Eintraege zurueck
+    # gib Liste der durch ", " oder "< " separierten Eintraege zurueck
     return re.split(",\s*|\s*<\s*|\*", st)
 
 def get_equiv_formula(st):
     # gibt die Teilformeln links und rechts von "<->" in Eingabestring st als Paar von Strings (a,b) zurueck
     a = re.split(" <-> ",st)[0].strip()          # strip() loescht fuehrende Leerzeichen
     b = re.split(" <-> ",st)[1].strip()
+    
+    # Umwandlung der Negationssyntax (in cna durch Minuskel) sodass "a" -> "~A"
+    # 1. Schritt fuege "~" vor jeder Minuskel ein
+    a = re.sub(r'([a-z])',  r'~\1', a)
+    # 2. Schritt Ersetzung durch Majuskel
+    a = re.sub(r'([a-z])',  lambda pat: pat.group(1).upper(), a)
+    
+    
     # in cna-Ausgabe haengen rechts noch weitere Informationen, diese von b abtrennen:
     b = re.split("[ \t]",b)[0]
     return (a,b)

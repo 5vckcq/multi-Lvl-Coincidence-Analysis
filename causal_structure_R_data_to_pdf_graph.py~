@@ -6,20 +6,24 @@ import re                                        # Regex fuer Suche in Strings
 
 # erst einmal nur Hilfsfunktionen:
 def find_causal_factors(st):
-    # sucht in String st nach durch ", ", " < " oder "*" separierten Bezeichnern fuer Kausalfaktoren
+    # sucht in String st nach durch ", " oder " < " separierten Bezeichnern fuer Kausalfaktoren
     # gibt die Liste an Kausalfaktoren zurueck
     
     # loesche "Factors: " aus Textzeile (sofern auftretend)
     st = st.replace("Factors: ","")
     # loesche Zeilenendensymbol und ggf. Leerzeichen am Zeilenende
     st = re.sub("\r?\n","",st).rstrip()
-    # gib Liste der durch ", ", "< " oder "*" separierten Eintraege zurueck
+    # gib Liste der durch ", " oder "< " separierten Eintraege zurueck
     return re.split(",\s*|\s*<\s*|\*", st)
 
 def get_equiv_formula(st):
     # gibt die Teilformeln links und rechts von "<->" in Eingabestring st als Paar von Strings (a,b) zurueck
     a = re.split(" <-> ",st)[0].strip()          # strip() loescht fuehrende Leerzeichen
     b = re.split(" <-> ",st)[1].strip()
+    
+    # Umwandlung der Negationssyntax (in cna durch Minuskel) sodass "a" -> "~A"
+    a = re.sub(r'([a-z])',  r'~\1', a)
+    
     # in cna-Ausgabe haengen rechts noch weitere Informationen, diese von b abtrennen:
     b = re.split("[ \t]",b)[0]
     return (a,b)
@@ -505,9 +509,9 @@ def read_R_file(file_name):
                             # loesche Inhalte der Hilfsliste
                             auxiliary_list.clear()
                                     
-                        if formula_redundant:
-                            # setze Formel auf Loeschliste
-                            discard_list.append(level_equiv_list[m][j])       
+                            if formula_redundant:
+                                # setze Formel auf Loeschliste
+                                discard_list.append(level_equiv_list[m][j])       
                             
                     for f in discard_list:
                         # loesche als redundant markierte Formeln 
