@@ -226,19 +226,8 @@ def convert_causal_relation(formula, level_factor_list_order, tex_code):
                     st = st + "% einfache Disjunktion\n"
                     st = st + "\draw[->] (" + disj + ".east) to (" + formula[1] + ".west);\n"
                 
-                elif (disj[0] == "~") and (disj[1:] in get_components_from_formula(formula[0], level_factor_list_order)) :
-                    # Fall 2: disj ist ein negierter Faktor (erstes Zeichen = "~" und weitere Zeichen entsprechen
-                    # einem bekannten Kausalfaktor
-                    
-                    # ANNAHME: in einer Disjunktionskette kann derselbe Faktor nur entweder negiert oder 
-                    # ohne Negation auftreten (sonst muss aus "elif" ein neues "if" gemacht werden)
-                    
-                    st = st + "% negierte Disjunkte\n"
-                    st = st  + "\\node[neg] (" + disj[1:] + "neg) at ([xshift=\LNeg]" + disj[1:] + ".south east) {};\n"
-                    st = st + "\draw[->] (" + disj[1:] + "neg) to (" + formula[1] + ".west);\n"
-                
                 elif formula[0].find("*") > -1 :
-                    # Fall 3: disj ist eine Konjunktion
+                    # Fall 2: disj ist eine Konjunktion
                     st = st + "% komplexe Disjunktion\n"
                     
                     conjunctor_list = re.split("\*", disj)
@@ -290,6 +279,19 @@ def convert_causal_relation(formula, level_factor_list_order, tex_code):
 
                     # verbinde Schnittpunkt mit Zielfaktor
                     st = st + "% Pfeil vom Schnittpunkt zum Zielfaktor\n\draw[->] (" + cross_point + "aux) -- (" + formula[1] + ".west);\n"
+                
+                elif (disj[0] == "~") and (disj[1:] in get_components_from_formula(formula[0], level_factor_list_order)) :
+                    # Fall 3: disj ist ein negierter Faktor (erstes Zeichen = "~" und weitere Zeichen entsprechen
+                    # einem bekannten Kausalfaktor
+                    
+                    # ANNAHME: in einer Disjunktionskette kann derselbe Faktor nur entweder negiert oder 
+                    # ohne Negation auftreten (sonst muss aus "elif" ein neues "if" gemacht werden)
+                    
+                    st = st + "% negierte Disjunkte\n"
+                    st = st  + "\\node[neg] (" + disj[1:] + "neg) at ([xshift=\LNeg]" + disj[1:] + ".south east) {};\n"
+                    st = st + "\draw[->] (" + disj[1:] + "neg) to (" + formula[1] + ".west);\n"
+                
+                
                 else :
                     # disj besitzt eine andere Struktur
                     

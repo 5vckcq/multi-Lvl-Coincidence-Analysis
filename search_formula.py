@@ -1,5 +1,33 @@
 #!/usr/bin/env python3
 
+# Funktionen zum erkennen redundater Formeln
+# Annahme: Eingabeformeln sind saemtlich disjunktive Normalformen
+# search_formula(f,list_f) formt Formel f solange um bis alle logisch erlaubten Umformungen
+# erfolgt sind oder eine Formel aus list_f mit einer Umformung uebereinstimmt
+#
+# durchgefuehrte Umformungen sind:
+# 1.) Distribution: A*B*C + A*B*D*E + B ... -> A*B*(C + D*E) + B ...
+# 2.) Kommutationen
+# - a) von Disjunktionen A*B + B*C + E + ... -> Menge aller Permutationen der Disjunkten
+# - b) von Konjunktionen A*B + B*C + E + ... -> Menge aller Permutationen in jeder Disjunkten
+# 3.) Idempotenzen
+# - a) von Disjunkten A*B*C + A*B*C + ... -> A*B*C + ... - nur bezueglich erster und zweiter Disjunkten
+# - b) von Konjunkten A*A*B + ... -> A*B + ... - bezueglich erster und zweiter Konjunkten in der ersten Disjunkten
+# 4.) Einsetzungen von Formeln aus list_f 
+#     -- jede dieser Formeln hat die Form alpha <-> beta, wobei beta ein Kausalfaktor ist und alpha eine disjunktive
+#        Normalform, wird der linke Ausdruck in Formel f oder einer ihrer Umformungen gefunden, so wird eine Ersetung
+#        zu beta vorgenommen
+# 
+# Die sechs Umformungsoperationen laufen parallelisiert ab.
+# Gueltige Umformungen werden in eine Baumstruktur unterhalb der gegenwaertigen Node eingetragen,
+# sofern sie nicht bereits eine Node im Baum bilden. Dazu wird eine Abgleichsmenge gefuehrt, an der jede neue
+# Umformung abgeglichen wird.
+# Die Baumstruktur wird in einer Tiefensuche durchlaufen, welche mit dem Finden einer der Formeln aus list_f
+# abgebrochen wird, mit der Ausgabe: True
+# Jede Node wird nur einmal durchschritten, sodass der Suchvorgang nach durchlaufen aller Nodes ebenfalls beendet wird,
+# mit der Ausgabe: False
+
+
 from tree import Tree
 import itertools
 import re
@@ -56,7 +84,6 @@ def commutation_conj(formula) :
         # Vorgehen: spalte Formel zunaechst nach Disjunkten auf
         # bilde fuer jede Disjunkte separat die moeglichen Permutationen der Konjunkten
         # kombiniere jede Kombination jeder Disjunkten miteinander
-        # fuehre dies fuer jede Formel aus eq_list aus
         
         permutation_list = []
         
@@ -522,12 +549,17 @@ def search_formula(formula,formula_list) :
                         tree.add_child(Tree(j))
         
                                 
-    return stop
+    return stop # True, wenn eine aequivalente Formel gefunden wurde, False, wenn alle Nodes ohne Uebereinstimmung durchlaufen
+    # worden sind
 
 def main() :
     # nur zur Demonstration der Hauptfunktion search_formula
+    # es wird eine Pruefformel definiert und eine Menge von drei Vergleichs-/ Umformungsformeln
+    # dann Aufruf von search_formula
     
-    formula = "E*G*~D*G*H + E*G*H + E*A" # die wird manipuliert
+    start_f = "E*G*~D*G*H + E*G*H + E*A" # diese Formel wird manipuliert
+    start_eq = "J"
+    formula = (start_f, start_eq)
     
     # ein paar Vergleichsformeln - u.a. fuer Substitutionen
     st = "H*I"
