@@ -23,7 +23,7 @@ Template für Umwandlung der R-Ausgabe in automatisch generierte Diagramme
 
 ## causal_structure_R_data_to_pdf_graph.py
 
-Python-Skript zur automatische Generierung der möglichen Kausal-Diagramme aus der R-Ausgabe
+Python-Skript zur automatischen Generierung der möglichen Kausal-Diagramme aus der R-Ausgabe
 
 **Dies ist die auszuführende Anwendungsdatei.**
 
