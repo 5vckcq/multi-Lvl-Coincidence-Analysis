@@ -1,9 +1,9 @@
 library(cna)
 
 rnames <- c(1,2,3,4,5,6,7,8)
-cnames <- c("F1","F2","F3","F4","F5","F6","F7","A","B","C")
+cnames <- c("F1","F2","F3","F4","F5","F6","F7","E","A","B","C")
 
-data_set <- array(0, dim=c(8,10),dimnames=list(rnames,cnames))
+data_set <- array(0, dim=c(8,11),dimnames=list(rnames,cnames))
 
 # erste Zeile alles auf 1
 data_set[1,] <- 1
@@ -38,10 +38,10 @@ sink(file = "r_output.txt") # Ausgabe werden ab hier in Datei gespeichert
 
 print(cna(data_set, # unserer Datensatz
   rm.dup.factors=FALSE, # verwerfe Spalten mit identischen Eintraegen nicht
-  maxstep=c(5,5,10), # maximal 5 Konjunkte, 5 Disjunkte und 11 Faktoren
+  maxstep=c(5,5,11), # maximal 5 Konjunkte, 5 Disjunkte und 11 Faktoren
   what = "a", # zeige nur atomare Loesungsformeln
   details = FALSE,
-  ordering = list(c("F1","F2","F3","F4","F5","F6","F7"),c("A","B","C"))), # ordering(e_1,e_2,...) setzt e_2 downstream bezueglich e_1, hier werden die Ebenen separiert
+  ordering = list(c("F1","F2","F3","F4","F5","F6","F7"),c("E","A","B","C"))), # ordering(e_1,e_2,...) setzt e_2 downstream bezueglich e_1, hier werden die Ebenen separiert
   nsolutions = "all") # gib alle Loesungen an
 
 sink(file = NULL) # Ausgabe in Datei endet hier
