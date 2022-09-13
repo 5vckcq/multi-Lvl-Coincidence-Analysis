@@ -1,32 +1,61 @@
-\documentclass[11pt,varwidth]{standalone}
+\documentclass[multi=page,crop,11pt,varwidth,border=2pt]{standalone}
+\usepackage{xcolor}
 \usepackage{tikz}
-\usetikzlibrary{arrows, fit, positioning, shapes, graphs, quotes, calc}
+\usepackage{graphicx} % for scale box
+\usetikzlibrary{arrows, fit, positioning, shapes, graphs, quotes, calc, bbox}
 
 \begin{document}
-\def\hilightsource#1{\draw[densely dashed,-latex] ($(#1)-(8mm,0)$) -> ($(#1)-(3mm,0)$);%
-  \fill [green, opacity=.25] (#1) circle [radius=3mm]; }%
-\def\hilighttarget#1{\draw[densely dashed,-latex] ($(#1)+(3mm,0)$) -> ($(#1)+(8mm,0)$);%
-  \fill [red, opacity=.25] (#1) circle [radius=3mm]; }%
-% Laengenkonstanten
-\def\LNeg{0.03cm}% Abstand des Negationssymbols von der Ausgangsnode
-\def\LConj{-0.5cm}% Abstand des Konjuntions-Knotenpunktes von der Zielnode
-\def\hDisjConj{0.9cm}% horizontale Positionierung des Konjuntions-Knotenpunktes innerhalb einer Disjunktion von der ersten Ausgangsnode
-\def\vDisjConj{0.2cm}% vertikale Positionierung des Konjuntions-Knotenpunktes innerhalb einer Disjunktion von der ersten Ausgangsnode
-\def\tDisjConj{0.3cm}% Verschiebung eines Konjunktionsknotenpunktes, falls mehrere innerhalb von Disjunktionen am gleichen Faktor zusammenfallen
-\def\LvDist{0.8cm}% vertikaler Abstand uebereinander befindlicher Nodes der selben Ebene
-\def\LhDist{1.2cm}% horizontaler Abstand nebeneinander befindlicher Nodes
-\def\iLvDist{1.4cm}% vertikaler Abstand zwischen benachbarten Ebenen
-\def\HeightNode{0.6cm}% Hoehe einer Node
+% define colors (ColorBrewer scheme Paired-12
+\definecolor{color0}{RGB}{166,206,227}
+\definecolor{color1}{RGB}{31,120,180}
+\definecolor{color2}{RGB}{178,223,138}
+\definecolor{color3}{RGB}{51,160,44}
+\definecolor{color4}{RGB}{251,154,153}
+\definecolor{color5}{RGB}{227,26,28}
+\definecolor{color6}{RGB}{253,191,111}
+\definecolor{color7}{RGB}{255,127,0}
+\definecolor{color8}{RGB}{202,178,214}
+\definecolor{color9}{RGB}{106,61,154}
+\definecolor{color10}{RGB}{245,227,101} % original value is poorly legible, therefore slightly modified
+\definecolor{color11}{RGB}{177,89,40}
+
+\tikzset{every node/.style={circle, draw, thick, minimum size=6mm, text width=5.5mm, align=center, inner sep = 0pt}}% definition for normal nodes = nodes of causal factors
+\tikzstyle{aux} = [circle, draw, fill, minimum size=0.5mm, text width=0.5mm]% auxiliary nodes for conjunction junctions
+\tikzstyle{neg} = [diamond, draw, minimum size=1mm, text width=1mm]% auxiliary nodes for negations
+\tikzstyle{conjunctonsegment} = [in=170,out=-10]% conjuctive connection lines are curved to easily distinguish them from disjunctions
+\tikzstyle{crelationleft} = [->,densely dotted,in=200,out=120]% style for the leftside constitution relations
+\tikzstyle{crelationright} = [->,densely dotted,in=-20,out=60]% style for the rightside constitution relations
+\tikzstyle{crelationstraight} = [->,densely dotted]% style for single constitution relations
+
+
+\def\hilightsource#1{\draw[densely dashed,-latex] ($(#1)-(8mm,0)$) -> ($(#1)-(3mm,0)$)}%
+\def\hilighttarget#1{\draw[densely dashed,-latex] ($(#1)+(3mm,0)$) -> ($(#1)+(8mm,0)$)}%
+% definition of constants
+\def\LNeg{0.03cm}% distance of the negation symbol to the corresponding node of the causal factor
+\def\LConj{-0.5cm}% distance of the conjunction junction to the target node
+\def\hDisjConj{0.9cm}% horizontal position of conjunction junction of a disjunction relative to the first source node (normal, non-circular case)
+\def\hcDisjConj{-0.3cm}% horizontal position of conjunction junction of a disjunction relative to the first source node (circular case, source and target node are horizontalle aligned)
+\def\vDisjConj{0.2cm}% vertical position of conjunction junction of a disjunction relative to the first source node
+\def\tDisjConj{0.3cm}% shift of  conjunction junction in case that it would overlap with another junction
+\def\LvDist{0.8cm}% vertical distance between nodes of the same level and causal order
+\def\LhDist{2cm}% horizontal distance between nodes of the same level and subsequent causal orders
+\def\iLvDist{1.4cm}% vertical distance between neighbouring levels
+\def\HeightNode{0.6cm}% height of nodes
+\def\LabelDist{-2mm}% vertical distance of labels from vertices
+
+\BLOCK{for index, entry, subtitle in data}
+\begin{page}
+\centering solution no.~\VAR{index}/\VAR{maxnumber}\\[3mm]
+
 \begin{tikzpicture}[>=latex,%
-  every node/.style={circle, draw, minimum size=6mm, text width=5.5mm, align=center, inner sep = 0pt},% gilt fuer alle normalen Nodes
-  aux/.style={circle, draw, fill=black, minimum size=0.5mm, text width=0.5mm},% Hilfsnodes an Konjunktionsschnittpunkten
-  neg/.style={diamond, draw, minimum size=1mm, text width=1mm},% Hilfsnode Negation
-  conjunctonsegment/.style={in=170,out=-10},% gewoelbte Verbindungen um konjunktive Verbindungen einfach von disjunktiven unterscheiden zu koennen
-  crelationleft/.style={->,densely dotted,opacity=0.6,in=200,out=120},% Linienstil linksumschliessende Konstitutionsbeziehung
-  crelationright/.style={->,densely dotted,opacity=0.6,in=-20,out=60},% Linienstil rechtsumschliessende Konstitutionsbeziehung
-  crelationstraight/.style={->,densely dotted,opacity=0.6}]% Linienstil geradlinige Konstitutionsbeziehung
+  %bezier bounding box=true,% avoid excessive white spaces around bended lines [comment this line out if compiling takes too long]  
+  ]%
 % Begin formula from file
-\VAR{tex_formula}
+\VAR{entry}
 % End formula from file
-\end{tikzpicture}
+\end{tikzpicture}\\[4mm]
+\VAR{subtitle}
+\end{page}
+\BLOCK{endfor}
+
 \end{document}
