@@ -17,9 +17,11 @@ def list_to_string(in_list):
     
     if in_list: # list is not empty
         if type(in_list[0]) == list: # list is nested
-            yield ' + '.join(['*'.join(disj) for disj in in_list])
+            return ' + '.join(['*'.join(disj) for disj in in_list])
         else: # list of strings
-            yield "*".join(in_list)
+            return "*".join(in_list)
+    else:
+        return ""
     
 
 def string_to_list(st):
@@ -228,8 +230,6 @@ def distribution(formula):
         # disj_list is a list [[d11, d12, ...], [d21, d22, ... ],  ...] with dij being the j-th disjunct in conjunct i
         
         # rebuild formula
-        print(disj_list)
-        #print(str([[*x] for x in itertools.product(*disj_list)]))
         formula = list_to_string([[*x] for x in itertools.product(*disj_list)])
         
         disj_list.clear()
@@ -325,13 +325,12 @@ def get_prime_implicants(instance_formula, factor, level_factor_list):
                             # negative instance term, add the fragment to the list of terms that is gradually shortened and checked to
                             # for being a prime implicator
                             reduced_term_list[k-1].append(reduce_term_by(term, lit))
-                            print(str(reduce_term_by(term, lit)) + " zu reduced_term_list[" + str(k-1) + "] hinzugefügt.")
 
                     
                 if any_lit_found: # if all fragments resulting from deleting a literal from term are contained in negative instance terms,
                     # then term is a prime implicator
                     prime_imp_list.append(term)
-                    print('\x1b[0;36;40m' + str(term) + " zu PI-Liste hinzugefügt.\x1b[0m")
+                    #print('\x1b[0;36;40m' + str(term) + " added to PI list.\x1b[0m") #dummy-print
     
     # add atomic prime implicants
     if reduced_term_list[1]:
@@ -381,7 +380,7 @@ def get_rdnf(pi_list, formula, factor_list):
                     # several prime implicants cover term
                     uncovered_terms[term] = aux_list
     
-    print(e_pi_list)
+
     # simplest case would be that the disjunction of essential prime implicants covers al min terms
     # check if this the case 
     all_covered = True
@@ -441,10 +440,9 @@ def get_rdnf(pi_list, formula, factor_list):
                 aux_formula = aux_formula + ")*("
         # remove trailing "*("
         aux_formula = aux_formula[:-2]
-        print(aux_formula)
+
         aux_formula = distribution(aux_formula)
-        print("nach Distribution")
-        print(aux_formula)
+
         # every disjunct of aux_formula constitutes one solution
         sol_list = re.split("\s*\+\s*",aux_formula)
         
@@ -577,8 +575,8 @@ def read_data_from_csv(file_path):
     
     # determine the list of causal factors and the min-term formula from the truth table
     level_factor_order_list, factor_list, formula_st = get_truth_table_from_file(file_path)  
-    print(factor_list)
-    print(formula_st)
+
+
     # translate the information on the causal ordering within each level into the nested list order_input_information
     for lvl in range(len(level_factor_order_list)):
         order_input_information.append([]) # append a new sublist per constitution level
@@ -640,19 +638,17 @@ def read_data_from_csv(file_path):
         if list_of_coextensives: # list is not empty
             for sublist in list_of_coextensives:
                 for i in range(1,len(sublist)):
-                    print(str(sublist[i]) +  " ist ko-extensiv mit " + str(sublist[0]))
+                    print('Factor ' + str(sublist[i]) +  " is coextensive with " + str(sublist[0]))
                     effects_list.remove(sublist[i])
         
         for fac in effects_list:
             # for each of these factors: 
             # determine its instance formula (the min-term equivalence formula to fac)
             i_formula = get_instance_formula_to_factor(string_to_list(formula_st), fac, level_factor_order_list)
-            print("Instanzformel zu " + str(fac) + " ist " + str(i_formula))
+
             
             # determine the prime implicants of this instance formula
             pi_list = get_prime_implicants(i_formula, fac, level_factor_order_list)
-            
-            print(fac + "  Primeimplikants" + str(pi_list))
 
             if pi_list:
                 # list of prime implicants is non-empty
@@ -673,7 +669,6 @@ def read_data_from_csv(file_path):
                             st = st + sublist[i] # expression and with all occurences of sublist[i] replaced by sublist[0]
                             # then append sublist[i] as second equivalent of the equivalence formula
                             list_equiv_formula.append(st) # add the new formula to the formulae list
-                            print(st + " hinzugefügt")
         
         if list_equiv_formula:
             abort = False
@@ -693,15 +688,12 @@ def read_data_from_csv(file_path):
         # factor_list is empty
         abort = True
     
-    print(list_equiv_tuple)
     return abort, level_factor_list, list_equiv_tuple, order_input_information
                    
 def main():
     # main function
     file_path = "samples/Beispieldatensatz_Data_Science_1.csv"
     _, fa_l_list, list_equiv_formula, _ = read_data_from_csv(file_path)
-    print(list_equiv_formula)
-    print(fa_l_list)
     
     
     

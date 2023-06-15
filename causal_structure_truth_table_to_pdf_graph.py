@@ -1473,7 +1473,7 @@ def find_structures(in_level_factor_list, in_level_equiv_list, mode):
                 if not(sol in new_circular_list):
                     new_circular_list.append(sol)
                                 
-            print('step 3C') # dummy-print
+            #print('step 3C') # dummy-print
             ########################################################################################
             # step 3C: find mutually exclusive causal relations (same effect but different causes) #
             ########################################################################################
@@ -1531,7 +1531,7 @@ def find_structures(in_level_factor_list, in_level_equiv_list, mode):
                 # all formulae from level_equiv_list[m] that are not elements of circular_list should go into unique_equiv
                 unique_equiv = [[formula for formula in level_equiv_list[m] if not(formula in circular_list)]]
             
-            print('step 3D') # dummy-print
+            #print('step 3D') # dummy-print
             #####################################################################
             # step 3D: compose a list of solutions for the constitution level m #
             #####################################################################                
@@ -1540,26 +1540,21 @@ def find_structures(in_level_factor_list, in_level_equiv_list, mode):
             
             if new_circular_list:
                 if list_redundant_equiv:
-                    print('case 1') # dummy-print
+                    #print('case 1') # dummy-print
                     if unique_equiv:
-                        print('case 1a') # dummy-print
+                        #print('case 1a') # dummy-print
                         aux_list = list(itertools.product(*list_redundant_equiv,new_circular_list,unique_equiv))
                     else:
                         if list_redundant_equiv:
-                            print('case 1b') # dummy-print
-                            print("redundant")
-                            print(list_redundant_equiv)
-                            print("circular:")
-                            print(new_circular_list)
+                            #print('case 1b') # dummy-print
                             aux_list = itertools.product(*list_redundant_equiv,new_circular_list)
-                            print("aux")
-                            print(aux_list)
+
                         else:
-                            print('case 1c') # dummy-print
+                            #print('case 1c') # dummy-print
                             aux_list = []
                             aux_list.extend(new_circular_list)
                 else:
-                    print('case 2') # dummy-print
+                    #print('case 2') # dummy-print
                     if unique_equiv:
                         aux_list = list(itertools.product(new_circular_list,unique_equiv))
                     else:
@@ -1567,16 +1562,16 @@ def find_structures(in_level_factor_list, in_level_equiv_list, mode):
                         aux_list.extend(new_circular_list)
             else:
                 if list_redundant_equiv:
-                    print('case 3') # dummy-print
+                    #print('case 3') # dummy-print
                     if unique_equiv:
                         aux_list = list(itertools.product(*list_redundant_equiv,unique_equiv))
                     else:
                         aux_list = list(*list_redundant_equiv)
                 else:
-                    print('case 4') # dummy-print
+                    #print('case 4') # dummy-print
                     aux_list = []
                     aux_list.extend(unique_equiv)
-            print('3D after combining lists to aux_list') # dummy-print
+            #print('3D after combining lists to aux_list') # dummy-print
                 
             # avoid problems with Cartesian products of lists and tuples
             # make sure that every component is a list
@@ -1593,9 +1588,8 @@ def find_structures(in_level_factor_list, in_level_equiv_list, mode):
                 counter = counter + 1
 
             solutions_list[m].extend(sec_aux_list)
-            print(solutions_list[m]) # dummy-print
             
-            print('3D redundant vs. circular') # dummy-print
+            #print('3D redundant vs. circular') # dummy-print
             # equations from redundant_equiv might have the same effect as formulae from the circular group
             # in this case the formula from redundant_equiv has to be removed from the solution
             for sol in solutions_list[m]:
@@ -1614,7 +1608,7 @@ def find_structures(in_level_factor_list, in_level_equiv_list, mode):
                 for formula in delete_list:
                     sol.remove(formula)
 
-            print('3D check for completeness') # dummy-print
+            #print('3D check for completeness') # dummy-print
             # check solutions for completeness every causal factor that apppears in level_equiv_list
             # has to appear in at least one causal formula
             for i in range(len(solutions_list[m])-1,-1,-1):
@@ -1649,7 +1643,7 @@ def find_structures(in_level_factor_list, in_level_equiv_list, mode):
        
     
     
-    print('step 3E') # dummy-print
+    #print('step 3E') # dummy-print
     #####################################################################
     # step 3E: combine the partial solutions of the constitution levels #
     #####################################################################    
@@ -1893,8 +1887,8 @@ def main() :
                         # classify the equivalence relations into causal relations (level_equiv_list) subdivided by constitution level
                         # or into constitution relations
                         level_equiv_list, constitution_relation_list = categorise_formulae(equiv_list, level_factor_list)
-                        print('level equiv list') # dummy-print
-                        print(level_equiv_list)
+                        #print('level equiv list') # dummy-print
+                        #print(level_equiv_list)
                     else:
                         print("Error while reading the input file " + input_file)
                 
