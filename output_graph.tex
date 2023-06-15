@@ -44,7 +44,7 @@
 \def\LabelDist{-2mm}% vertical distance of labels from vertices
 
 \begin{page}
-\centering solution no.~1/1\\[3mm]
+\centering solution no.~1/4\\[3mm]
 
 \begin{tikzpicture}[>=latex,%
   %bezier bounding box=true,% avoid excessive white spaces around bended lines [comment this line out if compiling takes too long]  
@@ -53,348 +53,277 @@
 % placement of the nodes
 % factors of level 0:
 % causal order 0:
-\node[draw=black, text=black]  (B) {$B$};
-\hilightsource{B};
-\node[draw=black, text=black] [above= \LvDist of B] (C) {$C$};
-\hilightsource{C};
-\node[draw=black, text=black] [above= \LvDist of C] (D) {$D$};
-\hilightsource{D};
-\node[draw=black, text=black] [above= \LvDist of D] (E) {$E$};
-\hilightsource{E};
-\node[draw=black, text=black] [above= \LvDist of E] (F) {$F$};
-\hilightsource{F};
-\node[draw=black, text=black] [above= \LvDist of F] (G) {$G$};
-\hilightsource{G};
-\node[draw=black, text=black] [above= \LvDist of G] (J) {$J$};
-\hilightsource{J};
-\node[draw=black, text=black] [above= \LvDist of J] (P) {$P$};
-\hilightsource{P};
+\node[draw=black, text=black]  (F6) {$F6$};
+\hilightsource{F6};
+\node[draw=black, text=black] [above= \LvDist of F6] (F5) {$F5$};
+\hilightsource{F5};
+\node[draw=black, text=black] [above= \LvDist of F5] (F2) {$F2$};
+\hilightsource{F2};
+\node[draw=black, text=black] [above= \LvDist of F2] (F1) {$F1$};
+\hilightsource{F1};
 % causal order 1:
-\node[draw=black, text=black] [right= \LhDist of B] (A) {$A$};
-% causal order 2:
-\node[draw=black, text=black] [right= \LhDist of A] (H) {$H$};
+\node[draw=black, text=black] [right= \LhDist of F6] (F7) {$F7$};
+\hilighttarget{F7};
+\node[draw=black, text=black] [above= \LvDist of F7] (F3) {$F3$};
+\hilighttarget{F3};
+\node[draw=black, text=black] [above= \LvDist of F3] (F4) {$F4$};
+\hilighttarget{F4};
+% factors of level 1:
+% causal order 0:
+\node[draw=black, text=black] [above= {4*\LvDist + 2* \HeightNode  + \iLvDist} of F6] (C) {$C$};
+\hilightsource{C};
+\hilighttarget{C};
+\node[draw=black, text=black] [above= \LvDist of C] (B) {$B$};
+\hilightsource{B};
+\hilighttarget{B};
+\node[draw=black, text=black] [above= \LvDist of B] (A) {$A$};
+\hilightsource{A};
+\hilighttarget{A};
 
 % causal relations
 % of level 0
-% formula: ~*B + C + ~*D + ~*E + F + G + ~*H + J + P <-> A
-% complex disjunction
+% formula: F5 <-> F3
+\draw[->, black] (F5.east) -- (F3.west);
+
+% formula: F1*F2*F6 <-> F7
 % junction of the conjuncts
-\node[aux, black] (BAaux) at ([xshift=\hDisjConj, yshift=\vDisjConj]B.east) {};
+\node[aux, black] (F7aux) at ([xshift=\LConj]F7.west) {};
 % partial arrows from the conjuncts to the junction
-\draw[conjunctonsegment, black] (B.east) to (BAaux);
+\draw[conjunctonsegment, black] (F6.east) to (F7aux);
+\draw[conjunctonsegment, black] (F2.east) to (F7aux);
+\draw[conjunctonsegment, black] (F1.east) to (F7aux);
 % arrow from junction to target factor
-\draw[->, black] (BAaux) -- (A.west) node[draw=none,text=black,fill=none,font=\tiny,pos=0,sloped,above=\LabelDist] {\scalebox{.3}{$\neg \cdot B$}};
-% simple disjunction
-\draw[->, black] (C.east) to (A.west);
-% complex disjunction
-% junction of the conjuncts
-\node[aux, black] (DAaux) at ([xshift=\hDisjConj, yshift=\vDisjConj]D.east) {};
-% partial arrows from the conjuncts to the junction
-\draw[conjunctonsegment, black] (D.east) to (DAaux);
-% arrow from junction to target factor
-\draw[->, black] (DAaux) -- (A.west) node[draw=none,text=black,fill=none,font=\tiny,pos=0,sloped,above=\LabelDist] {\scalebox{.3}{$\neg \cdot D$}};
-% complex disjunction
-% junction of the conjuncts
-\node[aux, black] (EAaux) at ([xshift=\hDisjConj, yshift=\vDisjConj]E.east) {};
-% partial arrows from the conjuncts to the junction
-\draw[conjunctonsegment, black] (E.east) to (EAaux);
-% arrow from junction to target factor
-\draw[->, black] (EAaux) -- (A.west) node[draw=none,text=black,fill=none,font=\tiny,pos=0,sloped,above=\LabelDist] {\scalebox{.3}{$\neg \cdot E$}};
-% simple disjunction
-\draw[->, black] (F.east) to (A.west);
-% simple disjunction
-\draw[->, black] (G.east) to (A.west);
-% complex disjunction
-% junction of the conjuncts
-\node[aux, black] (HAaux) at ([xshift=\hcDisjConj, yshift=\vDisjConj]H.west) {};
-% partial arrows from the conjuncts to the junction
-\draw[conjunctonsegment, black] (H.east) to (HAaux);
-% arrow from junction to target factor
-\draw[->, black] (HAaux) -- (A.west) node[draw=none,text=black,fill=none,font=\tiny,pos=0,sloped,above=\LabelDist] {\scalebox{.3}{$\neg \cdot H$}};
-% simple disjunction
-\draw[->, black] (J.east) to (A.west);
-% simple disjunction
-\draw[->, black] (P.east) to (A.west);
+\draw[->, black] (F7aux) -- (F7) node[draw=none, text=black, fill=none, font=\tiny, above=\LabelDist, pos=0, sloped] {\scalebox{.3}{$F1\cdot F2\cdot F6$}};
 
 
-% formula: ~*A + C + ~*D + E + F + G + H + J + P <-> B
-% complex disjunction
+% formula: F1*F2 <-> F4
 % junction of the conjuncts
-\node[aux, black] (ABaux) at ([xshift=\hcDisjConj, yshift=\vDisjConj]A.west) {};
+\node[aux, black] (F4aux) at ([xshift=\LConj]F4.west) {};
 % partial arrows from the conjuncts to the junction
-\draw[conjunctonsegment, black] (A.east) to (ABaux);
+\draw[conjunctonsegment, black] (F2.east) to (F4aux);
+\draw[conjunctonsegment, black] (F1.east) to (F4aux);
 % arrow from junction to target factor
-\draw[->, black] (ABaux) -- (B.west) node[draw=none,text=black,fill=none,font=\tiny,pos=0,sloped,above=\LabelDist] {\scalebox{.3}{$\neg \cdot A$}};
-% simple disjunction
-\draw[->, black] (C.east) to (B.west);
-% complex disjunction
-% junction of the conjuncts
-\node[aux, black] (DBaux) at ([xshift=\hcDisjConj, yshift=\vDisjConj]D.west) {};
-% partial arrows from the conjuncts to the junction
-\draw[conjunctonsegment, black] (D.east) to (DBaux);
-% arrow from junction to target factor
-\draw[->, black] (DBaux) -- (B.west) node[draw=none,text=black,fill=none,font=\tiny,pos=0,sloped,above=\LabelDist] {\scalebox{.3}{$\neg \cdot D$}};
-% simple disjunction
-\draw[->, black] (E.east) to (B.west);
-% simple disjunction
-\draw[->, black] (F.east) to (B.west);
-% simple disjunction
-\draw[->, black] (G.east) to (B.west);
-% simple disjunction with shifted starting point
-\draw[->, black] (H.north east) to (B.west);
-% simple disjunction
-\draw[->, black] (J.east) to (B.west);
-% simple disjunction
-\draw[->, black] (P.east) to (B.west);
+\draw[->, black] (F4aux) -- (F4) node[draw=none, text=black, fill=none, font=\tiny, above=\LabelDist, pos=0, sloped] {\scalebox{.3}{$F1\cdot F2$}};
 
 
-% formula: A + ~*B + ~*D + ~*E + F + G + ~*H + J + P <-> C
-% simple disjunction
-\draw[->, black] (A.east) to (C.west);
-% complex disjunction
-% junction of the conjuncts
-\node[aux, black] (BCaux) at ([xshift=\hcDisjConj, yshift=\vDisjConj]B.west) {};
-% partial arrows from the conjuncts to the junction
-\draw[conjunctonsegment, black] (B.east) to (BCaux);
-% arrow from junction to target factor
-\draw[->, black] (BCaux) -- (C.west) node[draw=none,text=black,fill=none,font=\tiny,pos=0,sloped,above=\LabelDist] {\scalebox{.3}{$\neg \cdot B$}};
-% complex disjunction
-% junction of the conjuncts
-\node[aux, black] (DCaux) at ([xshift=\hcDisjConj, yshift={\vDisjConj + 1*\tDisjConj}]D.west) {};
-% partial arrows from the conjuncts to the junction
-\draw[conjunctonsegment, black] (D.east) to (DCaux);
-% arrow from junction to target factor
-\draw[->, black] (DCaux) -- (C.west) node[draw=none,text=black,fill=none,font=\tiny,pos=0,sloped,above=\LabelDist] {\scalebox{.3}{$\neg \cdot D$}};
-% complex disjunction
-% junction of the conjuncts
-\node[aux, black] (ECaux) at ([xshift=\hcDisjConj, yshift=\vDisjConj]E.west) {};
-% partial arrows from the conjuncts to the junction
-\draw[conjunctonsegment, black] (E.east) to (ECaux);
-% arrow from junction to target factor
-\draw[->, black] (ECaux) -- (C.west) node[draw=none,text=black,fill=none,font=\tiny,pos=0,sloped,above=\LabelDist] {\scalebox{.3}{$\neg \cdot E$}};
-% simple disjunction
-\draw[->, black] (F.east) to (C.west);
-% simple disjunction
-\draw[->, black] (G.east) to (C.west);
-% complex disjunction
-% junction of the conjuncts
-\node[aux, black] (HCaux) at ([xshift=\hcDisjConj, yshift={\vDisjConj + 1*\tDisjConj}]H.west) {};
-% partial arrows from the conjuncts to the junction
-\draw[conjunctonsegment, black] (H.east) to (HCaux);
-% arrow from junction to target factor
-\draw[->, black] (HCaux) -- (C.west) node[draw=none,text=black,fill=none,font=\tiny,pos=0,sloped,above=\LabelDist] {\scalebox{.3}{$\neg \cdot H$}};
-% simple disjunction
-\draw[->, black] (J.east) to (C.west);
-% simple disjunction
-\draw[->, black] (P.east) to (C.west);
-
-
-% formula: ~*A + ~*B + C + ~*E + F + ~*G + ~*H + J + P <-> D
-% complex disjunction
-% junction of the conjuncts
-\node[aux, black] (ADaux) at ([xshift=\hcDisjConj, yshift={\vDisjConj + 1*\tDisjConj}]A.west) {};
-% partial arrows from the conjuncts to the junction
-\draw[conjunctonsegment, black] (A.east) to (ADaux);
-% arrow from junction to target factor
-\draw[->, black] (ADaux) -- (D.west) node[draw=none,text=black,fill=none,font=\tiny,pos=0,sloped,above=\LabelDist] {\scalebox{.3}{$\neg \cdot A$}};
-% complex disjunction
-% junction of the conjuncts
-\node[aux, black] (BDaux) at ([xshift=\hcDisjConj, yshift={\vDisjConj + 1*\tDisjConj}]B.west) {};
-% partial arrows from the conjuncts to the junction
-\draw[conjunctonsegment, black] (B.east) to (BDaux);
-% arrow from junction to target factor
-\draw[->, black] (BDaux) -- (D.west) node[draw=none,text=black,fill=none,font=\tiny,pos=0,sloped,above=\LabelDist] {\scalebox{.3}{$\neg \cdot B$}};
-% simple disjunction
-\draw[->, black] (C.east) to (D.west);
-% complex disjunction
-% junction of the conjuncts
-\node[aux, black] (EDaux) at ([xshift=\hcDisjConj, yshift={\vDisjConj + 1*\tDisjConj}]E.west) {};
-% partial arrows from the conjuncts to the junction
-\draw[conjunctonsegment, black] (E.east) to (EDaux);
-% arrow from junction to target factor
-\draw[->, black] (EDaux) -- (D.west) node[draw=none,text=black,fill=none,font=\tiny,pos=0,sloped,above=\LabelDist] {\scalebox{.3}{$\neg \cdot E$}};
-% simple disjunction
-\draw[->, black] (F.east) to (D.west);
-% complex disjunction
-% junction of the conjuncts
-\node[aux, black] (GDaux) at ([xshift=\hcDisjConj, yshift=\vDisjConj]G.west) {};
-% partial arrows from the conjuncts to the junction
-\draw[conjunctonsegment, black] (G.east) to (GDaux);
-% arrow from junction to target factor
-\draw[->, black] (GDaux) -- (D.west) node[draw=none,text=black,fill=none,font=\tiny,pos=0,sloped,above=\LabelDist] {\scalebox{.3}{$\neg \cdot G$}};
-% complex disjunction
-% junction of the conjuncts
-\node[aux, black] (HDaux) at ([xshift=\hcDisjConj, yshift={\vDisjConj + 2*\tDisjConj}]H.west) {};
-% partial arrows from the conjuncts to the junction
-\draw[conjunctonsegment, black] (H.east) to (HDaux);
-% arrow from junction to target factor
-\draw[->, black] (HDaux) -- (D.west) node[draw=none,text=black,fill=none,font=\tiny,pos=0,sloped,above=\LabelDist] {\scalebox{.3}{$\neg \cdot H$}};
-% simple disjunction
-\draw[->, black] (J.east) to (D.west);
-% simple disjunction
-\draw[->, black] (P.east) to (D.west);
-
-
-% formula: ~*A + ~*B + C + ~*D + F + ~*G + H + J + P <-> E
-% complex disjunction
-% junction of the conjuncts
-\node[aux, black] (AEaux) at ([xshift=\hcDisjConj, yshift={\vDisjConj + 2*\tDisjConj}]A.west) {};
-% partial arrows from the conjuncts to the junction
-\draw[conjunctonsegment, black] (A.east) to (AEaux);
-% arrow from junction to target factor
-\draw[->, black] (AEaux) -- (E.west) node[draw=none,text=black,fill=none,font=\tiny,pos=0,sloped,above=\LabelDist] {\scalebox{.3}{$\neg \cdot A$}};
-% complex disjunction
-% junction of the conjuncts
-\node[aux, black] (BEaux) at ([xshift=\hcDisjConj, yshift={\vDisjConj + 2*\tDisjConj}]B.west) {};
-% partial arrows from the conjuncts to the junction
-\draw[conjunctonsegment, black] (B.east) to (BEaux);
-% arrow from junction to target factor
-\draw[->, black] (BEaux) -- (E.west) node[draw=none,text=black,fill=none,font=\tiny,pos=0,sloped,above=\LabelDist] {\scalebox{.3}{$\neg \cdot B$}};
-% simple disjunction
-\draw[->, black] (C.east) to (E.west);
-% complex disjunction
-% junction of the conjuncts
-\node[aux, black] (DEaux) at ([xshift=\hcDisjConj, yshift={\vDisjConj + 2*\tDisjConj}]D.west) {};
-% partial arrows from the conjuncts to the junction
-\draw[conjunctonsegment, black] (D.east) to (DEaux);
-% arrow from junction to target factor
-\draw[->, black] (DEaux) -- (E.west) node[draw=none,text=black,fill=none,font=\tiny,pos=0,sloped,above=\LabelDist] {\scalebox{.3}{$\neg \cdot D$}};
-% simple disjunction
-\draw[->, black] (F.east) to (E.west);
-% complex disjunction
-% junction of the conjuncts
-\node[aux, black] (GEaux) at ([xshift=\hcDisjConj, yshift={\vDisjConj + 1*\tDisjConj}]G.west) {};
-% partial arrows from the conjuncts to the junction
-\draw[conjunctonsegment, black] (G.east) to (GEaux);
-% arrow from junction to target factor
-\draw[->, black] (GEaux) -- (E.west) node[draw=none,text=black,fill=none,font=\tiny,pos=0,sloped,above=\LabelDist] {\scalebox{.3}{$\neg \cdot G$}};
-% simple disjunction
-\draw[->, black] (H.east) to (E.west);
-% simple disjunction
-\draw[->, black] (J.east) to (E.west);
-% simple disjunction
-\draw[->, black] (P.east) to (E.west);
-
-
-% formula: ~*A + B + C + ~*D + E + F + H + J + P <-> G
-% complex disjunction
-% junction of the conjuncts
-\node[aux, black] (AGaux) at ([xshift=\hcDisjConj, yshift={\vDisjConj + 3*\tDisjConj}]A.west) {};
-% partial arrows from the conjuncts to the junction
-\draw[conjunctonsegment, black] (A.east) to (AGaux);
-% arrow from junction to target factor
-\draw[->, black] (AGaux) -- (G.west) node[draw=none,text=black,fill=none,font=\tiny,pos=0,sloped,above=\LabelDist] {\scalebox{.3}{$\neg \cdot A$}};
-% simple disjunction
-\draw[->, black] (B.east) to (G.west);
-% simple disjunction
-\draw[->, black] (C.east) to (G.west);
-% complex disjunction
-% junction of the conjuncts
-\node[aux, black] (DGaux) at ([xshift=\hcDisjConj, yshift={\vDisjConj + 3*\tDisjConj}]D.west) {};
-% partial arrows from the conjuncts to the junction
-\draw[conjunctonsegment, black] (D.east) to (DGaux);
-% arrow from junction to target factor
-\draw[->, black] (DGaux) -- (G.west) node[draw=none,text=black,fill=none,font=\tiny,pos=0,sloped,above=\LabelDist] {\scalebox{.3}{$\neg \cdot D$}};
-% simple disjunction
-\draw[->, black] (E.east) to (G.west);
-% simple disjunction
-\draw[->, black] (F.east) to (G.west);
-% simple disjunction
-\draw[->, black] (H.east) to (G.west);
-% simple disjunction
-\draw[->, black] (J.east) to (G.west);
-% simple disjunction
-\draw[->, black] (P.east) to (G.west);
-
-
-% formula: A + ~*B + ~*D + ~*E + C + G + ~*H + J + P <-> F
-% simple disjunction
-\draw[->, black] (A.east) to (F.west);
-% complex disjunction
-% junction of the conjuncts
-\node[aux, black] (BFaux) at ([xshift=\hcDisjConj, yshift={\vDisjConj + 3*\tDisjConj}]B.west) {};
-% partial arrows from the conjuncts to the junction
-\draw[conjunctonsegment, black] (B.east) to (BFaux);
-% arrow from junction to target factor
-\draw[->, black] (BFaux) -- (F.west) node[draw=none,text=black,fill=none,font=\tiny,pos=0,sloped,above=\LabelDist] {\scalebox{.3}{$\neg \cdot B$}};
-% complex disjunction
-% junction of the conjuncts
-\node[aux, black] (DFaux) at ([xshift=\hcDisjConj, yshift={\vDisjConj + 4*\tDisjConj}]D.west) {};
-% partial arrows from the conjuncts to the junction
-\draw[conjunctonsegment, black] (D.east) to (DFaux);
-% arrow from junction to target factor
-\draw[->, black] (DFaux) -- (F.west) node[draw=none,text=black,fill=none,font=\tiny,pos=0,sloped,above=\LabelDist] {\scalebox{.3}{$\neg \cdot D$}};
-% complex disjunction
-% junction of the conjuncts
-\node[aux, black] (EFaux) at ([xshift=\hcDisjConj, yshift={\vDisjConj + 2*\tDisjConj}]E.west) {};
-% partial arrows from the conjuncts to the junction
-\draw[conjunctonsegment, black] (E.east) to (EFaux);
-% arrow from junction to target factor
-\draw[->, black] (EFaux) -- (F.west) node[draw=none,text=black,fill=none,font=\tiny,pos=0,sloped,above=\LabelDist] {\scalebox{.3}{$\neg \cdot E$}};
-% simple disjunction
-\draw[->, black] (C.east) to (F.west);
-% simple disjunction
-\draw[->, black] (G.east) to (F.west);
-% complex disjunction
-% junction of the conjuncts
-\node[aux, black] (HFaux) at ([xshift=\hcDisjConj, yshift={\vDisjConj + 3*\tDisjConj}]H.west) {};
-% partial arrows from the conjuncts to the junction
-\draw[conjunctonsegment, black] (H.east) to (HFaux);
-% arrow from junction to target factor
-\draw[->, black] (HFaux) -- (F.west) node[draw=none,text=black,fill=none,font=\tiny,pos=0,sloped,above=\LabelDist] {\scalebox{.3}{$\neg \cdot H$}};
-% simple disjunction
-\draw[->, black] (J.east) to (F.west);
-% simple disjunction
-\draw[->, black] (P.east) to (F.west);
-
-
-% formula: A + ~*B + ~*D + ~*E + F + G + ~*H + C + P <-> J
-% simple disjunction
-\draw[->, black] (A.east) to (J.west);
-% complex disjunction
-% junction of the conjuncts
-\node[aux, black] (BJaux) at ([xshift=\hcDisjConj, yshift={\vDisjConj + 4*\tDisjConj}]B.west) {};
-% partial arrows from the conjuncts to the junction
-\draw[conjunctonsegment, black] (B.east) to (BJaux);
-% arrow from junction to target factor
-\draw[->, black] (BJaux) -- (J.west) node[draw=none,text=black,fill=none,font=\tiny,pos=0,sloped,above=\LabelDist] {\scalebox{.3}{$\neg \cdot B$}};
-% complex disjunction
-% junction of the conjuncts
-\node[aux, black] (DJaux) at ([xshift=\hcDisjConj, yshift={\vDisjConj + 5*\tDisjConj}]D.west) {};
-% partial arrows from the conjuncts to the junction
-\draw[conjunctonsegment, black] (D.east) to (DJaux);
-% arrow from junction to target factor
-\draw[->, black] (DJaux) -- (J.west) node[draw=none,text=black,fill=none,font=\tiny,pos=0,sloped,above=\LabelDist] {\scalebox{.3}{$\neg \cdot D$}};
-% complex disjunction
-% junction of the conjuncts
-\node[aux, black] (EJaux) at ([xshift=\hcDisjConj, yshift={\vDisjConj + 3*\tDisjConj}]E.west) {};
-% partial arrows from the conjuncts to the junction
-\draw[conjunctonsegment, black] (E.east) to (EJaux);
-% arrow from junction to target factor
-\draw[->, black] (EJaux) -- (J.west) node[draw=none,text=black,fill=none,font=\tiny,pos=0,sloped,above=\LabelDist] {\scalebox{.3}{$\neg \cdot E$}};
-% simple disjunction
-\draw[->, black] (F.east) to (J.west);
-% simple disjunction
-\draw[->, black] (G.east) to (J.west);
-% complex disjunction
-% junction of the conjuncts
-\node[aux, black] (HJaux) at ([xshift=\hcDisjConj, yshift={\vDisjConj + 4*\tDisjConj}]H.west) {};
-% partial arrows from the conjuncts to the junction
-\draw[conjunctonsegment, black] (H.east) to (HJaux);
-% arrow from junction to target factor
-\draw[->, black] (HJaux) -- (J.west) node[draw=none,text=black,fill=none,font=\tiny,pos=0,sloped,above=\LabelDist] {\scalebox{.3}{$\neg \cdot H$}};
-% simple disjunction
-\draw[->, black] (C.east) to (J.west);
-% simple disjunction
-\draw[->, black] (P.east) to (J.west);
-
-
+% of level 1
 
 % constitution relations
 
 % End formula from file
 \end{tikzpicture}\\[4mm]
-\tiny $(\neg  \cdot B + C + \neg  \cdot D + \neg  \cdot E + F + G + \neg  \cdot H + J + P\leftrightarrow A)\cdot(\neg  \cdot A + C + \neg  \cdot D + E + F + G + H + J + P\leftrightarrow B)\cdot(A + \neg  \cdot B + \neg  \cdot D + \neg  \cdot E + F + G + \neg  \cdot H + J + P\leftrightarrow C)\cdot(\neg  \cdot A + \neg  \cdot B + C + \neg  \cdot E + F + \neg  \cdot G + \neg  \cdot H + J + P\leftrightarrow D)\cdot(\neg  \cdot A + \neg  \cdot B + C + \neg  \cdot D + F + \neg  \cdot G + H + J + P\leftrightarrow E)\cdot(\neg  \cdot A + B + C + \neg  \cdot D + E + F + H + J + P\leftrightarrow G)\cdot(A + \neg  \cdot B + \neg  \cdot D + \neg  \cdot E + C + G + \neg  \cdot H + J + P\leftrightarrow F)\cdot(A + \neg  \cdot B + \neg  \cdot D + \neg  \cdot E + F + G + \neg  \cdot H + C + P\leftrightarrow J)$
+\tiny $(F5\leftrightarrow F3)\cdot(F1 \cdot F2 \cdot F6\leftrightarrow F7)\cdot(F1 \cdot F2\leftrightarrow F4)$
+\end{page}
+\begin{page}
+\centering solution no.~2/4\\[3mm]
+
+\begin{tikzpicture}[>=latex,%
+  %bezier bounding box=true,% avoid excessive white spaces around bended lines [comment this line out if compiling takes too long]  
+  ]%
+% Begin formula from file
+% placement of the nodes
+% factors of level 0:
+% causal order 0:
+\node[draw=black, text=black]  (F6) {$F6$};
+\hilightsource{F6};
+\node[draw=black, text=black] [above= \LvDist of F6] (F5) {$F5$};
+\hilightsource{F5};
+\node[draw=black, text=black] [above= \LvDist of F5] (F2) {$F2$};
+\hilightsource{F2};
+\node[draw=black, text=black] [above= \LvDist of F2] (F1) {$F1$};
+\hilightsource{F1};
+% causal order 1:
+\node[draw=black, text=black] [right= \LhDist of F6] (F3) {$F3$};
+\hilighttarget{F3};
+\node[draw=black, text=black] [above= \LvDist of F3] (F4) {$F4$};
+% causal order 2:
+\node[draw=black, text=black] [right= \LhDist of F3] (F7) {$F7$};
+\hilighttarget{F7};
+% factors of level 1:
+% causal order 0:
+\node[draw=black, text=black] [above= {4*\LvDist + 2* \HeightNode  + \iLvDist} of F6] (C) {$C$};
+\hilightsource{C};
+\hilighttarget{C};
+\node[draw=black, text=black] [above= \LvDist of C] (B) {$B$};
+\hilightsource{B};
+\hilighttarget{B};
+\node[draw=black, text=black] [above= \LvDist of B] (A) {$A$};
+\hilightsource{A};
+\hilighttarget{A};
+
+% causal relations
+% of level 0
+% formula: F5 <-> F3
+\draw[->, black] (F5.east) -- (F3.west);
+
+% formula: F4*F6 <-> F7
+% junction of the conjuncts
+\node[aux, black] (F7aux) at ([xshift=\LConj]F7.west) {};
+% partial arrows from the conjuncts to the junction
+\draw[conjunctonsegment, black] (F6.east) to (F7aux);
+\draw[conjunctonsegment, black] (F4.east) to (F7aux);
+% arrow from junction to target factor
+\draw[->, black] (F7aux) -- (F7) node[draw=none, text=black, fill=none, font=\tiny, above=\LabelDist, pos=0, sloped] {\scalebox{.3}{$F4\cdot F6$}};
+
+
+% formula: F1*F2 <-> F4
+% junction of the conjuncts
+\node[aux, black] (F4aux) at ([xshift=\LConj]F4.west) {};
+% partial arrows from the conjuncts to the junction
+\draw[conjunctonsegment, black] (F2.east) to (F4aux);
+\draw[conjunctonsegment, black] (F1.east) to (F4aux);
+% arrow from junction to target factor
+\draw[->, black] (F4aux) -- (F4) node[draw=none, text=black, fill=none, font=\tiny, above=\LabelDist, pos=0, sloped] {\scalebox{.3}{$F1\cdot F2$}};
+
+
+% of level 1
+
+% constitution relations
+
+% End formula from file
+\end{tikzpicture}\\[4mm]
+\tiny $(F5\leftrightarrow F3)\cdot(F4 \cdot F6\leftrightarrow F7)\cdot(F1 \cdot F2\leftrightarrow F4)$
+\end{page}
+\begin{page}
+\centering solution no.~3/4\\[3mm]
+
+\begin{tikzpicture}[>=latex,%
+  %bezier bounding box=true,% avoid excessive white spaces around bended lines [comment this line out if compiling takes too long]  
+  ]%
+% Begin formula from file
+% placement of the nodes
+% factors of level 0:
+% causal order 0:
+\node[draw=black, text=black]  (F6) {$F6$};
+\hilightsource{F6};
+\node[draw=black, text=black] [above= \LvDist of F6] (F5) {$F5$};
+\hilightsource{F5};
+\node[draw=black, text=black] [above= \LvDist of F5] (F2) {$F2$};
+\hilightsource{F2};
+\node[draw=black, text=black] [above= \LvDist of F2] (F1) {$F1$};
+\hilightsource{F1};
+% causal order 1:
+\node[draw=black, text=black] [right= \LhDist of F6] (F3) {$F3$};
+\hilighttarget{F3};
+\node[draw=black, text=black] [above= \LvDist of F3] (F7) {$F7$};
+\hilighttarget{F7};
+\node[draw=black, text=black] [above= \LvDist of F7] (F4) {$F4$};
+\hilighttarget{F4};
+% factors of level 1:
+% causal order 0:
+\node[draw=black, text=black] [above= {4*\LvDist + 2* \HeightNode  + \iLvDist} of F6] (C) {$C$};
+\hilightsource{C};
+\hilighttarget{C};
+\node[draw=black, text=black] [above= \LvDist of C] (B) {$B$};
+\hilightsource{B};
+\hilighttarget{B};
+\node[draw=black, text=black] [above= \LvDist of B] (A) {$A$};
+\hilightsource{A};
+\hilighttarget{A};
+
+% causal relations
+% of level 0
+% formula: F6 <-> F3
+\draw[->, black] (F6.east) -- (F3.west);
+
+% formula: F1*F2*F5 <-> F7
+% junction of the conjuncts
+\node[aux, black] (F7aux) at ([xshift=\LConj]F7.west) {};
+% partial arrows from the conjuncts to the junction
+\draw[conjunctonsegment, black] (F5.east) to (F7aux);
+\draw[conjunctonsegment, black] (F2.east) to (F7aux);
+\draw[conjunctonsegment, black] (F1.east) to (F7aux);
+% arrow from junction to target factor
+\draw[->, black] (F7aux) -- (F7) node[draw=none, text=black, fill=none, font=\tiny, above=\LabelDist, pos=0, sloped] {\scalebox{.3}{$F1\cdot F2\cdot F5$}};
+
+
+% formula: F1*F2 <-> F4
+% junction of the conjuncts
+\node[aux, black] (F4aux) at ([xshift=\LConj]F4.west) {};
+% partial arrows from the conjuncts to the junction
+\draw[conjunctonsegment, black] (F2.east) to (F4aux);
+\draw[conjunctonsegment, black] (F1.east) to (F4aux);
+% arrow from junction to target factor
+\draw[->, black] (F4aux) -- (F4) node[draw=none, text=black, fill=none, font=\tiny, above=\LabelDist, pos=0, sloped] {\scalebox{.3}{$F1\cdot F2$}};
+
+
+% of level 1
+
+% constitution relations
+
+% End formula from file
+\end{tikzpicture}\\[4mm]
+\tiny $(F6\leftrightarrow F3)\cdot(F1 \cdot F2 \cdot F5\leftrightarrow F7)\cdot(F1 \cdot F2\leftrightarrow F4)$
+\end{page}
+\begin{page}
+\centering solution no.~4/4\\[3mm]
+
+\begin{tikzpicture}[>=latex,%
+  %bezier bounding box=true,% avoid excessive white spaces around bended lines [comment this line out if compiling takes too long]  
+  ]%
+% Begin formula from file
+% placement of the nodes
+% factors of level 0:
+% causal order 0:
+\node[draw=black, text=black]  (F6) {$F6$};
+\hilightsource{F6};
+\node[draw=black, text=black] [above= \LvDist of F6] (F5) {$F5$};
+\hilightsource{F5};
+\node[draw=black, text=black] [above= \LvDist of F5] (F2) {$F2$};
+\hilightsource{F2};
+\node[draw=black, text=black] [above= \LvDist of F2] (F1) {$F1$};
+\hilightsource{F1};
+% causal order 1:
+\node[draw=black, text=black] [right= \LhDist of F6] (F3) {$F3$};
+\hilighttarget{F3};
+\node[draw=black, text=black] [above= \LvDist of F3] (F4) {$F4$};
+% causal order 2:
+\node[draw=black, text=black] [right= \LhDist of F3] (F7) {$F7$};
+\hilighttarget{F7};
+% factors of level 1:
+% causal order 0:
+\node[draw=black, text=black] [above= {4*\LvDist + 2* \HeightNode  + \iLvDist} of F6] (C) {$C$};
+\hilightsource{C};
+\hilighttarget{C};
+\node[draw=black, text=black] [above= \LvDist of C] (B) {$B$};
+\hilightsource{B};
+\hilighttarget{B};
+\node[draw=black, text=black] [above= \LvDist of B] (A) {$A$};
+\hilightsource{A};
+\hilighttarget{A};
+
+% causal relations
+% of level 0
+% formula: F6 <-> F3
+\draw[->, black] (F6.east) -- (F3.west);
+
+% formula: F4*F5 <-> F7
+% junction of the conjuncts
+\node[aux, black] (F7aux) at ([xshift=\LConj]F7.west) {};
+% partial arrows from the conjuncts to the junction
+\draw[conjunctonsegment, black] (F5.east) to (F7aux);
+\draw[conjunctonsegment, black] (F4.east) to (F7aux);
+% arrow from junction to target factor
+\draw[->, black] (F7aux) -- (F7) node[draw=none, text=black, fill=none, font=\tiny, above=\LabelDist, pos=0, sloped] {\scalebox{.3}{$F4\cdot F5$}};
+
+
+% formula: F1*F2 <-> F4
+% junction of the conjuncts
+\node[aux, black] (F4aux) at ([xshift=\LConj]F4.west) {};
+% partial arrows from the conjuncts to the junction
+\draw[conjunctonsegment, black] (F2.east) to (F4aux);
+\draw[conjunctonsegment, black] (F1.east) to (F4aux);
+% arrow from junction to target factor
+\draw[->, black] (F4aux) -- (F4) node[draw=none, text=black, fill=none, font=\tiny, above=\LabelDist, pos=0, sloped] {\scalebox{.3}{$F1\cdot F2$}};
+
+
+% of level 1
+
+% constitution relations
+
+% End formula from file
+\end{tikzpicture}\\[4mm]
+\tiny $(F6\leftrightarrow F3)\cdot(F4 \cdot F5\leftrightarrow F7)\cdot(F1 \cdot F2\leftrightarrow F4)$
 \end{page}
 
 \end{document}
