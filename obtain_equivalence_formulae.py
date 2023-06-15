@@ -14,29 +14,13 @@ def list_to_string(in_list):
     # converts a nested list of the form out_list[DISJUNCT][CONJUNCT] or 
     # a list simple list of the form out_list[CONJUNCT] into a string
     # which connects disjuncts by " + " and conjuncts by "*"
-    st = ""
-    if in_list:
-        # in_list is not empty
-        if type(in_list[0]) == list:
-            for disj in in_list:
-                for conj in disj:
-                    if st == "":
-                        st = conj
-                    else:
-                       if st[-1] == " ":
-                           st = st + conj
-                       else:
-                           st = st + "*" + conj
-                st = st + " + "
-            st = st[:-3]
-        else:
-            for conj in in_list:
-                if st == "":
-                    st = conj
-                else:
-                    st = st + "*" + conj
     
-    return st
+    if in_list: # list is not empty
+        if type(in_list[0]) == list: # list is nested
+            yield ' + '.join(['*'.join(disj) for disj in in_list])
+        else: # list of strings
+            yield "*".join(in_list)
+    
 
 def string_to_list(st):
     # converts a string of disjunctive normal form into a nested list
@@ -64,7 +48,7 @@ def find_effects(formula, factor_list):
     #
     # causal factors are effects only if they do not satisfy either of three conditions
     # 1) the causal factor is one in every line of the configuration table (in this case they are irrelevant)
-    # 2) it is zero in every line of the configuration table (same as 1))
+    # 2) it is zero in every line of the configuration table (same as 1)
     # 3) two lines in the table differ only by the value of the factor (this means they might only be first causes)
     
     # start with the full list of causal factors and reduce it accordingly to 1)-3) until only effects remain
@@ -108,7 +92,8 @@ def find_effects(formula, factor_list):
                         cond = sec_cond
                         break
         if cond:
-            # delete the causal factor it either of the three exclusion criteria is true
+            # delete the causal factor if either of the three exclusion criteria is true
+            print(effect_list[i] + " discarded. It has no causal relevance for any other causal factor.")
             del effect_list[i]
             
     return effect_list
@@ -203,8 +188,6 @@ def contains_term(original_term, comparison_term):
     # out: truth value whether original_term is contained in comparison_term
     #      "contains" can imply that e.g. "A*C" is contained in "A*B*C"
     
-    
-    
     if original_term == "":
         return False
     else:
@@ -215,7 +198,7 @@ def contains_term(original_term, comparison_term):
                 all_found = False
                 break
         
-    return all_found
+        return all_found
 
 def absorb_terms(arg): 
     # in: tuple of arguments: 
@@ -228,14 +211,16 @@ def absorb_terms(arg):
 
 
 def distribution(formula):
-    # 
+    # applies the distribution rule on a logical formula given as a string as often as possible
+    # then applies the absorption rule to simplify the resulting formula as often as possible
+    # returns the simplified formula as a string
     
     # as long as formula has a conjunctor right before or after a bracket
     if (formula.find(")*") > -1 or formula.find("*(") > -1):
                 
         formula = formula[:-1] # get rid of trailing ")"
         conj_list = re.split("\)\*", formula) # list of conjuncts of formula
-        conj_list = [conj[1:] for conj in conj_list] # get rid of "("
+        conj_list = [conj[1:] for conj in conj_list] # get rid of leading "("
         
         disj_list = [] # list of disjuncts per conjunct
         for conj in conj_list:
@@ -243,6 +228,8 @@ def distribution(formula):
         # disj_list is a list [[d11, d12, ...], [d21, d22, ... ],  ...] with dij being the j-th disjunct in conjunct i
         
         # rebuild formula
+        print(disj_list)
+        #print(str([[*x] for x in itertools.product(*disj_list)]))
         formula = list_to_string([[*x] for x in itertools.product(*disj_list)])
         
         disj_list.clear()
@@ -251,10 +238,10 @@ def distribution(formula):
         
         disj_list = re.split("\s*\+\s*", formula) # list of disjuncts of new formula
         
-        #conj_list = [list(set(re.split("\*", disj))).sort() for disj in disj_list] # geht nicht!
+        #conj_list = [list(set(re.split("\*", disj))).sort() for disj in disj_list] # doesn't work
         
         conj_list = []
-        set_disjuncts = set()
+        set_disjuncts = set() # set in place of a list automatically discards duplicates
         for disj in disj_list:
             if not(disj in set_disjuncts):
                 a = list(set(re.split("\*", disj)))
@@ -262,46 +249,37 @@ def distribution(formula):
                 conj_list.append(a)
                 set_disjuncts.add(disj)
         
-
-        
         new_list = []
         for disj in conj_list:
             if not(disj in new_list):
                 new_list.append(disj)   
         
-        
-        
-        # simplify by absorption (a*b*c*d*e + a*c*d <-> a*c*d)
-
-        
+        # simplify by absorption (a*b*c*d*e + a*c*d <-> a*c*d)        
         
         # start working on all CPUs
         arguments = ([f, new_list] for f in new_list)
         with multiprocessing.Pool() as pool:
-	    # call the function for each item in parallel
+	        # call the function for each item in parallel
             absorbed_terms = pool.map(absorb_terms, arguments)
         
         pool.close()
         pool.join()
-        
-        
-        #absorbed_terms = [[[s for s in new_list if all([x in fel for x in el] for el in s)] for fel in f] for f in new_list]
-        #absorbed_terms = [[s for s in new_list if not(contains_term(list_to_string(f), list_to_string(s)))] for f in new_list]
-        
 
-        new_list = [i for i in new_list if i not in absorbed_terms]
-        
-        
+        new_list = [i for i in new_list if i not in absorbed_terms]        
 
         new_list.sort()
-        # translate into formula
+        # translate formula encoded in the nested list of disjuncts of conjuncts into a string
         formula = list_to_string(new_list)
-                        
 
     return formula        
     
 def get_prime_implicants(instance_formula, factor, level_factor_list):
-    # DESCRIPTION
+    # prime implicants are obtained by comparing the min-terms of positive instance function
+    # with those of the negative instance function 
+    # - if a section of one positive min-term is not part of any negative min term,
+    #   that positive min-term can be reduced to this section
+    # - if every section is a part of at least one negative min term, the considered term is a prime factor
+    #   of the positive instance function
     
     
     # get number of True terms in instance_formula
@@ -328,25 +306,38 @@ def get_prime_implicants(instance_formula, factor, level_factor_list):
             if not(term in prime_imp_list):
                 any_lit_found = True
                 term_list = string_to_list(term)[0]
-                for lit in term_list:
-                    contained = False
-                    for neg_term in instance_formula:
-                        if not(instance_formula[neg_term]): # only continue with False neg_terms
-                            if contains_term(reduce_term_by(term, lit), neg_term):
-                                contained = True
-                                break
+                # reduce term by one of its literals and check whether the reduced fragments is not contained in any negative term
+                for lit in term_list: 
+                    
+                    # check only fragments that are neither already known to be not contained in any negative term
+                    # (that are not listed in reduced_term_list[k-1]), nor empty strings
+                    if not(reduce_term_by(term, lit) in reduced_term_list[k-1]) and reduce_term_by(term, lit) != "":
+                        contained = False
+                        for neg_term in instance_formula:
+                            # loop over all negative terms of the instance formula
+                            if not(instance_formula[neg_term]): # only continue with False neg_terms
+                                if contains_term(reduce_term_by(term, lit), neg_term):
+                                    contained = True
+                                    break # break from for-loop over negative terms after the fragment has been found in one negative term
 
-                    any_lit_found =  any_lit_found and contained
-                    if not(contained) and not(reduce_term_by(term, lit) in reduced_term_list[k-1]) and reduce_term_by(term, lit) != "":
-                        reduced_term_list[k-1].append(reduce_term_by(term, lit))
+                        any_lit_found =  any_lit_found and contained
+                        if not(contained): # if a fragment resulting from deleting a literal from term is not contained in any
+                            # negative instance term, add the fragment to the list of terms that is gradually shortened and checked to
+                            # for being a prime implicator
+                            reduced_term_list[k-1].append(reduce_term_by(term, lit))
+                            print(str(reduce_term_by(term, lit)) + " zu reduced_term_list[" + str(k-1) + "] hinzugefügt.")
 
                     
-                if any_lit_found:
+                if any_lit_found: # if all fragments resulting from deleting a literal from term are contained in negative instance terms,
+                    # then term is a prime implicator
                     prime_imp_list.append(term)
+                    print('\x1b[0;36;40m' + str(term) + " zu PI-Liste hinzugefügt.\x1b[0m")
     
     # add atomic prime implicants
     if reduced_term_list[1]:
-        prime_imp_list.extend(reduced_term_list[1])
+        for at_term in reduced_term_list[1]:
+            if not(at_term in prime_imp_list):
+                prime_imp_list.append(at_term)
    
     for n_pi in range(len(prime_imp_list)-1,-1,-1):
         for pi in prime_imp_list:
@@ -366,7 +357,6 @@ def get_rdnf(pi_list, formula, factor_list):
     
     solutions_list = []
     out_formula = ""
-    
     
     # define list of essential prime implicants
     e_pi_list = []
@@ -391,7 +381,7 @@ def get_rdnf(pi_list, formula, factor_list):
                     # several prime implicants cover term
                     uncovered_terms[term] = aux_list
     
-    
+    print(e_pi_list)
     # simplest case would be that the disjunction of essential prime implicants covers al min terms
     # check if this the case 
     all_covered = True
@@ -404,6 +394,8 @@ def get_rdnf(pi_list, formula, factor_list):
         all_covered = all_covered and covered
         if not(all_covered):
             break
+            
+                
     # the corresponding formula:
     for epi in e_pi_list:
         out_formula = out_formula + " + " + epi
@@ -449,7 +441,10 @@ def get_rdnf(pi_list, formula, factor_list):
                 aux_formula = aux_formula + ")*("
         # remove trailing "*("
         aux_formula = aux_formula[:-2]
+        print(aux_formula)
         aux_formula = distribution(aux_formula)
+        print("nach Distribution")
+        print(aux_formula)
         # every disjunct of aux_formula constitutes one solution
         sol_list = re.split("\s*\+\s*",aux_formula)
         
@@ -467,8 +462,12 @@ def get_rdnf(pi_list, formula, factor_list):
                 if len(sol_list) == 1:
                     # remove 
                     st = st[:-1]
-            elif st[-1] == ")":
+            elif len(st) > 0 and st[-1] == ")":
                 st = st[:-1]
+            if len(st) > 1 and st[-2] == "+":
+                # remove trailing " + "
+                st = st[:-3]
+
             solutions_list.append(st)        
     
     # remove solutions that are disjunctions of other solutions (if A <-> B then A + C <-> B should not be in the list of solutions)
@@ -486,7 +485,7 @@ def get_rdnf(pi_list, formula, factor_list):
                 if cond:
                     del solutions_list[n_sol]
                     break
-                                 
+                            
     return solutions_list
 
 def get_truth_table_from_file(file_path):
@@ -578,7 +577,8 @@ def read_data_from_csv(file_path):
     
     # determine the list of causal factors and the min-term formula from the truth table
     level_factor_order_list, factor_list, formula_st = get_truth_table_from_file(file_path)  
-    
+    print(factor_list)
+    print(formula_st)
     # translate the information on the causal ordering within each level into the nested list order_input_information
     for lvl in range(len(level_factor_order_list)):
         order_input_information.append([]) # append a new sublist per constitution level
@@ -598,20 +598,83 @@ def read_data_from_csv(file_path):
         formula = string_to_list(formula_st)
         
         # determine which causal factors might be effects       
-        for fac in find_effects(string_to_list(formula_st),factor_list):
+        effects_list = find_effects(string_to_list(formula_st),factor_list)
+        
+        # check for co-extensive factors - only for one factor of each set of co-extensive factors,
+        # the prime implicants have to be determined
+        list_of_coextensives = [] # this becomes a nested list: every sublist contains factors that are mutually coextensive
+        for i in range(len(effects_list)-1):
+            for j in range(i+1,len(effects_list)):
+                co_ext = True
+                for disj in formula:
+                    neg_i = "~" + effects_list[i]
+                    neg_j = "~" + effects_list[j]
+                    if (((effects_list[i] in disj) and not(effects_list[j] in disj)) or
+                    ((effects_list[j] in disj) and not(effects_list[i] in disj)) or
+                    ((neg_i in disj) and not(neg_j in disj)) or ((neg_j in disj) and not(neg_i in disj))):
+                        co_ext = False # two factors are not coextensive if one or its negation appears in one disjunct but the other
+                        break          # does not
+                
+                if co_ext:
+                    if not(list_of_coextensives): # if list of coextensives is still empty
+                        list_of_coextensives.append([]) # append an empty sublist
+                        list_of_coextensives[0].append(effects_list[i])
+                        list_of_coextensives[0].append(effects_list[j])
+                    else: # list is non-empty search for a sublist that contains effects_list[i]
+                        new_list = True
+                        for sublist in list_of_coextensives:
+                            if ((effects_list[i] in sublist) or (effects_list[j] in sublist)): 
+                                # at least one of both factors is already contained in one sublist of coextensive factors
+                                new_list = False
+                                if not(effects_list[i] in sublist): # and effects_list[i] is not,
+                                    sublist.append(effects_list[i]) # then add effects_list[i] to sublist
+                                elif not(effects_list[j] in sublist): # other case effects_list[j] is not contained,
+                                    sublist.append(effects_list[j]) # then add it to sublist
+                                break
+                        if new_list: # neither factor is already contained in any sublist
+                            list_of_coextensives.append([]) # create a new sublist
+                            list_of_coextensives[-1].append(effects_list[i]) # append effects_list[i]
+                            list_of_coextensives[-1].append(effects_list[j]) # and effects_list[j]
+
+        # remove all but one factor of each set of coextensive factors
+        if list_of_coextensives: # list is not empty
+            for sublist in list_of_coextensives:
+                for i in range(1,len(sublist)):
+                    print(str(sublist[i]) +  " ist ko-extensiv mit " + str(sublist[0]))
+                    effects_list.remove(sublist[i])
+        
+        for fac in effects_list:
             # for each of these factors: 
             # determine its instance formula (the min-term equivalence formula to fac)
             i_formula = get_instance_formula_to_factor(string_to_list(formula_st), fac, level_factor_order_list)
-            # dertermine the prime implicants of this instance formula
+            print("Instanzformel zu " + str(fac) + " ist " + str(i_formula))
+            
+            # determine the prime implicants of this instance formula
             pi_list = get_prime_implicants(i_formula, fac, level_factor_order_list)
+            
+            print(fac + "  Primeimplikants" + str(pi_list))
+
             if pi_list:
                 # list of prime implicants is non-empty
                 # obtain all possible transformations of the instance formula into the reduced disjunctive normal form
                 for sol in get_rdnf(pi_list, i_formula, level_factor_order_list):
-                    # since sol is equivalent to fac, at the operator and fac as second equivalent
+                    # since sol is equivalent to fac, append the equivalence-operator and the second equivalent (fac)
                     sol = sol + " <-> " + fac
                     list_equiv_formula.append(sol)
-            
+        
+        # add equivalence relations for coextensive factors
+        if list_of_coextensives:
+            for sublist in list_of_coextensives:
+                for i in range(1,len(sublist)):
+                    # replace sublist[0] by sublist[i] and vice versa in the equivalence formulae for sublist[0]
+                    for formula in list_equiv_formula:
+                        if formula[-1] == sublist[0]:
+                            st = formula[:-1].replace(sublist[i],sublist[0]) # the new formula is the old one without the last
+                            st = st + sublist[i] # expression and with all occurences of sublist[i] replaced by sublist[0]
+                            # then append sublist[i] as second equivalent of the equivalence formula
+                            list_equiv_formula.append(st) # add the new formula to the formulae list
+                            print(st + " hinzugefügt")
+        
         if list_equiv_formula:
             abort = False
             # transform the list of strings into a list of pairs, such that element[0] <-> element[1]
@@ -630,12 +693,12 @@ def read_data_from_csv(file_path):
         # factor_list is empty
         abort = True
     
-    
+    print(list_equiv_tuple)
     return abort, level_factor_list, list_equiv_tuple, order_input_information
                    
 def main():
     # main function
-    file_path = "test.csv"
+    file_path = "samples/Beispieldatensatz_Data_Science_1.csv"
     _, fa_l_list, list_equiv_formula, _ = read_data_from_csv(file_path)
     print(list_equiv_formula)
     print(fa_l_list)

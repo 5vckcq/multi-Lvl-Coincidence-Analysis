@@ -5,7 +5,7 @@
 import re                          # regex for complex search patterns in strings
 import itertools                   # itertools provides functions to obtain all permutations of a string and Cartesian products of lists
 
-# auxiliary function:
+# auxiliary functions:
 def powerset(in_set):
     # returns the powerset of the given input set in_set
     aux_list = list(in_set)
@@ -305,6 +305,7 @@ def get_clusters(formula_list, factor_list):
             new_list_of_connected[0].append(fac)
             # add also all factors that are connected with fac to the new cluster
             for formula in formula_list:
+                
                 if (formula[1] == fac) or (fac in get_components_from_formula(formula[0], factor_list)):                    
                     # if fac is part of this formula
                     # add the right side

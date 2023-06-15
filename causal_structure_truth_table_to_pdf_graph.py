@@ -192,19 +192,64 @@ def is_transitive(formula_list, factor_list):
             # If downstream_factor_list is not empty, there are some causal factors that cannot be categorised
             # into level_factor_list_order.
                 
-            # test-wise set the causal order of all remaining factors to max order + 1
-            circular = True   
+            circular = True                       
+            # set the causal order of all remaining factors to max order + 1
             order_factor_list.append([])
             
             for fac in downstream_factor_list:
                 order_factor_list[len(order_factor_list) - 1].append(fac)
-                    
+   
         else :
             circular = False
     
     return not(circular), order_factor_list          
                 
+def reduce_structural_redundancy(factor_list, formula_list):
+    # input: list of causal factors
+    #        list of equivalence relations between causal factors
+    #
+    # reduces the list of equivalence relations to dissolve structural redundancies
+    # -> all factors that are causally connected through formula_list remain causally connected,
+    #    while a linear ordering of the causal factors can be defined (which is assumed not to be possible for formula_list)
+    #
+    # returns: truth-value of success
+    #          nested list of causal factors (sub-divided by causal order) if True; initial factor_list if False
+    #          reduced formula list
+    
+    print(factor_list)
+    
+    # list of original causal connections for comparison    
+    original_list_of_causally_connected = get_clusters(formula_list, factor_list)
+    for cluster in original_list_of_causally_connected:
+        cluster.sort()
+    original_list_of_causally_connected.sort()
+    
+    non_circ_solution = False
+    
+    for redundant_formula in formula_list:
+        local_formula_list = [formula for formula in formula_list if formula != redundant_formula]
+        # remove one formula from formula_list
+        
+        local_cluster = get_clusters(local_formula_list, factor_list)
+        for cluster in local_cluster:
+            cluster.sort()
+        local_cluster.sort()
+        
+        if local_cluster == original_list_of_causally_connected:
+            # after removing the formula, all factors remain connected as before
+            non_circular, factor_list = is_transitive(local_formula_list, factor_list)
+            if non_circular:
+                # and circularity has been resolved
+                # then stop -> reduced solution has been found
+                non_circ_solution = True
+                break
+            
+            else:
+                # still circular -> recursion with reduced formula list
+                non_circ_solution, factor_list, local_formula_list = reduce_structural_redundancy(factor_list, local_formula_list)
+                factor_list = [order for level in factor_list for order in level] # flatten factor_list
        
+    return non_circ_solution, factor_list, local_formula_list       
 
 
 def minimise_constitution_relations(level_factor_list_order, level, level_equiv_list, constitution_relation_list, color_map, mode, color_index):
@@ -259,7 +304,7 @@ def minimise_constitution_relations(level_factor_list_order, level, level_equiv_
                 max_order = 0
                     
                 # determine the value of max_order
-                for l_fac in auxiliary_list :
+                for l_fac in auxiliary_list:
                     if get_factor_order(l_fac, level_factor_list_order) > max_order :
                         max_order = get_factor_order(l_fac, level_factor_list_order)
 
@@ -373,7 +418,7 @@ def arrange_factors(level_factor_list, level_equiv_list, constitution_relation_l
     ##########################################
         
     # adapt the causal order to particular solution    
-    level_factor_list_order = determine_factor_order(level_factor_list, level_equiv_list)
+    level_factor_list_order, level_equiv_list = determine_factor_order(level_factor_list, level_equiv_list)
     
     ################################################################################
     # step 4: rearranging the factors for optimised placement in the output graphs #
@@ -523,7 +568,7 @@ def arrange_factors(level_factor_list, level_equiv_list, constitution_relation_l
     # standard color for all factors is black
     for m in range(len(new_level_factor_list_order)) :
         for o in range(len(new_level_factor_list_order[m])) :
-            for e in range(len(new_level_factor_list_order[m][o])) :
+            for e in range(len(new_level_factor_list_order[m][o])):
                 color_map["draw"][new_level_factor_list_order[m][o][e]] = "black"
                 color_map["text"][new_level_factor_list_order[m][o][e]] = "black"
     
@@ -532,7 +577,7 @@ def arrange_factors(level_factor_list, level_equiv_list, constitution_relation_l
         partial_const_list, color_map, color_index = minimise_constitution_relations(new_level_factor_list_order, m, level_equiv_list, constitution_relation_list, color_map, mode, color_index)
         new_constitution_relation_list.extend(partial_const_list)  
     
-    return new_level_factor_list_order, new_constitution_relation_list, color_map
+    return new_level_factor_list_order, new_constitution_relation_list, color_map, level_equiv_list
 
 def convert_formula_to_tex_code(solution):
     # converts a full solution for a structure into its corresponding logical formula in tex-syntax
@@ -635,7 +680,7 @@ def convert_causal_relation(formula, level_factor_list_order, tex_code, color, c
                         st = st + "% simple disjunction\n"
                         st = st + "\draw[->, " + color + "] (" + disj + ".east) to (" + formula[1] + ".west);\n"
                 
-                elif formula[0].find("*") > -1 :
+                elif disj.find("*") > -1 :
                     # case B: the disjunct is a conjunction
                     st = st + "% complex disjunction\n"
                     
@@ -663,7 +708,7 @@ def convert_causal_relation(formula, level_factor_list_order, tex_code, color, c
                         # this is the normal non-circular case
                         position = "at ([xshift=\hDisjConj, yshift=\\vDisjConj]" + f_fac + ".east)"
                         circular = False
-                    else :
+                    else:
                         # circular case, f_fac has the same horizontal coordinate as the target factor,
                         # so the junction should not be placed to the right of f_fac but to the left
                         
@@ -990,22 +1035,23 @@ def determine_factor_order(level_factor_list, level_equiv_list):
         #############################################
         # step 4: determine the factor causal order #
         #############################################
-                
-                
+               
         level_factor_list_order.append([]) 
         level_factor_list_order[m].append([])  # add the empty list for factors of order 0
                 
                        
-        non_circular, level_factor_list_order[m] = is_transitive(level_equiv_list[m], level_factor_list[m]) 
-        #while not(non_circular):
-        # Idee (to be written)
-        # -> betrachte zunächst nur Formeln in denen alle Faktoren unklassifiziert sind
-        # -> behalte atomare Zusammenhänge (A<->B) bei
-        # -> lösche vom Rest sukzessive Formeln
+        non_circular, level_factor_list_order[m] = is_transitive(level_equiv_list[m], level_factor_list[m])
+       
+        
         if not(non_circular):
-            print("Cannot determine causal ordering for " + str(level_factor_list_order[m])) #hierhier
+            non_circular, level_factor_list_order[m], level_equiv_list[m] = reduce_structural_redundancy(level_factor_list[m], level_equiv_list[m])
+       
+       
+            if not(non_circular):
+                print("Cannot determine causal ordering for " + str(level_factor_list_order[m]))
 
-    return level_factor_list_order
+    print(level_factor_list_order)
+    return level_factor_list_order, level_equiv_list
     
     
     
@@ -1427,7 +1473,7 @@ def find_structures(in_level_factor_list, in_level_equiv_list, mode):
                 if not(sol in new_circular_list):
                     new_circular_list.append(sol)
                                 
-            
+            print('step 3C') # dummy-print
             ########################################################################################
             # step 3C: find mutually exclusive causal relations (same effect but different causes) #
             ########################################################################################
@@ -1450,6 +1496,7 @@ def find_structures(in_level_factor_list, in_level_equiv_list, mode):
             
             # the complement set will be unique_equiv
             unique_equiv = []
+            
             # find causal relations of which has to be chosen
             if len(list_redundant_fac) > 0:
                 # there are causal factors for which causal relations have to be discarded
@@ -1476,25 +1523,43 @@ def find_structures(in_level_factor_list, in_level_equiv_list, mode):
   
                 # unique_equiv contains all causal relations that appear in every solution
                 # = the only causal relation for the respective effect
-                unique_equiv.append(list_unique_equiv) 
+                if list_unique_equiv:
+                    unique_equiv.append(list_unique_equiv) 
             
+            else:
+                # there are no redundant formulae
+                # all formulae from level_equiv_list[m] that are not elements of circular_list should go into unique_equiv
+                unique_equiv = [[formula for formula in level_equiv_list[m] if not(formula in circular_list)]]
             
+            print('step 3D') # dummy-print
             #####################################################################
             # step 3D: compose a list of solutions for the constitution level m #
             #####################################################################                
             # this will be the Cartesian product of list_redundant_equiv, new_circular_equiv and unique_equiv
             # in case that one or two of these lists are empty, different cases have to be distinguished:
+            
             if new_circular_list:
                 if list_redundant_equiv:
+                    print('case 1') # dummy-print
                     if unique_equiv:
+                        print('case 1a') # dummy-print
                         aux_list = list(itertools.product(*list_redundant_equiv,new_circular_list,unique_equiv))
                     else:
                         if list_redundant_equiv:
-                            aux_list = list(itertools.product(*list_redundant_equiv,new_circular_list))
+                            print('case 1b') # dummy-print
+                            print("redundant")
+                            print(list_redundant_equiv)
+                            print("circular:")
+                            print(new_circular_list)
+                            aux_list = itertools.product(*list_redundant_equiv,new_circular_list)
+                            print("aux")
+                            print(aux_list)
                         else:
+                            print('case 1c') # dummy-print
                             aux_list = []
                             aux_list.extend(new_circular_list)
                 else:
+                    print('case 2') # dummy-print
                     if unique_equiv:
                         aux_list = list(itertools.product(new_circular_list,unique_equiv))
                     else:
@@ -1502,13 +1567,16 @@ def find_structures(in_level_factor_list, in_level_equiv_list, mode):
                         aux_list.extend(new_circular_list)
             else:
                 if list_redundant_equiv:
+                    print('case 3') # dummy-print
                     if unique_equiv:
                         aux_list = list(itertools.product(*list_redundant_equiv,unique_equiv))
                     else:
                         aux_list = list(*list_redundant_equiv)
                 else:
+                    print('case 4') # dummy-print
                     aux_list = []
                     aux_list.extend(unique_equiv)
+            print('3D after combining lists to aux_list') # dummy-print
                 
             # avoid problems with Cartesian products of lists and tuples
             # make sure that every component is a list
@@ -1525,7 +1593,9 @@ def find_structures(in_level_factor_list, in_level_equiv_list, mode):
                 counter = counter + 1
 
             solutions_list[m].extend(sec_aux_list)
+            print(solutions_list[m]) # dummy-print
             
+            print('3D redundant vs. circular') # dummy-print
             # equations from redundant_equiv might have the same effect as formulae from the circular group
             # in this case the formula from redundant_equiv has to be removed from the solution
             for sol in solutions_list[m]:
@@ -1544,6 +1614,7 @@ def find_structures(in_level_factor_list, in_level_equiv_list, mode):
                 for formula in delete_list:
                     sol.remove(formula)
 
+            print('3D check for completeness') # dummy-print
             # check solutions for completeness every causal factor that apppears in level_equiv_list
             # has to appear in at least one causal formula
             for i in range(len(solutions_list[m])-1,-1,-1):
@@ -1578,7 +1649,7 @@ def find_structures(in_level_factor_list, in_level_equiv_list, mode):
        
     
     
-
+    print('step 3E') # dummy-print
     #####################################################################
     # step 3E: combine the partial solutions of the constitution levels #
     #####################################################################    
@@ -1617,9 +1688,14 @@ def find_structures(in_level_factor_list, in_level_equiv_list, mode):
     # due to previous sorting, no dublicates are in the list
     # high computational effort for searching for duplicates (with taking into account the possibility of commutations)
     # is unnecessary
-   
+    dublicate_list = []
+    for i in range(len(final_list)-1,-1,-1):
+        if final_list[i] in dublicate_list:
+            del final_list[i]
+        else:
+            dublicate_list.append(final_list[i])
+            
     final_list.sort()
-    
     return final_list
 # End of find_structures                  
 
@@ -1792,6 +1868,7 @@ def main() :
                         # classify the equivalence relations into causal relations (level_equiv_list) subdivided by constitution level
                         # or into constitution relations
                         level_equiv_list, constitution_relation_list = categorise_formulae(equiv_list, level_factor_list)
+                        
                 else :
                     abort = True
                     print("Error: Expected input data file " + input_file + " has not been found in path folder.")
@@ -1816,6 +1893,8 @@ def main() :
                         # classify the equivalence relations into causal relations (level_equiv_list) subdivided by constitution level
                         # or into constitution relations
                         level_equiv_list, constitution_relation_list = categorise_formulae(equiv_list, level_factor_list)
+                        print('level equiv list') # dummy-print
+                        print(level_equiv_list)
                     else:
                         print("Error while reading the input file " + input_file)
                 
@@ -1881,8 +1960,7 @@ def main() :
                 
         total_solutions = len(solution_term_list)
         print("Time needed to find all solutions " + str(time.time() - start_time) + " seconds.")                
-        
-            
+         
         # prepare each solution individually for graphical output
         sol_counter = 0
   
@@ -1900,8 +1978,7 @@ def main() :
             # step 5: arrange the factors for improved placement in the plot
             # also get rid of unnecessary constitution graphs
             # (only the outer left and outer right part of the structure constituting a higher level factor should be drawn)
-            new_level_factor_list_order, new_constitution_relation_list, color_map = arrange_factors(level_factor_list, new_level_equiv_list, constitution_relation_list, mode)
-            
+            new_level_factor_list_order, new_constitution_relation_list, color_map, new_level_equiv_list = arrange_factors(level_factor_list, new_level_equiv_list, constitution_relation_list, mode)
             
             # check for uncategorised causal factors
             aux_factor_list = [] # list of factors that appear in new_level_equiv
@@ -1973,7 +2050,7 @@ def main() :
                         st = ""
                             
                     # subtitle of the graph will be the formula in tex-math syntax
-                    subtitle = convert_formula_to_tex_code(sol)
+                    subtitle = convert_formula_to_tex_code(new_level_equiv_list)
                     subtitle = "\\tiny " + subtitle # formulae might be quite long, so subtitle should be written in tiny
                         
                     # counter enumerates the solutions
