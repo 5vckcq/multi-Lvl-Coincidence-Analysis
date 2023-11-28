@@ -38,9 +38,6 @@ def find_causal_factors(st) :
     # looks in string st for denominators of causal factors, which are separated by ", " or " < "
     # returns a (possibly empty) list of causal factors
     
-    # deletes "Factors: " from line (if it occurs)
-    st = st.replace("Factors: ","")
-    
     # deletes end-of-line-symbol ("\n") and spaces at the end of line if necessary
     st = re.sub("\r?\n","",st).rstrip()
     

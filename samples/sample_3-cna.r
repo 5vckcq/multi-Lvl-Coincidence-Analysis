@@ -1,4 +1,8 @@
-# ninth test - example from the introductory part of our paper
+# example of a complex mechanism with three levels
+# many ambiguities due to several co-extensive factors
+# using QCA
+library(cna)
+library('data.table')
 
 # syntax:
 # negation: minuscle of factor (not(A)=a)
@@ -6,10 +10,6 @@
 # disjunction: "+"
 # implication: "->"
 # equivalence: "<->"
-
-library(cna)
-library('data.table')
-
 formula <- "(E1 <-> E2)*(E1 <-> E3)*(E2*E3 <-> E4)*(E5 <-> E6)*(E6 <-> E7)*(F1*F2 <-> F4)*(F3 <-> F5)*(F3 <-> F6)*(F4*F5*F6 <-> F7)*(E1 <-> F1)*(E4 <-> F1)*(E5 <-> F7)*(E7 <-> F7)*(F1*F2*F3 <-> G)*(F7 <-> G)"  # condition to generate the truth table
 
 complete_table <- allCombs(c(2,2,2,2,2,2,2,2,2,2,2,2,2,2,2)) - 1 # 14 columns for the 14 factors
@@ -33,5 +33,5 @@ print(cna(data_set, # use the truth table data_set
   # this is how the constitution levels get separated
   ), nsolutions = 100) # returns 100 solutions, might be changed to "all" (in quotation marks)
   
-print(formula) # since we do not get complex solution formulae from CNA, we have to append our known solution manually
+print(formula) # since we do not get complex solution formulae from CNA, append our known solution manually
 sink(file = NULL) # stop exporting into file

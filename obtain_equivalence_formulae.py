@@ -2,7 +2,7 @@
 #
 # file: obtain_equivalence_formulae.py
 
-# DESCRIPTION
+# Generates atomic solution formulae from Boolean coincidence data tables
 
 import re                 # regex for complex search patterns in strings
 import pandas as pd       # for reading csv files that contain truth tables
@@ -692,7 +692,7 @@ def read_data_from_csv(file_path):
                    
 def main():
     # main function
-    file_path = "samples/Beispieldatensatz_Data_Science_1.csv"
+    file_path = "samples/sample_2-csv.csv"
     _, fa_l_list, list_equiv_formula, _ = read_data_from_csv(file_path)
     
     

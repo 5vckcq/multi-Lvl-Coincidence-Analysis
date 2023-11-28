@@ -48,20 +48,11 @@ This template sets the environment for plotting the obtained mechanisms. It can 
 
 A folder that contains some samples either truth tables in csv-format or R-scripts that make use of the cna-package. Some of the examples model multi level mechanisms. The content of this folder is not required for running the script.
 
-**test_1**
-> causal structure from "Two challenges for a boolean approach to constitutive inference" (Harbecke, 2018) with an added upper level
+**sample_1**
+> single level causal structure
 
-**test_2**
-> a causal chain with two levels, a very simple multi-level structure 
+**sample_2**
+> a simple two-level structure 
 
-**test_3**
-> a variation of test_2 which involves disjunctions, conjunctions and negations
-
-**test_4**
-> a simple single level structure
-
-**test_5**
-> highly ambigious single level structure, taken from "Critical Tension: Sufficiency and Parsimony in QCA" (Dusa 2019)
-
-**test_6**
-> causal structure from the introductory part of "An Algorithm for Boolean Constitutive Inference for Mechanistic Explanation and Potential Measures of Simplicity" (Harbecke et al., forthcoming)
+**sample_3**
+> a complex three-level structure
