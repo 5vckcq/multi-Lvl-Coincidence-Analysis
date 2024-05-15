@@ -1,0 +1,41 @@
+--- Coincidence Analysis (CNA) ---
+
+Factors: A, B, C, D, E, F 
+
+Atomic solution formulas:
+-------------------------
+Outcome D:
+ solution consistency coverage complexity inus
+ F <-> D            1        1          1 TRUE
+
+Outcome E:
+ solution                    consistency coverage complexity inus
+ A*B + A*D + b*c + c*D <-> E           1        1          8 TRUE
+ A*B + A*D + b*c + c*F <-> E           1        1          8 TRUE
+ A*B + A*F + b*c + c*D <-> E           1        1          8 TRUE
+ A*B + A*F + b*c + c*F <-> E           1        1          8 TRUE
+
+Outcome F:
+ solution consistency coverage complexity inus
+ D <-> F            1        1          1 TRUE
+
+Complex solution formulas:
+--------------------------
+ outcome solution                                consistency coverage
+ E,F     (A*B + A*D + b*c + c*D <-> E)*(D <-> F)           1        1
+ D,E     (F <-> D)*(A*B + A*D + b*c + c*D <-> E)           1        1
+ E,F     (A*B + A*D + b*c + c*F <-> E)*(D <-> F)           1        1
+ D,E     (F <-> D)*(A*B + A*D + b*c + c*F <-> E)           1        1
+ E,F     (A*B + A*F + b*c + c*D <-> E)*(D <-> F)           1        1
+ D,E     (F <-> D)*(A*B + A*F + b*c + c*D <-> E)           1        1
+ E,F     (A*B + A*F + b*c + c*F <-> E)*(D <-> F)           1        1
+ D,E     (F <-> D)*(A*B + A*F + b*c + c*F <-> E)           1        1
+ complexity inus cyclic
+          9 TRUE  FALSE
+          9 TRUE  FALSE
+          9 TRUE  FALSE
+          9 TRUE  FALSE
+          9 TRUE  FALSE
+          9 TRUE  FALSE
+          9 TRUE  FALSE
+          9 TRUE  FALSE

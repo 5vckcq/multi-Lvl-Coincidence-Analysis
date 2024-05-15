@@ -28,9 +28,9 @@ def string_to_list(st):
     # converts a string of disjunctive normal form into a nested list
     # out_list[DISJUNCT][CONJUNCT]
     out_list = []
-    disj_list = re.split("\s*\+\s*", st)
+    disj_list = re.split(r'\s*\+\s*', st)
     for disj in disj_list:
-        out_list.extend([re.split("\*", disj)])
+        out_list.extend([re.split(r'\*', disj)])
 
     return out_list
 
@@ -221,12 +221,12 @@ def distribution(formula):
     if (formula.find(")*") > -1 or formula.find("*(") > -1):
                 
         formula = formula[:-1] # get rid of trailing ")"
-        conj_list = re.split("\)\*", formula) # list of conjuncts of formula
+        conj_list = re.split(r'\)\*', formula) # list of conjuncts of formula
         conj_list = [conj[1:] for conj in conj_list] # get rid of leading "("
         
         disj_list = [] # list of disjuncts per conjunct
         for conj in conj_list:
-            disj_list.append(re.split("\s*\+\s*", conj))        
+            disj_list.append(re.split(r'\s*\+\s*', conj))        
         # disj_list is a list [[d11, d12, ...], [d21, d22, ... ],  ...] with dij being the j-th disjunct in conjunct i
         
         # rebuild formula
@@ -236,15 +236,15 @@ def distribution(formula):
         conj_list.clear()
         
         
-        disj_list = re.split("\s*\+\s*", formula) # list of disjuncts of new formula
+        disj_list = re.split(r'\s*\+\s*', formula) # list of disjuncts of new formula
         
-        #conj_list = [list(set(re.split("\*", disj))).sort() for disj in disj_list] # doesn't work
+        #conj_list = [list(set(re.split(r'\*', disj))).sort() for disj in disj_list] # doesn't work
         
         conj_list = []
         set_disjuncts = set() # set in place of a list automatically discards duplicates
         for disj in disj_list:
             if not(disj in set_disjuncts):
-                a = list(set(re.split("\*", disj)))
+                a = list(set(re.split(r'\*', disj)))
                 a.sort()
                 conj_list.append(a)
                 set_disjuncts.add(disj)
@@ -444,7 +444,7 @@ def get_rdnf(pi_list, formula, factor_list):
         aux_formula = distribution(aux_formula)
 
         # every disjunct of aux_formula constitutes one solution
-        sol_list = re.split("\s*\+\s*",aux_formula)
+        sol_list = re.split(r'\s*\+\s*',aux_formula)
         
         for sol in sol_list:
             # in each solution "*" are to be changed into " + " (part of Petrick's algorithm)

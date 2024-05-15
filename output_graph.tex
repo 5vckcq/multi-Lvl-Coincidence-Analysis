@@ -1,0 +1,722 @@
+\documentclass[multi=page,crop,11pt,varwidth,border=2pt]{standalone}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{graphicx} % for scale box
+\usetikzlibrary{arrows, fit, positioning, shapes, graphs, quotes, calc, bbox}
+
+\begin{document}
+% define colors (ColorBrewer scheme Paired-12
+\definecolor{color0}{RGB}{166,206,227}
+\definecolor{color1}{RGB}{31,120,180}
+\definecolor{color2}{RGB}{178,223,138}
+\definecolor{color3}{RGB}{51,160,44}
+\definecolor{color4}{RGB}{251,154,153}
+\definecolor{color5}{RGB}{227,26,28}
+\definecolor{color6}{RGB}{253,191,111}
+\definecolor{color7}{RGB}{255,127,0}
+\definecolor{color8}{RGB}{202,178,214}
+\definecolor{color9}{RGB}{106,61,154}
+\definecolor{color10}{RGB}{245,227,101} % original value is poorly legible, therefore slightly modified
+\definecolor{color11}{RGB}{177,89,40}
+
+\tikzset{every node/.style={circle, draw, thick, minimum size=6mm, text width=5.5mm, align=center, inner sep = 0pt}}% definition for normal nodes = nodes of causal factors
+\tikzstyle{aux} = [circle, draw, fill, minimum size=0.5mm, text width=0.5mm]% auxiliary nodes for conjunction junctions
+\tikzstyle{neg} = [diamond, draw, minimum size=1mm, text width=1mm]% auxiliary nodes for negations
+\tikzstyle{conjunctonsegment} = [in=170,out=-10]% conjuctive connection lines are curved to easily distinguish them from disjunctions
+\tikzstyle{crelationleft} = [->,densely dotted,in=200,out=120]% style for the leftside constitution relations
+\tikzstyle{crelationright} = [->,densely dotted,in=-20,out=60]% style for the rightside constitution relations
+\tikzstyle{crelationstraight} = [->,densely dotted]% style for single constitution relations
+
+
+\def\hilightsource#1{\draw[densely dashed,-latex] ($(#1)-(8mm,0)$) -> ($(#1)-(3mm,0)$)}%
+\def\hilighttarget#1{\draw[densely dashed,-latex] ($(#1)+(3mm,0)$) -> ($(#1)+(8mm,0)$)}%
+% definition of constants
+\def\LNeg{0.03cm}% distance of the negation symbol to the corresponding node of the causal factor
+\def\LConj{-0.5cm}% distance of the conjunction junction to the target node
+\def\hDisjConj{0.9cm}% horizontal position of conjunction junction of a disjunction relative to the first source node (normal, non-circular case)
+\def\hcDisjConj{-0.3cm}% horizontal position of conjunction junction of a disjunction relative to the first source node (circular case, source and target node are horizontalle aligned)
+\def\vDisjConj{0.2cm}% vertical position of conjunction junction of a disjunction relative to the first source node
+\def\tDisjConj{0.3cm}% shift of  conjunction junction in case that it would overlap with another junction
+\def\LvDist{0.8cm}% vertical distance between nodes of the same level and causal order
+\def\LhDist{2cm}% horizontal distance between nodes of the same level and subsequent causal orders
+\def\iLvDist{1.4cm}% vertical distance between neighbouring levels
+\def\HeightNode{0.6cm}% height of nodes
+\def\LabelDist{-2mm}% vertical distance of labels from vertices
+
+
+\begin{page}
+\centering solution no.~1/6\\[3mm]
+
+\begin{tikzpicture}[>=latex,%
+  %bezier bounding box=true,% avoid excessive white spaces around bended lines [comment this line out if compiling takes too long]  
+  ]%
+% Begin formula from file
+% placement of the nodes
+% factors of level 0:
+% causal order 0:
+\node[draw=color0, text=black]  (H) {$H$};
+\hilightsource{H};
+\node[draw=color0, text=black] [above= \LvDist of H] (G) {$G$};
+\hilightsource{G};
+\node[draw=color1, text=black] [above= \LvDist of G] (E) {$E$};
+\hilightsource{E};
+\node[draw=color1, text=black] [above= \LvDist of E] (D) {$D$};
+\hilightsource{D};
+% causal order 1:
+\node[draw=color0, text=black] [right= \LhDist of H] (I) {$I$};
+\node[draw=color1, text=black] [above= \LvDist of I] (F) {$F$};
+\hilighttarget{F};
+% causal order 2:
+\node[draw=color2, text=black] [right= \LhDist of I] (J) {$J$};
+\hilighttarget{J};
+% factors of level 1:
+% causal order 0:
+\node[draw=black, text=color0] [above= {4*\LvDist + 2* \HeightNode  + \iLvDist} of H] (B) {$B$};
+\hilightsource{B};
+\node[draw=black, text=color1] [above= \LvDist of B] (A) {$A$};
+\hilightsource{A};
+% causal order 1:
+\node[draw=black, text=color2] [right= \LhDist of B] (C) {$C$};
+\hilighttarget{C};
+
+% causal relations
+% of level 0
+% formula: E*I + ~D*G*H <-> J
+% complex disjunction
+% junction of the conjuncts
+\node[aux, black] (EIJaux) at ([xshift=\hDisjConj, yshift=\vDisjConj]I.east) {};
+% partial arrows from the conjuncts to the junction
+\draw[conjunctonsegment, black] (E.east) to (EIJaux);
+\draw[conjunctonsegment, black] (I.east) to (EIJaux);
+% arrow from junction to target factor
+\draw[->, black] (EIJaux) -- (J.west) node[draw=none,text=black,fill=none,font=\tiny,pos=0,sloped,above=\LabelDist] {\scalebox{.3}{$E\cdot I$}};
+% complex disjunction
+% junction of the conjuncts
+\node[aux, black] (HGDJaux) at ([xshift=\hDisjConj, yshift=\vDisjConj]H.east) {};
+% partial arrows from the conjuncts to the junction
+\node[neg, color1] (Dneg) at ([xshift=\LNeg]D.south east) {};
+\draw[conjunctonsegment, black] (Dneg) to (HGDJaux);
+\draw[conjunctonsegment, black] (G.east) to (HGDJaux);
+\draw[conjunctonsegment, black] (H.east) to (HGDJaux);
+% arrow from junction to target factor
+\draw[->, black] (HGDJaux) -- (J.west) node[draw=none,text=black,fill=none,font=\tiny,pos=0,sloped,above=\LabelDist] {\scalebox{.3}{$\neg D\cdot G\cdot H$}};
+
+
+% formula: ~D + E <-> F
+% negated disjunct
+\node[neg, color1] (Dneg) at ([xshift=\LNeg]D.south east) {};
+\draw[->, color1] (Dneg) to (F.west);
+% simple disjunction with shifted starting point
+\draw[->, color1] (E.north east) to (F.west);
+
+
+% formula: G*H <-> I
+% junction of the conjuncts
+\node[aux, color0] (Iaux) at ([xshift=\LConj]I.west) {};
+% partial arrows from the conjuncts to the junction
+\draw[conjunctonsegment, color0] (H.east) to (Iaux);
+\draw[conjunctonsegment, color0] (G.east) to (Iaux);
+% arrow from junction to target factor
+\draw[->, color0] (Iaux) -- (I) node[draw=none, text=black, fill=none, font=\tiny, above=\LabelDist, pos=0, sloped] {\scalebox{.3}{$G\cdot H$}};
+
+
+% of level 1
+% formula: A*B <-> C
+% junction of the conjuncts
+\node[aux, black] (Caux) at ([xshift=\LConj]C.west) {};
+% partial arrows from the conjuncts to the junction
+\draw[conjunctonsegment, black] (B.east) to (Caux);
+\draw[conjunctonsegment, black] (A.east) to (Caux);
+% arrow from junction to target factor
+\draw[->, black] (Caux) -- (C) node[draw=none, text=black, fill=none, font=\tiny, above=\LabelDist, pos=0, sloped] {\scalebox{.3}{$A\cdot B$}};
+
+
+
+% constitution relations
+% formula: I <-> B
+\draw[crelationright, color0] (I.north east) to (B.south);
+
+% formula: H <-> B
+\draw[crelationleft, color0] (H.north west) to (B.south);
+
+% formula: G <-> B
+\draw[crelationleft, color0] (G.north west) to (B.south);
+
+% formula: F <-> A
+\draw[crelationright, color1] (F.north east) to (A.south);
+
+% formula: E <-> A
+\draw[crelationleft, color1] (E.north west) to (A.south);
+
+% formula: D <-> A
+\draw[crelationleft, color1] (D.north west) to (A.south);
+
+% formula: J <-> C
+\draw[crelationstraight, color2] (J.north) to (C.south);
+
+
+% End formula from file
+\end{tikzpicture}\\[4mm]
+\tiny $(E \cdot I + \neg D \cdot G \cdot H\leftrightarrow J)\cdot(\neg D + E\leftrightarrow F)\cdot(G \cdot H\leftrightarrow I)\cdot(A \cdot B\leftrightarrow C)$
+\end{page}
+
+\begin{page}
+\centering solution no.~2/6\\[3mm]
+
+\begin{tikzpicture}[>=latex,%
+  %bezier bounding box=true,% avoid excessive white spaces around bended lines [comment this line out if compiling takes too long]  
+  ]%
+% Begin formula from file
+% placement of the nodes
+% factors of level 0:
+% causal order 0:
+\node[draw=color0, text=black]  (H) {$H$};
+\hilightsource{H};
+\node[draw=color0, text=black] [above= \LvDist of H] (G) {$G$};
+\hilightsource{G};
+\node[draw=color1, text=black] [above= \LvDist of G] (E) {$E$};
+\hilightsource{E};
+\node[draw=color1, text=black] [above= \LvDist of E] (D) {$D$};
+\hilightsource{D};
+% causal order 1:
+\node[draw=color0, text=black] [right= \LhDist of H] (I) {$I$};
+\hilighttarget{I};
+\node[draw=color1, text=black] [above= \LvDist of I] (F) {$F$};
+% causal order 2:
+\node[draw=color2, text=black] [right= \LhDist of I] (J) {$J$};
+\hilighttarget{J};
+% factors of level 1:
+% causal order 0:
+\node[draw=black, text=color0] [above= {4*\LvDist + 2* \HeightNode  + \iLvDist} of H] (B) {$B$};
+\hilightsource{B};
+\node[draw=black, text=color1] [above= \LvDist of B] (A) {$A$};
+\hilightsource{A};
+% causal order 1:
+\node[draw=black, text=color2] [right= \LhDist of B] (C) {$C$};
+\hilighttarget{C};
+
+% causal relations
+% of level 0
+% formula: F*G*H <-> J
+% junction of the conjuncts
+\node[aux, black] (Jaux) at ([xshift=\LConj]J.west) {};
+% partial arrows from the conjuncts to the junction
+\draw[conjunctonsegment, black] (H.east) to (Jaux);
+\draw[conjunctonsegment, black] (G.east) to (Jaux);
+\draw[conjunctonsegment, black] (F.east) to (Jaux);
+% arrow from junction to target factor
+\draw[->, black] (Jaux) -- (J) node[draw=none, text=black, fill=none, font=\tiny, above=\LabelDist, pos=0, sloped] {\scalebox{.3}{$F\cdot G\cdot H$}};
+
+
+% formula: ~D + E <-> F
+% negated disjunct
+\node[neg, color1] (Dneg) at ([xshift=\LNeg]D.south east) {};
+\draw[->, color1] (Dneg) to (F.west);
+% simple disjunction with shifted starting point
+\draw[->, color1] (E.north east) to (F.west);
+
+
+% formula: G*H <-> I
+% junction of the conjuncts
+\node[aux, color0] (Iaux) at ([xshift=\LConj]I.west) {};
+% partial arrows from the conjuncts to the junction
+\draw[conjunctonsegment, color0] (H.east) to (Iaux);
+\draw[conjunctonsegment, color0] (G.east) to (Iaux);
+% arrow from junction to target factor
+\draw[->, color0] (Iaux) -- (I) node[draw=none, text=black, fill=none, font=\tiny, above=\LabelDist, pos=0, sloped] {\scalebox{.3}{$G\cdot H$}};
+
+
+% of level 1
+% formula: A*B <-> C
+% junction of the conjuncts
+\node[aux, black] (Caux) at ([xshift=\LConj]C.west) {};
+% partial arrows from the conjuncts to the junction
+\draw[conjunctonsegment, black] (B.east) to (Caux);
+\draw[conjunctonsegment, black] (A.east) to (Caux);
+% arrow from junction to target factor
+\draw[->, black] (Caux) -- (C) node[draw=none, text=black, fill=none, font=\tiny, above=\LabelDist, pos=0, sloped] {\scalebox{.3}{$A\cdot B$}};
+
+
+
+% constitution relations
+% formula: I <-> B
+\draw[crelationright, color0] (I.north east) to (B.south);
+
+% formula: H <-> B
+\draw[crelationleft, color0] (H.north west) to (B.south);
+
+% formula: G <-> B
+\draw[crelationleft, color0] (G.north west) to (B.south);
+
+% formula: F <-> A
+\draw[crelationright, color1] (F.north east) to (A.south);
+
+% formula: E <-> A
+\draw[crelationleft, color1] (E.north west) to (A.south);
+
+% formula: D <-> A
+\draw[crelationleft, color1] (D.north west) to (A.south);
+
+% formula: J <-> C
+\draw[crelationstraight, color2] (J.north) to (C.south);
+
+
+% End formula from file
+\end{tikzpicture}\\[4mm]
+\tiny $(F \cdot G \cdot H\leftrightarrow J)\cdot(\neg D + E\leftrightarrow F)\cdot(G \cdot H\leftrightarrow I)\cdot(A \cdot B\leftrightarrow C)$
+\end{page}
+
+\begin{page}
+\centering solution no.~3/6\\[3mm]
+
+\begin{tikzpicture}[>=latex,%
+  %bezier bounding box=true,% avoid excessive white spaces around bended lines [comment this line out if compiling takes too long]  
+  ]%
+% Begin formula from file
+% placement of the nodes
+% factors of level 0:
+% causal order 0:
+\node[draw=color0, text=black]  (H) {$H$};
+\hilightsource{H};
+\node[draw=color0, text=black] [above= \LvDist of H] (G) {$G$};
+\hilightsource{G};
+\node[draw=color1, text=black] [above= \LvDist of G] (E) {$E$};
+\hilightsource{E};
+\node[draw=color1, text=black] [above= \LvDist of E] (D) {$D$};
+\hilightsource{D};
+% causal order 1:
+\node[draw=color0, text=black] [right= \LhDist of H] (I) {$I$};
+\node[draw=color1, text=black] [above= \LvDist of I] (F) {$F$};
+% causal order 2:
+\node[draw=color2, text=black] [right= \LhDist of I] (J) {$J$};
+\hilighttarget{J};
+% factors of level 1:
+% causal order 0:
+\node[draw=black, text=color0] [above= {4*\LvDist + 2* \HeightNode  + \iLvDist} of H] (B) {$B$};
+\hilightsource{B};
+\node[draw=black, text=color1] [above= \LvDist of B] (A) {$A$};
+\hilightsource{A};
+% causal order 1:
+\node[draw=black, text=color2] [right= \LhDist of B] (C) {$C$};
+\hilighttarget{C};
+
+% causal relations
+% of level 0
+% formula: F*I <-> J
+% junction of the conjuncts
+\node[aux, black] (Jaux) at ([xshift=\LConj]J.west) {};
+% partial arrows from the conjuncts to the junction
+\draw[conjunctonsegment, black] (I.east) to (Jaux);
+\draw[conjunctonsegment, black] (F.east) to (Jaux);
+% arrow from junction to target factor
+\draw[->, black] (Jaux) -- (J) node[draw=none, text=black, fill=none, font=\tiny, above=\LabelDist, pos=0, sloped] {\scalebox{.3}{$F\cdot I$}};
+
+
+% formula: ~D + E <-> F
+% negated disjunct
+\node[neg, color1] (Dneg) at ([xshift=\LNeg]D.south east) {};
+\draw[->, color1] (Dneg) to (F.west);
+% simple disjunction with shifted starting point
+\draw[->, color1] (E.north east) to (F.west);
+
+
+% formula: G*H <-> I
+% junction of the conjuncts
+\node[aux, color0] (Iaux) at ([xshift=\LConj]I.west) {};
+% partial arrows from the conjuncts to the junction
+\draw[conjunctonsegment, color0] (H.east) to (Iaux);
+\draw[conjunctonsegment, color0] (G.east) to (Iaux);
+% arrow from junction to target factor
+\draw[->, color0] (Iaux) -- (I) node[draw=none, text=black, fill=none, font=\tiny, above=\LabelDist, pos=0, sloped] {\scalebox{.3}{$G\cdot H$}};
+
+
+% of level 1
+% formula: A*B <-> C
+% junction of the conjuncts
+\node[aux, black] (Caux) at ([xshift=\LConj]C.west) {};
+% partial arrows from the conjuncts to the junction
+\draw[conjunctonsegment, black] (B.east) to (Caux);
+\draw[conjunctonsegment, black] (A.east) to (Caux);
+% arrow from junction to target factor
+\draw[->, black] (Caux) -- (C) node[draw=none, text=black, fill=none, font=\tiny, above=\LabelDist, pos=0, sloped] {\scalebox{.3}{$A\cdot B$}};
+
+
+
+% constitution relations
+% formula: I <-> B
+\draw[crelationright, color0] (I.north east) to (B.south);
+
+% formula: H <-> B
+\draw[crelationleft, color0] (H.north west) to (B.south);
+
+% formula: G <-> B
+\draw[crelationleft, color0] (G.north west) to (B.south);
+
+% formula: F <-> A
+\draw[crelationright, color1] (F.north east) to (A.south);
+
+% formula: E <-> A
+\draw[crelationleft, color1] (E.north west) to (A.south);
+
+% formula: D <-> A
+\draw[crelationleft, color1] (D.north west) to (A.south);
+
+% formula: J <-> C
+\draw[crelationstraight, color2] (J.north) to (C.south);
+
+
+% End formula from file
+\end{tikzpicture}\\[4mm]
+\tiny $(F \cdot I\leftrightarrow J)\cdot(\neg D + E\leftrightarrow F)\cdot(G \cdot H\leftrightarrow I)\cdot(A \cdot B\leftrightarrow C)$
+\end{page}
+
+\begin{page}
+\centering solution no.~4/6\\[3mm]
+
+\begin{tikzpicture}[>=latex,%
+  %bezier bounding box=true,% avoid excessive white spaces around bended lines [comment this line out if compiling takes too long]  
+  ]%
+% Begin formula from file
+% placement of the nodes
+% factors of level 0:
+% causal order 0:
+\node[draw=color0, text=black]  (H) {$H$};
+\hilightsource{H};
+\node[draw=color0, text=black] [above= \LvDist of H] (G) {$G$};
+\hilightsource{G};
+\node[draw=color1, text=black] [above= \LvDist of G] (E) {$E$};
+\hilightsource{E};
+\node[draw=color1, text=black] [above= \LvDist of E] (D) {$D$};
+\hilightsource{D};
+% causal order 1:
+\node[draw=color2, text=black] [right= \LhDist of H] (J) {$J$};
+\hilighttarget{J};
+\node[draw=color0, text=black] [above= \LvDist of J] (I) {$I$};
+\hilighttarget{I};
+\node[draw=color1, text=black] [above= \LvDist of I] (F) {$F$};
+\hilighttarget{F};
+% factors of level 1:
+% causal order 0:
+\node[draw=black, text=color0] [above= {4*\LvDist + 2* \HeightNode  + \iLvDist} of H] (B) {$B$};
+\hilightsource{B};
+\node[draw=black, text=color1] [above= \LvDist of B] (A) {$A$};
+\hilightsource{A};
+% causal order 1:
+\node[draw=black, text=color2] [right= \LhDist of B] (C) {$C$};
+\hilighttarget{C};
+
+% causal relations
+% of level 0
+% formula: ~D*G*H + E*G*H <-> J
+% complex disjunction
+% junction of the conjuncts
+\node[aux, black] (HGDJaux) at ([xshift=\hDisjConj, yshift=\vDisjConj]H.east) {};
+% partial arrows from the conjuncts to the junction
+\node[neg, color1] (Dneg) at ([xshift=\LNeg]D.south east) {};
+\draw[conjunctonsegment, black] (Dneg) to (HGDJaux);
+\draw[conjunctonsegment, black] (G.east) to (HGDJaux);
+\draw[conjunctonsegment, black] (H.east) to (HGDJaux);
+% arrow from junction to target factor
+\draw[->, black] (HGDJaux) -- (J.west) node[draw=none,text=black,fill=none,font=\tiny,pos=0,sloped,above=\LabelDist] {\scalebox{.3}{$\neg D\cdot G\cdot H$}};
+% complex disjunction
+% junction of the conjuncts
+\node[aux, black] (HGEJaux) at ([xshift=\hDisjConj, yshift={\vDisjConj + 1*\tDisjConj}]H.east) {};
+% partial arrows from the conjuncts to the junction
+\draw[conjunctonsegment, black] (E.east) to (HGEJaux);
+\draw[conjunctonsegment, black] (G.east) to (HGEJaux);
+\draw[conjunctonsegment, black] (H.east) to (HGEJaux);
+% arrow from junction to target factor
+\draw[->, black] (HGEJaux) -- (J.west) node[draw=none,text=black,fill=none,font=\tiny,pos=0,sloped,above=\LabelDist] {\scalebox{.3}{$E\cdot G\cdot H$}};
+
+
+% formula: ~D + E <-> F
+% negated disjunct
+\node[neg, color1] (Dneg) at ([xshift=\LNeg]D.south east) {};
+\draw[->, color1] (Dneg) to (F.west);
+% simple disjunction with shifted starting point
+\draw[->, color1] (E.north east) to (F.west);
+
+
+% formula: G*H <-> I
+% junction of the conjuncts
+\node[aux, color0] (Iaux) at ([xshift=\LConj]I.west) {};
+% partial arrows from the conjuncts to the junction
+\draw[conjunctonsegment, color0] (H.east) to (Iaux);
+\draw[conjunctonsegment, color0] (G.east) to (Iaux);
+% arrow from junction to target factor
+\draw[->, color0] (Iaux) -- (I) node[draw=none, text=black, fill=none, font=\tiny, above=\LabelDist, pos=0, sloped] {\scalebox{.3}{$G\cdot H$}};
+
+
+% of level 1
+% formula: A*B <-> C
+% junction of the conjuncts
+\node[aux, black] (Caux) at ([xshift=\LConj]C.west) {};
+% partial arrows from the conjuncts to the junction
+\draw[conjunctonsegment, black] (B.east) to (Caux);
+\draw[conjunctonsegment, black] (A.east) to (Caux);
+% arrow from junction to target factor
+\draw[->, black] (Caux) -- (C) node[draw=none, text=black, fill=none, font=\tiny, above=\LabelDist, pos=0, sloped] {\scalebox{.3}{$A\cdot B$}};
+
+
+
+% constitution relations
+% formula: I <-> B
+\draw[crelationright, color0] (I.north east) to (B.south);
+
+% formula: H <-> B
+\draw[crelationleft, color0] (H.north west) to (B.south);
+
+% formula: G <-> B
+\draw[crelationleft, color0] (G.north west) to (B.south);
+
+% formula: F <-> A
+\draw[crelationright, color1] (F.north east) to (A.south);
+
+% formula: E <-> A
+\draw[crelationleft, color1] (E.north west) to (A.south);
+
+% formula: D <-> A
+\draw[crelationleft, color1] (D.north west) to (A.south);
+
+% formula: J <-> C
+\draw[crelationstraight, color2] (J.north) to (C.south);
+
+
+% End formula from file
+\end{tikzpicture}\\[4mm]
+\tiny $(\neg D \cdot G \cdot H + E \cdot G \cdot H\leftrightarrow J)\cdot(\neg D + E\leftrightarrow F)\cdot(G \cdot H\leftrightarrow I)\cdot(A \cdot B\leftrightarrow C)$
+\end{page}
+
+\begin{page}
+\centering solution no.~5/6\\[3mm]
+
+\begin{tikzpicture}[>=latex,%
+  %bezier bounding box=true,% avoid excessive white spaces around bended lines [comment this line out if compiling takes too long]  
+  ]%
+% Begin formula from file
+% placement of the nodes
+% factors of level 0:
+% causal order 0:
+\node[draw=color0, text=black]  (H) {$H$};
+\hilightsource{H};
+\node[draw=color0, text=black] [above= \LvDist of H] (G) {$G$};
+\hilightsource{G};
+\node[draw=color1, text=black] [above= \LvDist of G] (E) {$E$};
+\hilightsource{E};
+\node[draw=color1, text=black] [above= \LvDist of E] (D) {$D$};
+\hilightsource{D};
+% causal order 1:
+\node[draw=color0, text=black] [right= \LhDist of H] (I) {$I$};
+\node[draw=color1, text=black] [above= \LvDist of I] (F) {$F$};
+\hilighttarget{F};
+% causal order 2:
+\node[draw=color2, text=black] [right= \LhDist of I] (J) {$J$};
+\hilighttarget{J};
+% factors of level 1:
+% causal order 0:
+\node[draw=black, text=color0] [above= {4*\LvDist + 2* \HeightNode  + \iLvDist} of H] (B) {$B$};
+\hilightsource{B};
+\node[draw=black, text=color1] [above= \LvDist of B] (A) {$A$};
+\hilightsource{A};
+% causal order 1:
+\node[draw=black, text=color2] [right= \LhDist of B] (C) {$C$};
+\hilighttarget{C};
+
+% causal relations
+% of level 0
+% formula: ~D*I + E*G*H <-> J
+% complex disjunction
+% junction of the conjuncts
+\node[aux, black] (DIJaux) at ([xshift=\hDisjConj, yshift=\vDisjConj]I.east) {};
+% partial arrows from the conjuncts to the junction
+\node[neg, color1] (Dneg) at ([xshift=\LNeg]D.south east) {};
+\draw[conjunctonsegment, black] (Dneg) to (DIJaux);
+\draw[conjunctonsegment, black] (I.east) to (DIJaux);
+% arrow from junction to target factor
+\draw[->, black] (DIJaux) -- (J.west) node[draw=none,text=black,fill=none,font=\tiny,pos=0,sloped,above=\LabelDist] {\scalebox{.3}{$\neg D\cdot I$}};
+% complex disjunction
+% junction of the conjuncts
+\node[aux, black] (HGEJaux) at ([xshift=\hDisjConj, yshift=\vDisjConj]H.east) {};
+% partial arrows from the conjuncts to the junction
+\draw[conjunctonsegment, black] (E.east) to (HGEJaux);
+\draw[conjunctonsegment, black] (G.east) to (HGEJaux);
+\draw[conjunctonsegment, black] (H.east) to (HGEJaux);
+% arrow from junction to target factor
+\draw[->, black] (HGEJaux) -- (J.west) node[draw=none,text=black,fill=none,font=\tiny,pos=0,sloped,above=\LabelDist] {\scalebox{.3}{$E\cdot G\cdot H$}};
+
+
+% formula: ~D + E <-> F
+% negated disjunct
+\node[neg, color1] (Dneg) at ([xshift=\LNeg]D.south east) {};
+\draw[->, color1] (Dneg) to (F.west);
+% simple disjunction with shifted starting point
+\draw[->, color1] (E.north east) to (F.west);
+
+
+% formula: G*H <-> I
+% junction of the conjuncts
+\node[aux, color0] (Iaux) at ([xshift=\LConj]I.west) {};
+% partial arrows from the conjuncts to the junction
+\draw[conjunctonsegment, color0] (H.east) to (Iaux);
+\draw[conjunctonsegment, color0] (G.east) to (Iaux);
+% arrow from junction to target factor
+\draw[->, color0] (Iaux) -- (I) node[draw=none, text=black, fill=none, font=\tiny, above=\LabelDist, pos=0, sloped] {\scalebox{.3}{$G\cdot H$}};
+
+
+% of level 1
+% formula: A*B <-> C
+% junction of the conjuncts
+\node[aux, black] (Caux) at ([xshift=\LConj]C.west) {};
+% partial arrows from the conjuncts to the junction
+\draw[conjunctonsegment, black] (B.east) to (Caux);
+\draw[conjunctonsegment, black] (A.east) to (Caux);
+% arrow from junction to target factor
+\draw[->, black] (Caux) -- (C) node[draw=none, text=black, fill=none, font=\tiny, above=\LabelDist, pos=0, sloped] {\scalebox{.3}{$A\cdot B$}};
+
+
+
+% constitution relations
+% formula: I <-> B
+\draw[crelationright, color0] (I.north east) to (B.south);
+
+% formula: H <-> B
+\draw[crelationleft, color0] (H.north west) to (B.south);
+
+% formula: G <-> B
+\draw[crelationleft, color0] (G.north west) to (B.south);
+
+% formula: F <-> A
+\draw[crelationright, color1] (F.north east) to (A.south);
+
+% formula: E <-> A
+\draw[crelationleft, color1] (E.north west) to (A.south);
+
+% formula: D <-> A
+\draw[crelationleft, color1] (D.north west) to (A.south);
+
+% formula: J <-> C
+\draw[crelationstraight, color2] (J.north) to (C.south);
+
+
+% End formula from file
+\end{tikzpicture}\\[4mm]
+\tiny $(\neg D \cdot I + E \cdot G \cdot H\leftrightarrow J)\cdot(\neg D + E\leftrightarrow F)\cdot(G \cdot H\leftrightarrow I)\cdot(A \cdot B\leftrightarrow C)$
+\end{page}
+
+\begin{page}
+\centering solution no.~6/6\\[3mm]
+
+\begin{tikzpicture}[>=latex,%
+  %bezier bounding box=true,% avoid excessive white spaces around bended lines [comment this line out if compiling takes too long]  
+  ]%
+% Begin formula from file
+% placement of the nodes
+% factors of level 0:
+% causal order 0:
+\node[draw=color0, text=black]  (H) {$H$};
+\hilightsource{H};
+\node[draw=color0, text=black] [above= \LvDist of H] (G) {$G$};
+\hilightsource{G};
+\node[draw=color1, text=black] [above= \LvDist of G] (E) {$E$};
+\hilightsource{E};
+\node[draw=color1, text=black] [above= \LvDist of E] (D) {$D$};
+\hilightsource{D};
+% causal order 1:
+\node[draw=color0, text=black] [right= \LhDist of H] (I) {$I$};
+\node[draw=color1, text=black] [above= \LvDist of I] (F) {$F$};
+\hilighttarget{F};
+% causal order 2:
+\node[draw=color2, text=black] [right= \LhDist of I] (J) {$J$};
+\hilighttarget{J};
+% factors of level 1:
+% causal order 0:
+\node[draw=black, text=color0] [above= {4*\LvDist + 2* \HeightNode  + \iLvDist} of H] (B) {$B$};
+\hilightsource{B};
+\node[draw=black, text=color1] [above= \LvDist of B] (A) {$A$};
+\hilightsource{A};
+% causal order 1:
+\node[draw=black, text=color2] [right= \LhDist of B] (C) {$C$};
+\hilighttarget{C};
+
+% causal relations
+% of level 0
+% formula: ~D*I + E*I <-> J
+% complex disjunction
+% junction of the conjuncts
+\node[aux, black] (DIJaux) at ([xshift=\hDisjConj, yshift=\vDisjConj]I.east) {};
+% partial arrows from the conjuncts to the junction
+\node[neg, color1] (Dneg) at ([xshift=\LNeg]D.south east) {};
+\draw[conjunctonsegment, black] (Dneg) to (DIJaux);
+\draw[conjunctonsegment, black] (I.east) to (DIJaux);
+% arrow from junction to target factor
+\draw[->, black] (DIJaux) -- (J.west) node[draw=none,text=black,fill=none,font=\tiny,pos=0,sloped,above=\LabelDist] {\scalebox{.3}{$\neg D\cdot I$}};
+% complex disjunction
+% junction of the conjuncts
+\node[aux, black] (EIJaux) at ([xshift=\hDisjConj, yshift={\vDisjConj + 1*\tDisjConj}]I.east) {};
+% partial arrows from the conjuncts to the junction
+\draw[conjunctonsegment, black] (E.east) to (EIJaux);
+\draw[conjunctonsegment, black] (I.east) to (EIJaux);
+% arrow from junction to target factor
+\draw[->, black] (EIJaux) -- (J.west) node[draw=none,text=black,fill=none,font=\tiny,pos=0,sloped,above=\LabelDist] {\scalebox{.3}{$E\cdot I$}};
+
+
+% formula: ~D + E <-> F
+% negated disjunct
+\node[neg, color1] (Dneg) at ([xshift=\LNeg]D.south east) {};
+\draw[->, color1] (Dneg) to (F.west);
+% simple disjunction with shifted starting point
+\draw[->, color1] (E.north east) to (F.west);
+
+
+% formula: G*H <-> I
+% junction of the conjuncts
+\node[aux, color0] (Iaux) at ([xshift=\LConj]I.west) {};
+% partial arrows from the conjuncts to the junction
+\draw[conjunctonsegment, color0] (H.east) to (Iaux);
+\draw[conjunctonsegment, color0] (G.east) to (Iaux);
+% arrow from junction to target factor
+\draw[->, color0] (Iaux) -- (I) node[draw=none, text=black, fill=none, font=\tiny, above=\LabelDist, pos=0, sloped] {\scalebox{.3}{$G\cdot H$}};
+
+
+% of level 1
+% formula: A*B <-> C
+% junction of the conjuncts
+\node[aux, black] (Caux) at ([xshift=\LConj]C.west) {};
+% partial arrows from the conjuncts to the junction
+\draw[conjunctonsegment, black] (B.east) to (Caux);
+\draw[conjunctonsegment, black] (A.east) to (Caux);
+% arrow from junction to target factor
+\draw[->, black] (Caux) -- (C) node[draw=none, text=black, fill=none, font=\tiny, above=\LabelDist, pos=0, sloped] {\scalebox{.3}{$A\cdot B$}};
+
+
+
+% constitution relations
+% formula: I <-> B
+\draw[crelationright, color0] (I.north east) to (B.south);
+
+% formula: H <-> B
+\draw[crelationleft, color0] (H.north west) to (B.south);
+
+% formula: G <-> B
+\draw[crelationleft, color0] (G.north west) to (B.south);
+
+% formula: F <-> A
+\draw[crelationright, color1] (F.north east) to (A.south);
+
+% formula: E <-> A
+\draw[crelationleft, color1] (E.north west) to (A.south);
+
+% formula: D <-> A
+\draw[crelationleft, color1] (D.north west) to (A.south);
+
+% formula: J <-> C
+\draw[crelationstraight, color2] (J.north) to (C.south);
+
+
+% End formula from file
+\end{tikzpicture}\\[4mm]
+\tiny $(\neg D \cdot I + E \cdot I\leftrightarrow J)\cdot(\neg D + E\leftrightarrow F)\cdot(G \cdot H\leftrightarrow I)\cdot(A \cdot B\leftrightarrow C)$
+\end{page}
+
+
+\end{document}

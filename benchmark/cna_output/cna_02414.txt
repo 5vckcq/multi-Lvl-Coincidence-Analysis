@@ -1,0 +1,63 @@
+--- Coincidence Analysis (CNA) ---
+
+Factors: A, B, C, D, E, F 
+
+Atomic solution formulas:
+-------------------------
+Outcome E:
+ solution                  consistency coverage complexity inus
+ B*c + B*d + A*C*d <-> E             1        1          7 TRUE
+ B*c + B*d + A*d*f <-> E             1        1          7 TRUE
+ B*c + A*C*d + a*d*F <-> E           1        1          8 TRUE
+ B*c + A*C*d + C*d*F <-> E           1        1          8 TRUE
+ B*c + A*d*f + a*d*F <-> E           1        1          8 TRUE
+ B*c + A*d*f + C*d*F <-> E           1        1          8 TRUE
+
+Outcome F:
+ solution                  consistency coverage complexity inus
+ a*B + D*E + A*b*c <-> F             1        1          7 TRUE
+ a*B + D*E + A*c*e <-> F             1        1          7 TRUE
+ a*B + A*b*c + A*c*D <-> F           1        1          8 TRUE
+ a*B + A*b*c + B*c*D <-> F           1        1          8 TRUE
+ a*B + A*c*D + A*c*e <-> F           1        1          8 TRUE
+ a*B + A*c*D + A*d*e <-> F           1        1          8 TRUE
+ a*B + A*c*e + B*c*D <-> F           1        1          8 TRUE
+
+Complex solution formulas:
+--------------------------
+ outcome solution                                                consistency
+ E,F     (B*c + B*d + A*C*d <-> E)*(a*B + D*E + A*b*c <-> F)               1
+ E,F     (B*c + B*d + A*C*d <-> E)*(a*B + D*E + A*c*e <-> F)               1
+ E,F     (B*c + B*d + A*C*d <-> E)*(a*B + A*b*c + A*c*D <-> F)             1
+ E,F     (B*c + B*d + A*C*d <-> E)*(a*B + A*b*c + B*c*D <-> F)             1
+ E,F     (B*c + B*d + A*C*d <-> E)*(a*B + A*c*D + A*c*e <-> F)             1
+ E,F     (B*c + B*d + A*C*d <-> E)*(a*B + A*c*D + A*d*e <-> F)             1
+ E,F     (B*c + B*d + A*C*d <-> E)*(a*B + A*c*e + B*c*D <-> F)             1
+ E,F     (B*c + B*d + A*d*f <-> E)*(a*B + A*b*c + A*c*D <-> F)             1
+ E,F     (B*c + B*d + A*d*f <-> E)*(a*B + A*b*c + B*c*D <-> F)             1
+ E,F     (B*c + A*C*d + a*d*F <-> E)*(a*B + A*b*c + A*c*D <-> F)           1
+ E,F     (B*c + A*C*d + a*d*F <-> E)*(a*B + A*b*c + B*c*D <-> F)           1
+ E,F     (B*c + A*C*d + C*d*F <-> E)*(a*B + A*b*c + A*c*D <-> F)           1
+ E,F     (B*c + A*C*d + C*d*F <-> E)*(a*B + A*b*c + B*c*D <-> F)           1
+ E,F     (B*c + A*d*f + a*d*F <-> E)*(a*B + A*b*c + A*c*D <-> F)           1
+ E,F     (B*c + A*d*f + a*d*F <-> E)*(a*B + A*b*c + B*c*D <-> F)           1
+ E,F     (B*c + A*d*f + C*d*F <-> E)*(a*B + A*b*c + A*c*D <-> F)           1
+ E,F     (B*c + A*d*f + C*d*F <-> E)*(a*B + A*b*c + B*c*D <-> F)           1
+ coverage complexity inus cyclic
+        1         14 TRUE  FALSE
+        1         14 TRUE  FALSE
+        1         15 TRUE  FALSE
+        1         15 TRUE  FALSE
+        1         15 TRUE  FALSE
+        1         15 TRUE  FALSE
+        1         15 TRUE  FALSE
+        1         15 TRUE  FALSE
+        1         15 TRUE  FALSE
+        1         16 TRUE  FALSE
+        1         16 TRUE  FALSE
+        1         16 TRUE  FALSE
+        1         16 TRUE  FALSE
+        1         16 TRUE  FALSE
+        1         16 TRUE  FALSE
+        1         16 TRUE  FALSE
+        1         16 TRUE  FALSE

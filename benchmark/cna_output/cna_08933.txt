@@ -1,0 +1,44 @@
+--- Coincidence Analysis (CNA) ---
+
+Factors: A, B, C, D, E, F 
+
+Atomic solution formulas:
+-------------------------
+Outcome E:
+ solution                consistency coverage complexity inus
+ A*b + b*C + C*d <-> E             1        1          6 TRUE
+ A*b + b*C + C*F <-> E             1        1          6 TRUE
+ A*b + b*f + C*d <-> E             1        1          6 TRUE
+ A*b + b*f + C*F <-> E             1        1          6 TRUE
+ A*b + b*C + B*d*F <-> E           1        1          7 TRUE
+ A*b + b*f + B*d*F <-> E           1        1          7 TRUE
+
+Outcome F:
+ solution                  consistency coverage complexity inus
+ b*e + B*E + c*D <-> F               1        1          6 TRUE
+ b*e + c*D + B*C*d <-> F             1        1          7 TRUE
+ B*E + c*D + a*b*c <-> F             1        1          7 TRUE
+ c*D + a*b*c + B*C*d <-> F           1        1          8 TRUE
+
+Complex solution formulas:
+--------------------------
+ outcome solution                                              consistency
+ E,F     (A*b + b*C + C*d <-> E)*(b*e + B*E + c*D <-> F)                 1
+ E,F     (A*b + b*C + C*d <-> E)*(b*e + c*D + B*C*d <-> F)               1
+ E,F     (A*b + b*C + C*d <-> E)*(B*E + c*D + a*b*c <-> F)               1
+ E,F     (A*b + b*C + C*d <-> E)*(c*D + a*b*c + B*C*d <-> F)             1
+ E,F     (A*b + b*C + C*F <-> E)*(c*D + a*b*c + B*C*d <-> F)             1
+ E,F     (A*b + b*f + C*d <-> E)*(c*D + a*b*c + B*C*d <-> F)             1
+ E,F     (A*b + b*f + C*F <-> E)*(c*D + a*b*c + B*C*d <-> F)             1
+ E,F     (A*b + b*C + B*d*F <-> E)*(c*D + a*b*c + B*C*d <-> F)           1
+ E,F     (A*b + b*f + B*d*F <-> E)*(c*D + a*b*c + B*C*d <-> F)           1
+ coverage complexity inus cyclic
+        1         12 TRUE  FALSE
+        1         13 TRUE  FALSE
+        1         13 TRUE  FALSE
+        1         14 TRUE  FALSE
+        1         14 TRUE  FALSE
+        1         14 TRUE  FALSE
+        1         14 TRUE  FALSE
+        1         15 TRUE  FALSE
+        1         15 TRUE  FALSE

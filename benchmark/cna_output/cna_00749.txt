@@ -1,0 +1,55 @@
+--- Coincidence Analysis (CNA) ---
+
+Factors: A, B, C, D, E, F 
+
+Atomic solution formulas:
+-------------------------
+Outcome A:
+ solution        consistency coverage complexity inus
+ e + b*f <-> A             1        1          3 TRUE
+ b*f + B*F <-> A           1        1          4 TRUE
+
+Outcome B:
+ solution        consistency coverage complexity inus
+ e + a*f <-> B             1        1          3 TRUE
+ a*f + A*F <-> B           1        1          4 TRUE
+
+Outcome E:
+ solution    consistency coverage complexity inus
+ a + b <-> E           1        1          2 TRUE
+ a + f <-> E           1        1          2 TRUE
+ b + f <-> E           1        1          2 TRUE
+
+Outcome F:
+ solution        consistency coverage complexity inus
+ e + a*b <-> F             1        1          3 TRUE
+ A*B + a*b <-> F           1        1          4 TRUE
+
+Complex solution formulas:
+--------------------------
+ outcome solution                        consistency coverage complexity inus
+ E,F     (a + b <-> E)*(e + a*b <-> F)             1        1          5 TRUE
+ B,E     (e + a*f <-> B)*(a + f <-> E)             1        1          5 TRUE
+ A,E     (e + b*f <-> A)*(b + f <-> E)             1        1          5 TRUE
+ E,F     (a + b <-> E)*(A*B + a*b <-> F)           1        1          6 TRUE
+ E,F     (a + f <-> E)*(A*B + a*b <-> F)           1        1          6 TRUE
+ E,F     (b + f <-> E)*(A*B + a*b <-> F)           1        1          6 TRUE
+ B,E     (a*f + A*F <-> B)*(a + b <-> E)           1        1          6 TRUE
+ B,E     (a*f + A*F <-> B)*(a + f <-> E)           1        1          6 TRUE
+ B,E     (a*f + A*F <-> B)*(b + f <-> E)           1        1          6 TRUE
+ A,E     (b*f + B*F <-> A)*(a + b <-> E)           1        1          6 TRUE
+ A,E     (b*f + B*F <-> A)*(a + f <-> E)           1        1          6 TRUE
+ A,E     (b*f + B*F <-> A)*(b + f <-> E)           1        1          6 TRUE
+ cyclic
+  FALSE
+  FALSE
+  FALSE
+  FALSE
+  FALSE
+  FALSE
+  FALSE
+  FALSE
+  FALSE
+  FALSE
+  FALSE
+  FALSE

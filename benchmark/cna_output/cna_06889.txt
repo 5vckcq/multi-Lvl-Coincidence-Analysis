@@ -1,0 +1,84 @@
+--- Coincidence Analysis (CNA) ---
+
+Factors: A, B, C, D, E, F 
+
+Atomic solution formulas:
+-------------------------
+Outcome D:
+ solution        consistency coverage complexity inus
+ c + f <-> D               1        1          2 TRUE
+ e + f <-> D               1        1          2 TRUE
+ A + b + c <-> D           1        1          3 TRUE
+ A + b + e <-> D           1        1          3 TRUE
+
+Outcome E:
+ solution      consistency coverage complexity inus
+ C + f <-> E             1        1          2 TRUE
+ d + f <-> E             1        1          2 TRUE
+ C + a*b <-> E           1        1          3 TRUE
+
+Outcome F:
+ solution            consistency coverage complexity inus
+ d + e <-> F                   1        1          2 TRUE
+ e + a*B <-> F                 1        1          3 TRUE
+ a*B + A*c <-> F               1        1          4 TRUE
+ d + A*c + B*c <-> F           1        1          5 TRUE
+
+Complex solution formulas:
+--------------------------
+ outcome solution                                                consistency
+ D,E     (c + f <-> D)*(C + f <-> E)                                       1
+ D,E     (c + f <-> D)*(d + f <-> E)                                       1
+ D,E     (e + f <-> D)*(C + f <-> E)                                       1
+ D,F     (e + f <-> D)*(e + a*B <-> F)                                     1
+ D,F     (A + b + e <-> D)*(d + e <-> F)                                   1
+ D,F     (A + b + e <-> D)*(e + a*B <-> F)                                 1
+ E,F     (d + f <-> E)*(d + A*c + B*c <-> F)                               1
+ D,E,F   (c + f <-> D)*(C + f <-> E)*(a*B + A*c <-> F)                     1
+ D,E,F   (c + f <-> D)*(d + f <-> E)*(a*B + A*c <-> F)                     1
+ D,E,F   (e + f <-> D)*(C + f <-> E)*(a*B + A*c <-> F)                     1
+ D,E,F   (c + f <-> D)*(C + a*b <-> E)*(e + a*B <-> F)                     1
+ D,E,F   (e + f <-> D)*(C + a*b <-> E)*(e + a*B <-> F)                     1
+ D,E,F   (A + b + c <-> D)*(C + a*b <-> E)*(d + e <-> F)                   1
+ D,E,F   (A + b + e <-> D)*(C + a*b <-> E)*(d + e <-> F)                   1
+ D,E,F   (c + f <-> D)*(C + a*b <-> E)*(a*B + A*c <-> F)                   1
+ D,E,F   (e + f <-> D)*(C + a*b <-> E)*(a*B + A*c <-> F)                   1
+ D,E,F   (A + b + c <-> D)*(C + f <-> E)*(a*B + A*c <-> F)                 1
+ D,E,F   (A + b + c <-> D)*(d + f <-> E)*(a*B + A*c <-> F)                 1
+ D,E,F   (A + b + e <-> D)*(C + f <-> E)*(a*B + A*c <-> F)                 1
+ D,E,F   (A + b + c <-> D)*(C + a*b <-> E)*(e + a*B <-> F)                 1
+ D,E,F   (A + b + e <-> D)*(C + a*b <-> E)*(e + a*B <-> F)                 1
+ D,E,F   (A + b + c <-> D)*(C + f <-> E)*(d + A*c + B*c <-> F)             1
+ D,E,F   (A + b + c <-> D)*(d + f <-> E)*(d + A*c + B*c <-> F)             1
+ D,E,F   (A + b + c <-> D)*(C + a*b <-> E)*(a*B + A*c <-> F)               1
+ D,E,F   (A + b + e <-> D)*(C + a*b <-> E)*(a*B + A*c <-> F)               1
+ D,E,F   (A + b + c <-> D)*(C + a*b <-> E)*(d + A*c + B*c <-> F)           1
+ D,E,F   (A + b + e <-> D)*(C + a*b <-> E)*(d + A*c + B*c <-> F)           1
+ coverage complexity inus cyclic
+        1          4 TRUE  FALSE
+        1          4 TRUE  FALSE
+        1          4 TRUE  FALSE
+        1          5 TRUE  FALSE
+        1          5 TRUE  FALSE
+        1          6 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          9 TRUE  FALSE
+        1          9 TRUE  FALSE
+        1          9 TRUE  FALSE
+        1          9 TRUE  FALSE
+        1          9 TRUE  FALSE
+        1          9 TRUE  FALSE
+        1          9 TRUE  FALSE
+        1         10 TRUE  FALSE
+        1         10 TRUE  FALSE
+        1         10 TRUE  FALSE
+        1         10 TRUE  FALSE
+        1         11 TRUE  FALSE
+        1         11 TRUE  FALSE

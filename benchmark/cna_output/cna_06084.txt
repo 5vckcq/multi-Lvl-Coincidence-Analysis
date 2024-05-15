@@ -1,0 +1,44 @@
+--- Coincidence Analysis (CNA) ---
+
+Factors: A, B, C, D, E, F 
+
+Atomic solution formulas:
+-------------------------
+Outcome E:
+ solution                    consistency coverage complexity inus
+ A + D*f + B*c*d <-> E                 1        1          6 TRUE
+ A + D*f + B*d*F <-> E                 1        1          6 TRUE
+ A + b*D + C*D + B*c*d <-> E           1        1          8 TRUE
+ A + b*D + C*D + B*d*F <-> E           1        1          8 TRUE
+ A + b*f + C*D + B*c*d <-> E           1        1          8 TRUE
+ A + b*f + C*D + B*d*F <-> E           1        1          8 TRUE
+ A + C*D + c*f + B*c*d <-> E           1        1          8 TRUE
+ A + C*D + c*f + B*d*F <-> E           1        1          8 TRUE
+
+Outcome F:
+ solution          consistency coverage complexity inus
+ B*c + b*e <-> F             1        1          4 TRUE
+ B*c + a*b*d <-> F           1        1          5 TRUE
+
+Complex solution formulas:
+--------------------------
+ outcome solution                                          consistency coverage
+ E,F     (A + D*f + B*c*d <-> E)*(B*c + a*b*d <-> F)                 1        1
+ E,F     (A + D*f + B*d*F <-> E)*(B*c + a*b*d <-> F)                 1        1
+ E,F     (A + b*D + C*D + B*c*d <-> E)*(B*c + b*e <-> F)             1        1
+ E,F     (A + b*D + C*D + B*c*d <-> E)*(B*c + a*b*d <-> F)           1        1
+ E,F     (A + b*D + C*D + B*d*F <-> E)*(B*c + a*b*d <-> F)           1        1
+ E,F     (A + b*f + C*D + B*c*d <-> E)*(B*c + a*b*d <-> F)           1        1
+ E,F     (A + b*f + C*D + B*d*F <-> E)*(B*c + a*b*d <-> F)           1        1
+ E,F     (A + C*D + c*f + B*c*d <-> E)*(B*c + a*b*d <-> F)           1        1
+ E,F     (A + C*D + c*f + B*d*F <-> E)*(B*c + a*b*d <-> F)           1        1
+ complexity inus cyclic
+         11 TRUE  FALSE
+         11 TRUE  FALSE
+         12 TRUE  FALSE
+         13 TRUE  FALSE
+         13 TRUE  FALSE
+         13 TRUE  FALSE
+         13 TRUE  FALSE
+         13 TRUE  FALSE
+         13 TRUE  FALSE

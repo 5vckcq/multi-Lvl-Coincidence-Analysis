@@ -1,0 +1,66 @@
+--- Coincidence Analysis (CNA) ---
+
+Factors: A, B, C, D, E, F 
+
+Atomic solution formulas:
+-------------------------
+Outcome A:
+ solution consistency coverage complexity inus
+ c <-> A            1        1          1 TRUE
+
+Outcome B:
+ solution    consistency coverage complexity inus
+ d + e <-> B           1        1          2 TRUE
+
+Outcome C:
+ solution consistency coverage complexity inus
+ a <-> C            1        1          1 TRUE
+
+Outcome D:
+ solution    consistency coverage complexity inus
+ A + b <-> D           1        1          2 TRUE
+ b + c <-> D           1        1          2 TRUE
+ b + e <-> D           1        1          2 TRUE
+
+Outcome E:
+ solution    consistency coverage complexity inus
+ a + b <-> E           1        1          2 TRUE
+ b + C <-> E           1        1          2 TRUE
+ b + d <-> E           1        1          2 TRUE
+
+Complex solution formulas:
+--------------------------
+ outcome solution                              consistency coverage complexity
+ C,D,E   (a <-> C)*(A + b <-> D)*(a + b <-> E)           1        1          5
+ A,D,E   (c <-> A)*(A + b <-> D)*(a + b <-> E)           1        1          5
+ C,D,E   (a <-> C)*(A + b <-> D)*(b + C <-> E)           1        1          5
+ A,D,E   (c <-> A)*(A + b <-> D)*(b + C <-> E)           1        1          5
+ C,D,E   (a <-> C)*(A + b <-> D)*(b + d <-> E)           1        1          5
+ A,D,E   (c <-> A)*(A + b <-> D)*(b + d <-> E)           1        1          5
+ C,D,E   (a <-> C)*(b + c <-> D)*(a + b <-> E)           1        1          5
+ A,D,E   (c <-> A)*(b + c <-> D)*(a + b <-> E)           1        1          5
+ C,D,E   (a <-> C)*(b + c <-> D)*(b + C <-> E)           1        1          5
+ A,D,E   (c <-> A)*(b + c <-> D)*(b + C <-> E)           1        1          5
+ C,D,E   (a <-> C)*(b + c <-> D)*(b + d <-> E)           1        1          5
+ A,D,E   (c <-> A)*(b + c <-> D)*(b + d <-> E)           1        1          5
+ C,D,E   (a <-> C)*(b + e <-> D)*(a + b <-> E)           1        1          5
+ A,D,E   (c <-> A)*(b + e <-> D)*(a + b <-> E)           1        1          5
+ C,D,E   (a <-> C)*(b + e <-> D)*(b + C <-> E)           1        1          5
+ A,D,E   (c <-> A)*(b + e <-> D)*(b + C <-> E)           1        1          5
+ inus cyclic
+ TRUE  FALSE
+ TRUE  FALSE
+ TRUE  FALSE
+ TRUE  FALSE
+ TRUE  FALSE
+ TRUE  FALSE
+ TRUE  FALSE
+ TRUE  FALSE
+ TRUE  FALSE
+ TRUE  FALSE
+ TRUE  FALSE
+ TRUE  FALSE
+ TRUE  FALSE
+ TRUE  FALSE
+ TRUE  FALSE
+ TRUE  FALSE

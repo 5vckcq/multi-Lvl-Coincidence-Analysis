@@ -88,6 +88,7 @@ def convert_causal_relation(formula, level_factor_list_order, tex_code, color, c
                 if disj in get_components_from_formula(formula[0], level_factor_list_order):
                     # case A: the discunct is one causal factor
                     
+                    """ START COMMENTED OUT
                     # in order to prevent overlapping horizontal arrows                    
                     # get positions of disj and formula[1] in their respective level_factor_list_order sublists
                     # first position i of disj
@@ -117,6 +118,13 @@ def convert_causal_relation(formula, level_factor_list_order, tex_code, color, c
                         st = st + "% simple disjunction\n"
                         st = st + "\draw[->, " + color + "] (" + disj + ".east) to (" + formula[1] + ".west);\n"
                 
+                    END COMMENTED OUT
+                    """
+                    # alternative:
+                    # a straight arrow is drawn from source factor.north east to target factor.west
+                    st = st + "% simple disjunction with shifted starting point\n"
+                    st = st + "\draw[->, " + color + "] (" + disj + ".north east) to (" + formula[1] + ".west);\n"
+                    
                 elif disj.find("*") > -1 :
                     # case B: the disjunct is a conjunction
                     st = st + "% complex disjunction\n"

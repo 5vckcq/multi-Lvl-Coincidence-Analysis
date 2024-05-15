@@ -34,7 +34,7 @@ def list_comparison(list1, list2):
     list2.sort()
     return list1 == list2
     
-def find_causal_factors(st) :
+def find_causal_factors(st):
     # looks in string st for denominators of causal factors, which are separated by ", " or " < "
     # returns a (possibly empty) list of causal factors
     
@@ -42,7 +42,7 @@ def find_causal_factors(st) :
     st = re.sub("\r?\n","",st).rstrip()
     
     # returns the list of components of st that were separated by ", " or " < "
-    return re.split(",\s*|\s*<\s*", st)
+    return re.split(r',\s*|\s*<\s*', st)
     
 
 def get_causal_prefactors(factor, formula_list, factor_list) :
@@ -51,8 +51,8 @@ def get_causal_prefactors(factor, formula_list, factor_list) :
     return_list = []
     
     
-    for formula in formula_list :
-        if formula[1] == factor :
+    for formula in formula_list:
+        if formula[1] == factor:
             # if the factor we are interested in is the target factor of the relation formula,            
             # then add all factors that appear on the left side of formula to the return list
             return_list.extend(get_components_from_formula(formula[0], factor_list))
@@ -69,6 +69,10 @@ def get_equiv_formula(st):
     # returns the leftside and rightside partial formulae of the "alpha <-> beta" from the input string st
     # as pairs of strings (a,b)
     a = re.split(" <-> ",st)[0].strip()          # strip() removes leading spaces
+    # in case that the line starts with some unnecessary stuff, followed by spaces, capture only content
+    # behind white space
+    if bool(re.search(r'\s{2,}', a)):
+        a = re.split(r'\s{2,}', a)[1]        
     b = re.split(" <-> ",st)[1].strip()
     
     # conversion of the negation syntax (in cna by minuscle) such that "a" -> "~A"
@@ -94,7 +98,7 @@ def get_equiv_formula(st):
     
     
     # The lines of the cna output contain further stuff, we can get rid off it:
-    b = re.split("[ \t]",b)[0]
+    b = re.split(r'[ \t]',b)[0]
     return (a,b)
 
 def get_components_from_formula(st, factor_list):
@@ -264,10 +268,10 @@ def get_ordered_dnf(formula):
         formula = ""
                                          
     # split formula into disjuncts
-    disj_list = re.split("\s\+\s", formula)
+    disj_list = re.split(r'\s\+\s', formula)
                                         
     # split disjuncts into conjuncts
-    conj_list = [re.split("\*", disj) for disj in disj_list] # nested list conj_list[DISJUNCT][CONJUNCT IN DISJUNCT]
+    conj_list = [re.split(r'\*', disj) for disj in disj_list] # nested list conj_list[DISJUNCT][CONJUNCT IN DISJUNCT]
     for disj in conj_list:
         # sort each conjunct
         disj.sort()
@@ -291,6 +295,12 @@ def get_clusters(formula_list, factor_list):
     # two factors are causally connected, iff they either appear in the same formula of formula_list or they are connected via intermediate factors
     # returns the list of clusters, each cluster is a list of the contained factors
     
+    # flatten factor_list in case that the list is nested
+    if type(factor_list[0]) == list:
+            factor_list = [x for sub_list in factor_list for x in sub_list]
+            if type(factor_list[0]) == list:
+                factor_list = [x for sub_list in factor_list for x in sub_list]
+    
     # list for output 
     new_list_of_connected = []
     # each cluster is a sublist
@@ -302,7 +312,6 @@ def get_clusters(formula_list, factor_list):
             new_list_of_connected[0].append(fac)
             # add also all factors that are connected with fac to the new cluster
             for formula in formula_list:
-                
                 if (formula[1] == fac) or (fac in get_components_from_formula(formula[0], factor_list)):                    
                     # if fac is part of this formula
                     # add the right side
@@ -415,4 +424,93 @@ def get_clusters(formula_list, factor_list):
                         del new_list_of_connected[num_cluster]
                         break # leave for-loop of sec_num_cluster                          
 
-    return new_list_of_connected        
+    return new_list_of_connected     
+
+def get_truthvalue(formula, assignment):
+    # recursive function to return the truth value of formula under the given assignment of truth values to variables
+    # returns False in case of syntax error in formula or if not all variables are assigned to a truth value
+    # assignment is expected to be a dictionary whose entries encompass the variables occuring in formula with Boolean values
+    # assumptions for formula corresponding to mLCA-style: 
+    # (1) if formula is a list with more than one element, each element is interpreted as a conjunct of a chain of conjunctions
+    # (2) if formula is a 1-elemental list whose element is a 2-tuple or formula is a 2-tuple, both tuple elements are interpreted as connected by an equivalence
+    # (2a) left side term is a disjunctive normal form string variable
+    # (2b) right side term is atomic
+    # (3) if formula is a string, it is a disjunctive normal form with disjunctor ' + ',
+    #     conjunctor '*' and negator '~'
+    if type(formula) == list and len(formula) > 1:
+        # case (1) -> conjunction
+        truthvalue = get_truthvalue(formula[0], assignment) and get_truthvalue(formula[1:], assignment)
+    elif type(formula) == list and len(formula) == 1:
+        # case (2) -- list with only one element, assumed to be a tuple
+        if type(formula[0]) == tuple and len(formula[0]) == 2:
+            # -> logical equivalence
+            truthvalue = get_truthvalue(formula[0][0], assignment) == get_truthvalue(formula[0][1], assignment)
+        else:
+            # type error
+            print('syntax/type error')
+            truthvalue = False
+    elif type(formula) == tuple and len(formula) == 2:
+        # case (2) -- 2-tuple -> logical equivalence
+        truthvalue = get_truthvalue(formula[0], assignment) == get_truthvalue(formula[1], assignment)
+    elif type(formula) == str and len(formula) == 1:
+        # case (2a) - atomic term
+        if type(assignment) == dict:
+            if formula in assignment:
+                if type(assignment[formula]) == bool:
+                    truthvalue = assignment[formula]
+                else: 
+                    print('type error in dictionary')
+                    truthvalue = False
+            else:
+                print('missing key in dictionary')
+                truthvalue = False
+        else: 
+            print('type error: no dict')
+            truthvalue = False
+    elif type(formula) == str and len(formula) > 1:        
+        # case (2b) - complex string
+        if formula.find(' + ') > -1:
+            # split disjunction
+            terms = formula.split(' + ', 1)
+            truthvalue = get_truthvalue(terms[0], assignment) or get_truthvalue(terms[1], assignment)
+        elif formula.find('*') > -1:
+            # split conjunction
+            terms = formula.split('*', 1)
+            truthvalue = get_truthvalue(terms[0], assignment) and get_truthvalue(terms[1], assignment)
+        elif formula.find('~') == 0:
+            # negator (as main operator) can only be in the first position
+            truthvalue = not(get_truthvalue(formula[1:], assignment))
+        else:
+            # syntax error
+            truthvalue = False            
+    else:
+        # syntax/type error
+        truthvalue = False
+        
+    return truthvalue
+    
+def count_true(function_list, factor_list):
+    # input: logical formula given as list of tuples
+    # counts for how many assignments of the variables occuring in function_list the function becomes true
+    # returns: zero if syntax/type errors in function
+    #          otherwise the number of possible assignments such that function_list becomes true
+        
+    counter = 0 # counts in how many cases function_list is true
+    
+    # determine variables occuring in formula
+    st = ''
+    for term in function_list:
+        st = st + '(' + term[0] + '<->' + term[1] + ')*'
+    st = st[:-1]
+    
+    variable_list = get_components_from_formula(st, factor_list)
+    
+    # generate all cases for Boolean variables
+    assignment_list = []
+    for bool_value in itertools.product([True, False], repeat = len(variable_list)):
+        assignment_list.append(dict(zip(variable_list, bool_value)))
+    
+    for assignment in assignment_list:
+        if get_truthvalue(function_list, assignment):
+            counter = counter + 1
+    return counter

@@ -1,0 +1,51 @@
+--- Coincidence Analysis (CNA) ---
+
+Factors: A, B, C, D, E, F 
+
+Atomic solution formulas:
+-------------------------
+Outcome D:
+ solution      consistency coverage complexity inus
+ a + C <-> D             1        1          2 TRUE
+ a + e <-> D             1        1          2 TRUE
+ e + B*f <-> D           1        1          3 TRUE
+
+Outcome E:
+ solution        consistency coverage complexity inus
+ d + B*c <-> E             1        1          3 TRUE
+ A*c + B*c <-> E           1        1          4 TRUE
+
+Outcome F:
+ solution    consistency coverage complexity inus
+ B*d <-> F             1        1          2 TRUE
+ A*B*c <-> F           1        1          3 TRUE
+ A*B*E <-> F           1        1          3 TRUE
+
+Complex solution formulas:
+--------------------------
+ outcome solution                                        consistency coverage
+ E,F     (d + B*c <-> E)*(B*d <-> F)                               1        1
+ D,E,F   (a + C <-> D)*(d + B*c <-> E)*(B*d <-> F)                 1        1
+ D,E,F   (a + C <-> D)*(d + B*c <-> E)*(A*B*c <-> F)               1        1
+ D,E,F   (a + C <-> D)*(d + B*c <-> E)*(A*B*E <-> F)               1        1
+ D,E,F   (a + C <-> D)*(A*c + B*c <-> E)*(B*d <-> F)               1        1
+ D,E,F   (a + e <-> D)*(A*c + B*c <-> E)*(B*d <-> F)               1        1
+ D,E,F   (a + C <-> D)*(A*c + B*c <-> E)*(A*B*c <-> F)             1        1
+ D,E,F   (a + C <-> D)*(A*c + B*c <-> E)*(A*B*E <-> F)             1        1
+ D,E,F   (a + e <-> D)*(A*c + B*c <-> E)*(A*B*c <-> F)             1        1
+ D,E,F   (a + e <-> D)*(A*c + B*c <-> E)*(A*B*E <-> F)             1        1
+ D,E,F   (e + B*f <-> D)*(A*c + B*c <-> E)*(A*B*c <-> F)           1        1
+ D,E,F   (e + B*f <-> D)*(A*c + B*c <-> E)*(A*B*E <-> F)           1        1
+ complexity inus cyclic
+          5 TRUE  FALSE
+          7 TRUE  FALSE
+          8 TRUE  FALSE
+          8 TRUE  FALSE
+          8 TRUE  FALSE
+          8 TRUE  FALSE
+          9 TRUE  FALSE
+          9 TRUE  FALSE
+          9 TRUE  FALSE
+          9 TRUE  FALSE
+         10 TRUE  FALSE
+         10 TRUE  FALSE

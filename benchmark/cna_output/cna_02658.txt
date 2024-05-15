@@ -1,0 +1,333 @@
+--- Coincidence Analysis (CNA) ---
+
+Factors: A, B, C, D, E, F 
+
+Atomic solution formulas:
+-------------------------
+Outcome A:
+ solution    consistency coverage complexity inus
+ c + D <-> A           1        1          2 TRUE
+ c + e <-> A           1        1          2 TRUE
+ D + F <-> A           1        1          2 TRUE
+ e + F <-> A           1        1          2 TRUE
+
+Outcome C:
+ solution    consistency coverage complexity inus
+ f <-> C               1        1          1 TRUE
+ a + b <-> C           1        1          2 TRUE
+ a + D <-> C           1        1          2 TRUE
+ a + e <-> C           1        1          2 TRUE
+
+Outcome D:
+ solution  consistency coverage complexity inus
+ e <-> D             1        1          1 TRUE
+ A*b <-> D           1        1          2 TRUE
+ A*C <-> D           1        1          2 TRUE
+ A*f <-> D           1        1          2 TRUE
+
+Outcome E:
+ solution    consistency coverage complexity inus
+ d <-> E               1        1          1 TRUE
+ a + B <-> E           1        1          2 TRUE
+ a + c <-> E           1        1          2 TRUE
+ a + F <-> E           1        1          2 TRUE
+
+Outcome F:
+ solution  consistency coverage complexity inus
+ c <-> F             1        1          1 TRUE
+ A*B <-> F           1        1          2 TRUE
+ A*d <-> F           1        1          2 TRUE
+ A*E <-> F           1        1          2 TRUE
+
+Complex solution formulas:
+--------------------------
+ outcome solution                                            consistency
+ A,E,F   (c + D <-> A)*(d <-> E)*(c <-> F)                             1
+ A,D,F   (c + D <-> A)*(e <-> D)*(c <-> F)                             1
+ A,C,E   (c + D <-> A)*(f <-> C)*(d <-> E)                             1
+ A,C,D   (c + D <-> A)*(f <-> C)*(e <-> D)                             1
+ A,E,F   (c + e <-> A)*(d <-> E)*(c <-> F)                             1
+ A,D,F   (c + e <-> A)*(e <-> D)*(c <-> F)                             1
+ A,C,E   (c + e <-> A)*(f <-> C)*(d <-> E)                             1
+ A,C,D   (c + e <-> A)*(f <-> C)*(e <-> D)                             1
+ A,E,F   (D + F <-> A)*(d <-> E)*(c <-> F)                             1
+ A,D,F   (D + F <-> A)*(e <-> D)*(c <-> F)                             1
+ A,C,E   (D + F <-> A)*(f <-> C)*(d <-> E)                             1
+ A,C,D   (D + F <-> A)*(f <-> C)*(e <-> D)                             1
+ A,E,F   (e + F <-> A)*(d <-> E)*(c <-> F)                             1
+ A,D,F   (e + F <-> A)*(e <-> D)*(c <-> F)                             1
+ A,C,E   (e + F <-> A)*(f <-> C)*(d <-> E)                             1
+ A,C,D   (e + F <-> A)*(f <-> C)*(e <-> D)                             1
+ A,E,F   (c + D <-> A)*(a + c <-> E)*(A*d <-> F)                       1
+ A,D,F   (c + e <-> A)*(A*C <-> D)*(A*E <-> F)                         1
+ A,C,E   (D + F <-> A)*(a + D <-> C)*(a + F <-> E)                     1
+ C,D,E,F (f <-> C)*(e <-> D)*(a + B <-> E)*(A*B <-> F)                 1
+ C,D,E,F (f <-> C)*(e <-> D)*(a + B <-> E)*(A*d <-> F)                 1
+ C,D,E,F (f <-> C)*(e <-> D)*(a + B <-> E)*(A*E <-> F)                 1
+ C,D,E,F (f <-> C)*(e <-> D)*(a + c <-> E)*(A*B <-> F)                 1
+ C,D,E,F (f <-> C)*(e <-> D)*(a + F <-> E)*(A*B <-> F)                 1
+ C,D,E,F (f <-> C)*(A*b <-> D)*(d <-> E)*(A*B <-> F)                   1
+ C,D,E,F (f <-> C)*(A*b <-> D)*(d <-> E)*(A*d <-> F)                   1
+ C,D,E,F (f <-> C)*(A*b <-> D)*(d <-> E)*(A*E <-> F)                   1
+ C,D,E,F (f <-> C)*(A*C <-> D)*(d <-> E)*(A*B <-> F)                   1
+ C,D,E,F (f <-> C)*(A*f <-> D)*(d <-> E)*(A*B <-> F)                   1
+ C,D,E,F (a + b <-> C)*(e <-> D)*(a + B <-> E)*(c <-> F)               1
+ C,D,E,F (a + b <-> C)*(e <-> D)*(a + c <-> E)*(c <-> F)               1
+ C,D,E,F (a + b <-> C)*(e <-> D)*(a + F <-> E)*(c <-> F)               1
+ C,D,E,F (a + D <-> C)*(e <-> D)*(a + B <-> E)*(c <-> F)               1
+ C,D,E,F (a + e <-> C)*(e <-> D)*(a + B <-> E)*(c <-> F)               1
+ C,D,E,F (a + b <-> C)*(A*b <-> D)*(d <-> E)*(c <-> F)                 1
+ C,D,E,F (a + b <-> C)*(A*C <-> D)*(d <-> E)*(c <-> F)                 1
+ C,D,E,F (a + b <-> C)*(A*f <-> D)*(d <-> E)*(c <-> F)                 1
+ C,D,E,F (a + D <-> C)*(A*b <-> D)*(d <-> E)*(c <-> F)                 1
+ C,D,E,F (a + e <-> C)*(A*b <-> D)*(d <-> E)*(c <-> F)                 1
+ C,D,E,F (f <-> C)*(A*b <-> D)*(a + B <-> E)*(A*B <-> F)               1
+ C,D,E,F (f <-> C)*(A*b <-> D)*(a + B <-> E)*(A*d <-> F)               1
+ C,D,E,F (f <-> C)*(A*b <-> D)*(a + B <-> E)*(A*E <-> F)               1
+ C,D,E,F (f <-> C)*(A*b <-> D)*(a + c <-> E)*(A*B <-> F)               1
+ C,D,E,F (f <-> C)*(A*b <-> D)*(a + c <-> E)*(A*d <-> F)               1
+ C,D,E,F (f <-> C)*(A*b <-> D)*(a + F <-> E)*(A*B <-> F)               1
+ C,D,E,F (f <-> C)*(A*b <-> D)*(a + F <-> E)*(A*d <-> F)               1
+ C,D,E,F (f <-> C)*(A*C <-> D)*(a + B <-> E)*(A*B <-> F)               1
+ C,D,E,F (f <-> C)*(A*C <-> D)*(a + B <-> E)*(A*E <-> F)               1
+ C,D,E,F (f <-> C)*(A*C <-> D)*(a + c <-> E)*(A*B <-> F)               1
+ C,D,E,F (f <-> C)*(A*C <-> D)*(a + F <-> E)*(A*B <-> F)               1
+ C,D,E,F (f <-> C)*(A*f <-> D)*(a + B <-> E)*(A*B <-> F)               1
+ C,D,E,F (f <-> C)*(A*f <-> D)*(a + B <-> E)*(A*E <-> F)               1
+ C,D,E,F (f <-> C)*(A*f <-> D)*(a + c <-> E)*(A*B <-> F)               1
+ C,D,E,F (f <-> C)*(A*f <-> D)*(a + F <-> E)*(A*B <-> F)               1
+ C,D,E,F (a + b <-> C)*(e <-> D)*(a + B <-> E)*(A*B <-> F)             1
+ C,D,E,F (a + b <-> C)*(e <-> D)*(a + B <-> E)*(A*d <-> F)             1
+ C,D,E,F (a + b <-> C)*(e <-> D)*(a + B <-> E)*(A*E <-> F)             1
+ C,D,E,F (a + b <-> C)*(e <-> D)*(a + c <-> E)*(A*B <-> F)             1
+ C,D,E,F (a + b <-> C)*(e <-> D)*(a + c <-> E)*(A*d <-> F)             1
+ C,D,E,F (a + b <-> C)*(e <-> D)*(a + c <-> E)*(A*E <-> F)             1
+ C,D,E,F (a + b <-> C)*(e <-> D)*(a + F <-> E)*(A*B <-> F)             1
+ C,D,E,F (a + D <-> C)*(e <-> D)*(a + B <-> E)*(A*B <-> F)             1
+ C,D,E,F (a + D <-> C)*(e <-> D)*(a + B <-> E)*(A*d <-> F)             1
+ C,D,E,F (a + D <-> C)*(e <-> D)*(a + B <-> E)*(A*E <-> F)             1
+ C,D,E,F (a + D <-> C)*(e <-> D)*(a + F <-> E)*(A*B <-> F)             1
+ C,D,E,F (a + e <-> C)*(e <-> D)*(a + B <-> E)*(A*B <-> F)             1
+ C,D,E,F (a + e <-> C)*(e <-> D)*(a + B <-> E)*(A*d <-> F)             1
+ C,D,E,F (a + e <-> C)*(e <-> D)*(a + B <-> E)*(A*E <-> F)             1
+ C,D,E,F (a + e <-> C)*(e <-> D)*(a + F <-> E)*(A*B <-> F)             1
+ C,D,E,F (a + b <-> C)*(A*b <-> D)*(d <-> E)*(A*B <-> F)               1
+ C,D,E,F (a + b <-> C)*(A*b <-> D)*(d <-> E)*(A*d <-> F)               1
+ C,D,E,F (a + b <-> C)*(A*b <-> D)*(d <-> E)*(A*E <-> F)               1
+ C,D,E,F (a + b <-> C)*(A*C <-> D)*(d <-> E)*(A*B <-> F)               1
+ C,D,E,F (a + b <-> C)*(A*C <-> D)*(d <-> E)*(A*d <-> F)               1
+ C,D,E,F (a + b <-> C)*(A*C <-> D)*(d <-> E)*(A*E <-> F)               1
+ C,D,E,F (a + b <-> C)*(A*f <-> D)*(d <-> E)*(A*B <-> F)               1
+ C,D,E,F (a + D <-> C)*(A*b <-> D)*(d <-> E)*(A*B <-> F)               1
+ C,D,E,F (a + D <-> C)*(A*b <-> D)*(d <-> E)*(A*d <-> F)               1
+ C,D,E,F (a + D <-> C)*(A*b <-> D)*(d <-> E)*(A*E <-> F)               1
+ C,D,E,F (a + D <-> C)*(A*f <-> D)*(d <-> E)*(A*B <-> F)               1
+ C,D,E,F (a + e <-> C)*(A*b <-> D)*(d <-> E)*(A*B <-> F)               1
+ C,D,E,F (a + e <-> C)*(A*b <-> D)*(d <-> E)*(A*d <-> F)               1
+ C,D,E,F (a + e <-> C)*(A*b <-> D)*(d <-> E)*(A*E <-> F)               1
+ C,D,E,F (a + e <-> C)*(A*f <-> D)*(d <-> E)*(A*B <-> F)               1
+ C,D,E,F (a + b <-> C)*(A*b <-> D)*(a + B <-> E)*(c <-> F)             1
+ C,D,E,F (a + b <-> C)*(A*b <-> D)*(a + c <-> E)*(c <-> F)             1
+ C,D,E,F (a + b <-> C)*(A*b <-> D)*(a + F <-> E)*(c <-> F)             1
+ C,D,E,F (a + b <-> C)*(A*C <-> D)*(a + B <-> E)*(c <-> F)             1
+ C,D,E,F (a + b <-> C)*(A*C <-> D)*(a + c <-> E)*(c <-> F)             1
+ C,D,E,F (a + b <-> C)*(A*C <-> D)*(a + F <-> E)*(c <-> F)             1
+ C,D,E,F (a + b <-> C)*(A*f <-> D)*(a + B <-> E)*(c <-> F)             1
+ C,D,E,F (a + b <-> C)*(A*f <-> D)*(a + c <-> E)*(c <-> F)             1
+ C,D,E,F (a + b <-> C)*(A*f <-> D)*(a + F <-> E)*(c <-> F)             1
+ C,D,E,F (a + D <-> C)*(A*b <-> D)*(a + B <-> E)*(c <-> F)             1
+ C,D,E,F (a + D <-> C)*(A*b <-> D)*(a + c <-> E)*(c <-> F)             1
+ C,D,E,F (a + D <-> C)*(A*b <-> D)*(a + F <-> E)*(c <-> F)             1
+ C,D,E,F (a + e <-> C)*(A*b <-> D)*(a + B <-> E)*(c <-> F)             1
+ C,D,E,F (a + e <-> C)*(A*C <-> D)*(a + B <-> E)*(c <-> F)             1
+ C,D,E,F (a + e <-> C)*(A*f <-> D)*(a + B <-> E)*(c <-> F)             1
+ C,D,E,F (a + b <-> C)*(A*b <-> D)*(a + B <-> E)*(A*B <-> F)           1
+ C,D,E,F (a + b <-> C)*(A*b <-> D)*(a + B <-> E)*(A*d <-> F)           1
+ C,D,E,F (a + b <-> C)*(A*b <-> D)*(a + B <-> E)*(A*E <-> F)           1
+ C,D,E,F (a + b <-> C)*(A*b <-> D)*(a + c <-> E)*(A*B <-> F)           1
+ C,D,E,F (a + b <-> C)*(A*b <-> D)*(a + c <-> E)*(A*d <-> F)           1
+ C,D,E,F (a + b <-> C)*(A*b <-> D)*(a + c <-> E)*(A*E <-> F)           1
+ C,D,E,F (a + b <-> C)*(A*b <-> D)*(a + F <-> E)*(A*B <-> F)           1
+ C,D,E,F (a + b <-> C)*(A*b <-> D)*(a + F <-> E)*(A*d <-> F)           1
+ C,D,E,F (a + b <-> C)*(A*C <-> D)*(a + B <-> E)*(A*B <-> F)           1
+ C,D,E,F (a + b <-> C)*(A*C <-> D)*(a + B <-> E)*(A*d <-> F)           1
+ C,D,E,F (a + b <-> C)*(A*C <-> D)*(a + B <-> E)*(A*E <-> F)           1
+ C,D,E,F (a + b <-> C)*(A*C <-> D)*(a + c <-> E)*(A*B <-> F)           1
+ C,D,E,F (a + b <-> C)*(A*C <-> D)*(a + c <-> E)*(A*d <-> F)           1
+ C,D,E,F (a + b <-> C)*(A*C <-> D)*(a + c <-> E)*(A*E <-> F)           1
+ C,D,E,F (a + b <-> C)*(A*C <-> D)*(a + F <-> E)*(A*B <-> F)           1
+ C,D,E,F (a + b <-> C)*(A*C <-> D)*(a + F <-> E)*(A*d <-> F)           1
+ C,D,E,F (a + b <-> C)*(A*f <-> D)*(a + B <-> E)*(A*B <-> F)           1
+ C,D,E,F (a + b <-> C)*(A*f <-> D)*(a + B <-> E)*(A*E <-> F)           1
+ C,D,E,F (a + b <-> C)*(A*f <-> D)*(a + c <-> E)*(A*B <-> F)           1
+ C,D,E,F (a + b <-> C)*(A*f <-> D)*(a + c <-> E)*(A*E <-> F)           1
+ C,D,E,F (a + b <-> C)*(A*f <-> D)*(a + F <-> E)*(A*B <-> F)           1
+ C,D,E,F (a + D <-> C)*(A*b <-> D)*(a + B <-> E)*(A*B <-> F)           1
+ C,D,E,F (a + D <-> C)*(A*b <-> D)*(a + B <-> E)*(A*d <-> F)           1
+ C,D,E,F (a + D <-> C)*(A*b <-> D)*(a + B <-> E)*(A*E <-> F)           1
+ C,D,E,F (a + D <-> C)*(A*b <-> D)*(a + c <-> E)*(A*B <-> F)           1
+ C,D,E,F (a + D <-> C)*(A*b <-> D)*(a + c <-> E)*(A*d <-> F)           1
+ C,D,E,F (a + D <-> C)*(A*b <-> D)*(a + c <-> E)*(A*E <-> F)           1
+ C,D,E,F (a + D <-> C)*(A*b <-> D)*(a + F <-> E)*(A*B <-> F)           1
+ C,D,E,F (a + D <-> C)*(A*b <-> D)*(a + F <-> E)*(A*d <-> F)           1
+ C,D,E,F (a + D <-> C)*(A*f <-> D)*(a + B <-> E)*(A*B <-> F)           1
+ C,D,E,F (a + D <-> C)*(A*f <-> D)*(a + B <-> E)*(A*E <-> F)           1
+ C,D,E,F (a + D <-> C)*(A*f <-> D)*(a + c <-> E)*(A*B <-> F)           1
+ C,D,E,F (a + D <-> C)*(A*f <-> D)*(a + F <-> E)*(A*B <-> F)           1
+ C,D,E,F (a + e <-> C)*(A*b <-> D)*(a + B <-> E)*(A*B <-> F)           1
+ C,D,E,F (a + e <-> C)*(A*b <-> D)*(a + B <-> E)*(A*d <-> F)           1
+ C,D,E,F (a + e <-> C)*(A*b <-> D)*(a + B <-> E)*(A*E <-> F)           1
+ C,D,E,F (a + e <-> C)*(A*b <-> D)*(a + F <-> E)*(A*B <-> F)           1
+ C,D,E,F (a + e <-> C)*(A*b <-> D)*(a + F <-> E)*(A*d <-> F)           1
+ C,D,E,F (a + e <-> C)*(A*C <-> D)*(a + B <-> E)*(A*B <-> F)           1
+ C,D,E,F (a + e <-> C)*(A*C <-> D)*(a + B <-> E)*(A*d <-> F)           1
+ C,D,E,F (a + e <-> C)*(A*C <-> D)*(a + B <-> E)*(A*E <-> F)           1
+ C,D,E,F (a + e <-> C)*(A*C <-> D)*(a + F <-> E)*(A*B <-> F)           1
+ C,D,E,F (a + e <-> C)*(A*f <-> D)*(a + B <-> E)*(A*B <-> F)           1
+ C,D,E,F (a + e <-> C)*(A*f <-> D)*(a + B <-> E)*(A*E <-> F)           1
+ C,D,E,F (a + e <-> C)*(A*f <-> D)*(a + F <-> E)*(A*B <-> F)           1
+ coverage complexity inus cyclic
+        1          4 TRUE  FALSE
+        1          4 TRUE  FALSE
+        1          4 TRUE  FALSE
+        1          4 TRUE  FALSE
+        1          4 TRUE  FALSE
+        1          4 TRUE  FALSE
+        1          4 TRUE  FALSE
+        1          4 TRUE  FALSE
+        1          4 TRUE  FALSE
+        1          4 TRUE  FALSE
+        1          4 TRUE  FALSE
+        1          4 TRUE  FALSE
+        1          4 TRUE  FALSE
+        1          4 TRUE  FALSE
+        1          4 TRUE  FALSE
+        1          4 TRUE  FALSE
+        1          6 TRUE  FALSE
+        1          6 TRUE  FALSE
+        1          6 TRUE  FALSE
+        1          6 TRUE  FALSE
+        1          6 TRUE  FALSE
+        1          6 TRUE  FALSE
+        1          6 TRUE  FALSE
+        1          6 TRUE  FALSE
+        1          6 TRUE  FALSE
+        1          6 TRUE  FALSE
+        1          6 TRUE  FALSE
+        1          6 TRUE  FALSE
+        1          6 TRUE  FALSE
+        1          6 TRUE  FALSE
+        1          6 TRUE  FALSE
+        1          6 TRUE  FALSE
+        1          6 TRUE  FALSE
+        1          6 TRUE  FALSE
+        1          6 TRUE  FALSE
+        1          6 TRUE  FALSE
+        1          6 TRUE  FALSE
+        1          6 TRUE  FALSE
+        1          6 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          7 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE
+        1          8 TRUE  FALSE

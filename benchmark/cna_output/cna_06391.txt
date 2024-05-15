@@ -1,0 +1,35 @@
+--- Coincidence Analysis (CNA) ---
+
+Factors: A, B, C, D, E, F 
+
+Atomic solution formulas:
+-------------------------
+Outcome D:
+ solution              consistency coverage complexity inus
+ a*c + b*E <-> D                 1        1          4 TRUE
+ a*E + b*c <-> D                 1        1          4 TRUE
+ a*E + b*E <-> D                 1        1          4 TRUE
+ a*b + a*c + b*c <-> D           1        1          6 TRUE
+ a*c + b*c + C*E <-> D           1        1          6 TRUE
+
+Outcome E:
+ solution      consistency coverage complexity inus
+ c + D <-> E             1        1          2 TRUE
+ c + a*b <-> E           1        1          3 TRUE
+
+Complex solution formulas:
+--------------------------
+ outcome solution                                consistency coverage
+ D,E     (a*c + b*E <-> D)*(c + a*b <-> E)                 1        1
+ D,E     (a*E + b*c <-> D)*(c + a*b <-> E)                 1        1
+ D,E     (a*E + b*E <-> D)*(c + a*b <-> E)                 1        1
+ D,E     (a*b + a*c + b*c <-> D)*(c + D <-> E)             1        1
+ D,E     (a*b + a*c + b*c <-> D)*(c + a*b <-> E)           1        1
+ D,E     (a*c + b*c + C*E <-> D)*(c + a*b <-> E)           1        1
+ complexity inus cyclic
+          7 TRUE  FALSE
+          7 TRUE  FALSE
+          7 TRUE  FALSE
+          8 TRUE  FALSE
+          9 TRUE  FALSE
+          9 TRUE  FALSE

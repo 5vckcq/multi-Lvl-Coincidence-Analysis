@@ -36,7 +36,7 @@ Further optional arguments are:
 
 **Dependencies**
 
-Running the script requires besides a Python3 environment, a latex distribution installed on the system running this script, as well as the jinja2, pandas and itertools Python3 libraries and the TikZ library for latex.
+Running the script requires besides a Python3 environment, a latex distribution installed on the system running this script, as well as the jinja2, pandas and itertools Python3 libraries and the TikZ library for latex. The graphical interface requires also the python packages tkinter and pymupdf.
 
 
 ## Latex_Template.tex
@@ -56,3 +56,7 @@ A folder that contains some samples either truth tables in csv-format or R-scrip
 
 **sample_3**
 > a complex three-level structure
+
+## License
+
+The code in this repository, including all code samples is released under the [GPL-3.0 license](LICENSE).

@@ -1,0 +1,50 @@
+--- Coincidence Analysis (CNA) ---
+
+Factors: A, B, C, D, E, F 
+
+Atomic solution formulas:
+-------------------------
+Outcome E:
+ solution          consistency coverage complexity inus
+ b*d + a*c*d <-> E           1        1          5 TRUE
+ b*d + c*d*f <-> E           1        1          5 TRUE
+
+Outcome F:
+ solution                    consistency coverage complexity inus
+ a*b + A*c + A*e <-> F                 1        1          6 TRUE
+ a*b + A*e + b*c <-> F                 1        1          6 TRUE
+ A*B + a*b + A*c + A*D <-> F           1        1          8 TRUE
+ A*B + a*b + A*c + b*D <-> F           1        1          8 TRUE
+ A*B + a*b + A*c + b*e <-> F           1        1          8 TRUE
+ A*B + a*b + A*D + b*c <-> F           1        1          8 TRUE
+ A*B + a*b + b*c + b*D <-> F           1        1          8 TRUE
+ A*B + a*b + b*c + b*e <-> F           1        1          8 TRUE
+
+Complex solution formulas:
+--------------------------
+ outcome solution                                          consistency coverage
+ E,F     (b*d + a*c*d <-> E)*(a*b + A*c + A*e <-> F)                 1        1
+ E,F     (b*d + a*c*d <-> E)*(a*b + A*e + b*c <-> F)                 1        1
+ E,F     (b*d + a*c*d <-> E)*(A*B + a*b + A*c + A*D <-> F)           1        1
+ E,F     (b*d + a*c*d <-> E)*(A*B + a*b + A*c + b*D <-> F)           1        1
+ E,F     (b*d + a*c*d <-> E)*(A*B + a*b + A*c + b*e <-> F)           1        1
+ E,F     (b*d + a*c*d <-> E)*(A*B + a*b + A*D + b*c <-> F)           1        1
+ E,F     (b*d + a*c*d <-> E)*(A*B + a*b + b*c + b*D <-> F)           1        1
+ E,F     (b*d + a*c*d <-> E)*(A*B + a*b + b*c + b*e <-> F)           1        1
+ E,F     (b*d + c*d*f <-> E)*(A*B + a*b + A*c + A*D <-> F)           1        1
+ E,F     (b*d + c*d*f <-> E)*(A*B + a*b + A*c + b*D <-> F)           1        1
+ E,F     (b*d + c*d*f <-> E)*(A*B + a*b + A*D + b*c <-> F)           1        1
+ E,F     (b*d + c*d*f <-> E)*(A*B + a*b + b*c + b*D <-> F)           1        1
+ complexity inus cyclic
+         11 TRUE  FALSE
+         11 TRUE  FALSE
+         13 TRUE  FALSE
+         13 TRUE  FALSE
+         13 TRUE  FALSE
+         13 TRUE  FALSE
+         13 TRUE  FALSE
+         13 TRUE  FALSE
+         13 TRUE  FALSE
+         13 TRUE  FALSE
+         13 TRUE  FALSE
+         13 TRUE  FALSE

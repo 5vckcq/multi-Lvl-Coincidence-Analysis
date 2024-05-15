@@ -1,0 +1,53 @@
+--- Coincidence Analysis (CNA) ---
+
+Factors: A, B, C, D, E, F 
+
+Atomic solution formulas:
+-------------------------
+Outcome C:
+ solution consistency coverage complexity inus
+ D <-> C            1        1          1 TRUE
+
+Outcome D:
+ solution consistency coverage complexity inus
+ C <-> D            1        1          1 TRUE
+
+Outcome E:
+ solution        consistency coverage complexity inus
+ a + B + C <-> E           1        1          3 TRUE
+ a + B + D <-> E           1        1          3 TRUE
+ a + B + F <-> E           1        1          3 TRUE
+
+Outcome F:
+ solution  consistency coverage complexity inus
+ b*C <-> F           1        1          2 TRUE
+ b*D <-> F           1        1          2 TRUE
+
+Complex solution formulas:
+--------------------------
+ outcome solution                                consistency coverage
+ D,E,F   (C <-> D)*(a + B + C <-> E)*(b*C <-> F)           1        1
+ C,E,F   (D <-> C)*(a + B + C <-> E)*(b*C <-> F)           1        1
+ D,E,F   (C <-> D)*(a + B + C <-> E)*(b*D <-> F)           1        1
+ C,E,F   (D <-> C)*(a + B + C <-> E)*(b*D <-> F)           1        1
+ D,E,F   (C <-> D)*(a + B + D <-> E)*(b*C <-> F)           1        1
+ C,E,F   (D <-> C)*(a + B + D <-> E)*(b*C <-> F)           1        1
+ D,E,F   (C <-> D)*(a + B + D <-> E)*(b*D <-> F)           1        1
+ C,E,F   (D <-> C)*(a + B + D <-> E)*(b*D <-> F)           1        1
+ D,E,F   (C <-> D)*(a + B + F <-> E)*(b*C <-> F)           1        1
+ C,E,F   (D <-> C)*(a + B + F <-> E)*(b*C <-> F)           1        1
+ D,E,F   (C <-> D)*(a + B + F <-> E)*(b*D <-> F)           1        1
+ C,E,F   (D <-> C)*(a + B + F <-> E)*(b*D <-> F)           1        1
+ complexity inus cyclic
+          6 TRUE  FALSE
+          6 TRUE  FALSE
+          6 TRUE  FALSE
+          6 TRUE  FALSE
+          6 TRUE  FALSE
+          6 TRUE  FALSE
+          6 TRUE  FALSE
+          6 TRUE  FALSE
+          6 TRUE  FALSE
+          6 TRUE  FALSE
+          6 TRUE  FALSE
+          6 TRUE  FALSE
