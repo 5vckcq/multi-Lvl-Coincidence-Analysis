@@ -1,6 +1,6 @@
 # multi-lvl-Coincidence-Analysis
 
-## causal_structure_truth_table_to_pdf_graph.py
+## mLCA.py
 
 Python script that generates the possible causal diagrams either from a truth table in csv-format or the R output of cna using the latex template Latex_Template.tex. The template file must be in the same folder as the script file. 
 
@@ -37,6 +37,10 @@ Further optional arguments are:
 **Dependencies**
 
 Running the script requires besides a Python3 environment, a latex distribution installed on the system running this script, as well as the jinja2, pandas and itertools Python3 libraries and the TikZ library for latex. The graphical interface requires also the python packages tkinter and pymupdf.
+
+## mlca-gui.py
+
+Run this file for a simple graphical user interface.
 
 
 ## Latex_Template.tex
