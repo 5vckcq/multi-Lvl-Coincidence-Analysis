@@ -1,3 +1,14 @@
+configTable of type "cs"
+   A B C D E F | n.obs
+13 0 0 1 1 0 0 |     1
+14 1 0 1 1 0 0 |     1
+15 0 1 1 1 0 0 |     1
+25 0 0 0 1 1 0 |     1
+27 0 1 0 1 1 0 |     1
+28 1 1 0 1 1 0 |     1
+40 1 1 1 0 0 1 |     1
+58 1 0 0 1 1 1 |     1
+Total no.of.cases: 8 
 --- Coincidence Analysis (CNA) ---
 
 Factors: A, B, C, D, E, F 
@@ -5,127 +16,78 @@ Factors: A, B, C, D, E, F
 Atomic solution formulas:
 -------------------------
 Outcome C:
- solution consistency coverage complexity inus
- e <-> C            1        1          1 TRUE
+ solution consistency coverage complexity inus exhaustiveness faithfulness
+ e <-> C            1        1          1 TRUE              1            1
 
 Outcome D:
- solution        consistency coverage complexity inus
- b + f <-> D               1        1          2 TRUE
- c + f <-> D               1        1          2 TRUE
- E + f <-> D               1        1          2 TRUE
- a + b + c <-> D           1        1          3 TRUE
- a + b + E <-> D           1        1          3 TRUE
+ solution        consistency coverage complexity inus exhaustiveness faithfulness
+ b + f <-> D               1        1          2 TRUE              1            1
+ c + f <-> D               1        1          2 TRUE              1            1
+ E + f <-> D               1        1          2 TRUE              1            1
+ a + b + c <-> D           1        1          3 TRUE              1            1
+ a + b + E <-> D           1        1          3 TRUE              1            1
 
 Outcome E:
- solution consistency coverage complexity inus
- c <-> E            1        1          1 TRUE
+ solution consistency coverage complexity inus exhaustiveness faithfulness
+ c <-> E            1        1          1 TRUE              1            1
 
 Outcome F:
- solution            consistency coverage complexity inus
- d + A*b*c <-> F               1        1          4 TRUE
- d + A*b*E <-> F               1        1          4 TRUE
- A*B*C + A*b*c <-> F           1        1          6 TRUE
- A*B*C + A*b*E <-> F           1        1          6 TRUE
- A*b*c + A*B*e <-> F           1        1          6 TRUE
- A*B*e + A*b*E <-> F           1        1          6 TRUE
+ solution            consistency coverage complexity inus exhaustiveness faithfulness
+ d + A*b*c <-> F               1        1          4 TRUE            0.5            1
+ d + A*b*E <-> F               1        1          4 TRUE            0.5            1
+ A*B*C + A*b*c <-> F           1        1          6 TRUE            1.0            1
+ A*B*C + A*b*E <-> F           1        1          6 TRUE            0.5            1
+ A*b*c + A*B*e <-> F           1        1          6 TRUE            0.5            1
+ A*B*e + A*b*E <-> F           1        1          6 TRUE            1.0            1
 
 Complex solution formulas:
 --------------------------
- outcome solution                                          consistency coverage
- D,E,F   (a + b + c <-> D)*(c <-> E)*(d + A*b*c <-> F)               1        1
- C,D,F   (e <-> C)*(a + b + c <-> D)*(d + A*b*c <-> F)               1        1
- D,E,F   (a + b + c <-> D)*(c <-> E)*(d + A*b*E <-> F)               1        1
- C,D,F   (e <-> C)*(a + b + c <-> D)*(d + A*b*E <-> F)               1        1
- D,E,F   (a + b + E <-> D)*(c <-> E)*(d + A*b*c <-> F)               1        1
- C,D,F   (e <-> C)*(a + b + E <-> D)*(d + A*b*c <-> F)               1        1
- D,E,F   (a + b + E <-> D)*(c <-> E)*(d + A*b*E <-> F)               1        1
- C,D,F   (e <-> C)*(a + b + E <-> D)*(d + A*b*E <-> F)               1        1
- D,E,F   (b + f <-> D)*(c <-> E)*(A*B*C + A*b*c <-> F)               1        1
- C,D,F   (e <-> C)*(b + f <-> D)*(A*B*C + A*b*c <-> F)               1        1
- D,E,F   (b + f <-> D)*(c <-> E)*(A*B*C + A*b*E <-> F)               1        1
- C,D,F   (e <-> C)*(b + f <-> D)*(A*B*C + A*b*E <-> F)               1        1
- D,E,F   (b + f <-> D)*(c <-> E)*(A*b*c + A*B*e <-> F)               1        1
- C,D,F   (e <-> C)*(b + f <-> D)*(A*b*c + A*B*e <-> F)               1        1
- D,E,F   (b + f <-> D)*(c <-> E)*(A*B*e + A*b*E <-> F)               1        1
- C,D,F   (e <-> C)*(b + f <-> D)*(A*B*e + A*b*E <-> F)               1        1
- D,E,F   (c + f <-> D)*(c <-> E)*(A*B*C + A*b*c <-> F)               1        1
- C,D,F   (e <-> C)*(c + f <-> D)*(A*B*C + A*b*c <-> F)               1        1
- D,E,F   (c + f <-> D)*(c <-> E)*(A*B*C + A*b*E <-> F)               1        1
- C,D,F   (e <-> C)*(c + f <-> D)*(A*B*C + A*b*E <-> F)               1        1
- D,E,F   (c + f <-> D)*(c <-> E)*(A*b*c + A*B*e <-> F)               1        1
- C,D,F   (e <-> C)*(c + f <-> D)*(A*b*c + A*B*e <-> F)               1        1
- D,E,F   (c + f <-> D)*(c <-> E)*(A*B*e + A*b*E <-> F)               1        1
- C,D,F   (e <-> C)*(c + f <-> D)*(A*B*e + A*b*E <-> F)               1        1
- D,E,F   (E + f <-> D)*(c <-> E)*(A*B*C + A*b*c <-> F)               1        1
- C,D,F   (e <-> C)*(E + f <-> D)*(A*B*C + A*b*c <-> F)               1        1
- D,E,F   (E + f <-> D)*(c <-> E)*(A*B*C + A*b*E <-> F)               1        1
- C,D,F   (e <-> C)*(E + f <-> D)*(A*B*C + A*b*E <-> F)               1        1
- D,E,F   (E + f <-> D)*(c <-> E)*(A*b*c + A*B*e <-> F)               1        1
- C,D,F   (e <-> C)*(E + f <-> D)*(A*b*c + A*B*e <-> F)               1        1
- D,E,F   (E + f <-> D)*(c <-> E)*(A*B*e + A*b*E <-> F)               1        1
- C,D,F   (e <-> C)*(E + f <-> D)*(A*B*e + A*b*E <-> F)               1        1
- D,E,F   (a + b + c <-> D)*(c <-> E)*(A*B*C + A*b*c <-> F)           1        1
- C,D,F   (e <-> C)*(a + b + c <-> D)*(A*B*C + A*b*c <-> F)           1        1
- D,E,F   (a + b + c <-> D)*(c <-> E)*(A*B*C + A*b*E <-> F)           1        1
- C,D,F   (e <-> C)*(a + b + c <-> D)*(A*B*C + A*b*E <-> F)           1        1
- D,E,F   (a + b + c <-> D)*(c <-> E)*(A*b*c + A*B*e <-> F)           1        1
- C,D,F   (e <-> C)*(a + b + c <-> D)*(A*b*c + A*B*e <-> F)           1        1
- D,E,F   (a + b + c <-> D)*(c <-> E)*(A*B*e + A*b*E <-> F)           1        1
- C,D,F   (e <-> C)*(a + b + c <-> D)*(A*B*e + A*b*E <-> F)           1        1
- D,E,F   (a + b + E <-> D)*(c <-> E)*(A*B*C + A*b*c <-> F)           1        1
- C,D,F   (e <-> C)*(a + b + E <-> D)*(A*B*C + A*b*c <-> F)           1        1
- D,E,F   (a + b + E <-> D)*(c <-> E)*(A*B*C + A*b*E <-> F)           1        1
- C,D,F   (e <-> C)*(a + b + E <-> D)*(A*B*C + A*b*E <-> F)           1        1
- D,E,F   (a + b + E <-> D)*(c <-> E)*(A*b*c + A*B*e <-> F)           1        1
- C,D,F   (e <-> C)*(a + b + E <-> D)*(A*b*c + A*B*e <-> F)           1        1
- D,E,F   (a + b + E <-> D)*(c <-> E)*(A*B*e + A*b*E <-> F)           1        1
- C,D,F   (e <-> C)*(a + b + E <-> D)*(A*B*e + A*b*E <-> F)           1        1
- complexity inus cyclic
-          8 TRUE  FALSE
-          8 TRUE  FALSE
-          8 TRUE  FALSE
-          8 TRUE  FALSE
-          8 TRUE  FALSE
-          8 TRUE  FALSE
-          8 TRUE  FALSE
-          8 TRUE  FALSE
-          9 TRUE  FALSE
-          9 TRUE  FALSE
-          9 TRUE  FALSE
-          9 TRUE  FALSE
-          9 TRUE  FALSE
-          9 TRUE  FALSE
-          9 TRUE  FALSE
-          9 TRUE  FALSE
-          9 TRUE  FALSE
-          9 TRUE  FALSE
-          9 TRUE  FALSE
-          9 TRUE  FALSE
-          9 TRUE  FALSE
-          9 TRUE  FALSE
-          9 TRUE  FALSE
-          9 TRUE  FALSE
-          9 TRUE  FALSE
-          9 TRUE  FALSE
-          9 TRUE  FALSE
-          9 TRUE  FALSE
-          9 TRUE  FALSE
-          9 TRUE  FALSE
-          9 TRUE  FALSE
-          9 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
+ outcome solution                                          consistency coverage complexity inus exhaustiveness faithfulness coherence redundant cyclic
+ D,E,F   (a + b + c <-> D)*(c <-> E)*(d + A*b*c <-> F)               1        1          8 TRUE              1            1         1     FALSE  FALSE
+ C,D,F   (e <-> C)*(a + b + c <-> D)*(d + A*b*c <-> F)               1        1          8 TRUE              1            1         1     FALSE  FALSE
+ D,E,F   (a + b + c <-> D)*(c <-> E)*(d + A*b*E <-> F)               1        1          8 TRUE              1            1         1     FALSE  FALSE
+ C,D,F   (e <-> C)*(a + b + c <-> D)*(d + A*b*E <-> F)               1        1          8 TRUE              1            1         1     FALSE  FALSE
+ D,E,F   (a + b + E <-> D)*(c <-> E)*(d + A*b*c <-> F)               1        1          8 TRUE              1            1         1     FALSE  FALSE
+ C,D,F   (e <-> C)*(a + b + E <-> D)*(d + A*b*c <-> F)               1        1          8 TRUE              1            1         1     FALSE  FALSE
+ D,E,F   (a + b + E <-> D)*(c <-> E)*(d + A*b*E <-> F)               1        1          8 TRUE              1            1         1     FALSE  FALSE
+ C,D,F   (e <-> C)*(a + b + E <-> D)*(d + A*b*E <-> F)               1        1          8 TRUE              1            1         1     FALSE  FALSE
+ D,E,F   (b + f <-> D)*(c <-> E)*(A*B*C + A*b*c <-> F)               1        1          9 TRUE              1            1         1     FALSE  FALSE
+ C,D,F   (e <-> C)*(b + f <-> D)*(A*B*C + A*b*c <-> F)               1        1          9 TRUE              1            1         1     FALSE  FALSE
+ D,E,F   (b + f <-> D)*(c <-> E)*(A*B*C + A*b*E <-> F)               1        1          9 TRUE              1            1         1     FALSE  FALSE
+ C,D,F   (e <-> C)*(b + f <-> D)*(A*B*C + A*b*E <-> F)               1        1          9 TRUE              1            1         1     FALSE  FALSE
+ D,E,F   (b + f <-> D)*(c <-> E)*(A*b*c + A*B*e <-> F)               1        1          9 TRUE              1            1         1     FALSE  FALSE
+ C,D,F   (e <-> C)*(b + f <-> D)*(A*b*c + A*B*e <-> F)               1        1          9 TRUE              1            1         1     FALSE  FALSE
+ D,E,F   (b + f <-> D)*(c <-> E)*(A*B*e + A*b*E <-> F)               1        1          9 TRUE              1            1         1     FALSE  FALSE
+ C,D,F   (e <-> C)*(b + f <-> D)*(A*B*e + A*b*E <-> F)               1        1          9 TRUE              1            1         1     FALSE  FALSE
+ D,E,F   (c + f <-> D)*(c <-> E)*(A*B*C + A*b*c <-> F)               1        1          9 TRUE              1            1         1     FALSE  FALSE
+ C,D,F   (e <-> C)*(c + f <-> D)*(A*B*C + A*b*c <-> F)               1        1          9 TRUE              1            1         1     FALSE  FALSE
+ D,E,F   (c + f <-> D)*(c <-> E)*(A*B*C + A*b*E <-> F)               1        1          9 TRUE              1            1         1     FALSE  FALSE
+ C,D,F   (e <-> C)*(c + f <-> D)*(A*B*C + A*b*E <-> F)               1        1          9 TRUE              1            1         1     FALSE  FALSE
+ D,E,F   (c + f <-> D)*(c <-> E)*(A*b*c + A*B*e <-> F)               1        1          9 TRUE              1            1         1     FALSE  FALSE
+ C,D,F   (e <-> C)*(c + f <-> D)*(A*b*c + A*B*e <-> F)               1        1          9 TRUE              1            1         1     FALSE  FALSE
+ D,E,F   (c + f <-> D)*(c <-> E)*(A*B*e + A*b*E <-> F)               1        1          9 TRUE              1            1         1     FALSE  FALSE
+ C,D,F   (e <-> C)*(c + f <-> D)*(A*B*e + A*b*E <-> F)               1        1          9 TRUE              1            1         1     FALSE  FALSE
+ D,E,F   (E + f <-> D)*(c <-> E)*(A*B*C + A*b*c <-> F)               1        1          9 TRUE              1            1         1     FALSE  FALSE
+ C,D,F   (e <-> C)*(E + f <-> D)*(A*B*C + A*b*c <-> F)               1        1          9 TRUE              1            1         1     FALSE  FALSE
+ D,E,F   (E + f <-> D)*(c <-> E)*(A*B*C + A*b*E <-> F)               1        1          9 TRUE              1            1         1     FALSE  FALSE
+ C,D,F   (e <-> C)*(E + f <-> D)*(A*B*C + A*b*E <-> F)               1        1          9 TRUE              1            1         1     FALSE  FALSE
+ D,E,F   (E + f <-> D)*(c <-> E)*(A*b*c + A*B*e <-> F)               1        1          9 TRUE              1            1         1     FALSE  FALSE
+ C,D,F   (e <-> C)*(E + f <-> D)*(A*b*c + A*B*e <-> F)               1        1          9 TRUE              1            1         1     FALSE  FALSE
+ D,E,F   (E + f <-> D)*(c <-> E)*(A*B*e + A*b*E <-> F)               1        1          9 TRUE              1            1         1     FALSE  FALSE
+ C,D,F   (e <-> C)*(E + f <-> D)*(A*B*e + A*b*E <-> F)               1        1          9 TRUE              1            1         1     FALSE  FALSE
+ D,E,F   (a + b + c <-> D)*(c <-> E)*(A*B*C + A*b*c <-> F)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+ C,D,F   (e <-> C)*(a + b + c <-> D)*(A*B*C + A*b*c <-> F)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+ D,E,F   (a + b + c <-> D)*(c <-> E)*(A*B*C + A*b*E <-> F)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+ C,D,F   (e <-> C)*(a + b + c <-> D)*(A*B*C + A*b*E <-> F)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+ D,E,F   (a + b + c <-> D)*(c <-> E)*(A*b*c + A*B*e <-> F)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+ C,D,F   (e <-> C)*(a + b + c <-> D)*(A*b*c + A*B*e <-> F)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+ D,E,F   (a + b + c <-> D)*(c <-> E)*(A*B*e + A*b*E <-> F)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+ C,D,F   (e <-> C)*(a + b + c <-> D)*(A*B*e + A*b*E <-> F)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+ D,E,F   (a + b + E <-> D)*(c <-> E)*(A*B*C + A*b*c <-> F)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+ C,D,F   (e <-> C)*(a + b + E <-> D)*(A*B*C + A*b*c <-> F)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+ D,E,F   (a + b + E <-> D)*(c <-> E)*(A*B*C + A*b*E <-> F)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+ C,D,F   (e <-> C)*(a + b + E <-> D)*(A*B*C + A*b*E <-> F)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+ D,E,F   (a + b + E <-> D)*(c <-> E)*(A*b*c + A*B*e <-> F)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+ C,D,F   (e <-> C)*(a + b + E <-> D)*(A*b*c + A*B*e <-> F)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+ D,E,F   (a + b + E <-> D)*(c <-> E)*(A*B*e + A*b*E <-> F)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+ C,D,F   (e <-> C)*(a + b + E <-> D)*(A*B*e + A*b*E <-> F)           1        1         10 TRUE              1            1         1     FALSE  FALSE

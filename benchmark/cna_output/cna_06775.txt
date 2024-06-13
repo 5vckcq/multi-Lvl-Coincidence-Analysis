@@ -1,3 +1,22 @@
+configTable of type "cs"
+   A B C D E F | n.obs
+3  0 1 0 0 0 0 |     1
+4  1 1 0 0 0 0 |     1
+5  0 0 1 0 0 0 |     1
+6  1 0 1 0 0 0 |     1
+9  0 0 0 1 0 0 |     1
+12 1 1 0 1 0 0 |     1
+13 0 0 1 1 0 0 |     1
+14 1 0 1 1 0 0 |     1
+16 1 1 1 1 0 0 |     1
+31 0 1 1 1 1 0 |     1
+33 0 0 0 0 0 1 |     1
+34 1 0 0 0 0 1 |     1
+39 0 1 1 0 0 1 |     1
+40 1 1 1 0 0 1 |     1
+42 1 0 0 1 0 1 |     1
+59 0 1 0 1 1 1 |     1
+Total no.of.cases: 16 
 --- Coincidence Analysis (CNA) ---
 
 Factors: A, B, C, D, E, F 
@@ -5,12 +24,17 @@ Factors: A, B, C, D, E, F
 Atomic solution formulas:
 -------------------------
 Outcome E:
- solution              consistency coverage complexity inus
- a*B*D <-> E                     1        1          3 TRUE
- a*D*F + a*B*C*f <-> E           1        1          7 TRUE
- B*c*F + a*B*C*f <-> E           1        1          7 TRUE
- B*D*F + a*B*C*f <-> E           1        1          7 TRUE
+ solution              consistency coverage complexity inus exhaustiveness faithfulness
+ a*B*D <-> E                     1        1          3 TRUE           1.00            1
+ a*D*F + a*B*C*f <-> E           1        1          7 TRUE           0.50            1
+ B*c*F + a*B*C*f <-> E           1        1          7 TRUE           0.75            1
+ B*D*F + a*B*C*f <-> E           1        1          7 TRUE           0.50            1
+
+Outcome F:
+ solution                          consistency coverage complexity inus exhaustiveness faithfulness
+ c*E + A*b*c + b*c*d + B*C*d <-> F           1        1         11 TRUE            0.5            1
 
 Complex solution formulas:
 --------------------------
-Same as asf
+ outcome solution                                          consistency coverage complexity inus exhaustiveness faithfulness coherence redundant cyclic
+ E,F     (a*B*D <-> E)*(c*E + A*b*c + b*c*d + B*C*d <-> F)           1        1         14 TRUE              1            1         1     FALSE  FALSE

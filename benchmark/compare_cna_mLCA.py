@@ -54,56 +54,48 @@ def read_list_from_cna(file_cna):
         # format remaining lines properly
         if lines_cna: 
             # if there are csf
-            for index in range(len(lines_cna)):
-                # remove everything before first '(' and after last ')'
-                lines_cna[index] = '(' + re.split(r'\((.*)', lines_cna[index])[1]
-                # split the line at every ")"
-                aux_list =  re.split(r'\)', lines_cna[index])
-                # reconnect all elements except the last and add the ")"
-                lines_cna[index] = ')'.join(aux_list[:-1]) + ')'
+            for index in range(len(lines_cna)-1,-1,-1):
+                details = re.split(r'\s{2,}' ,lines_cna[index])
+                exhaustiveness = 0.0
+                faithfulness = 0.0
+                for i in range(len(details)-2):
+                    if details[i].find("TRUE") > -1 or details[i].find("FALSE") > -1:
+                        exhaustiveness = float(details[i+1])
+                        faithfulness = float(details[i+2])
+                        break
                 
                 
-                # replace lower letters by '~' + upper letter
-                # 1. step: add "~" before each minuscle, which is either
-                # a) follows a '('-bracket
-                # b) follows a conjunctor
-                # c) follows a disjunctor
-                # a):
-                lines_cna[index] = re.sub(r'\(([a-z])',  r'(~\1', lines_cna[index])
-                # b) if following a "*", the letter will be placed behind "*~"
-                lines_cna[index] = re.sub(r'\*([a-z])',  r'*~\1', lines_cna[index])
-                # The regex expression "\*" picks the star symbol "*" from the string.
+                if exhaustiveness < 1.0 or faithfulness < 1.0:
+                    #print(file_cna + " " + lines_cna[index]) #dummy
+                    del lines_cna[index]
+                    
+                else:
+                    # remove everything before first '(' and after last ')'
+                    lines_cna[index] = '(' + re.split(r'\((.*)', lines_cna[index])[1]
+                    # split the line at every ")"
+                    aux_list =  re.split(r'\)', lines_cna[index])
+                    # reconnect all elements except the last and add the ")"
+                    lines_cna[index] = ')'.join(aux_list[:-1]) + ')'
+                
+                
+                    # replace lower letters by '~' + upper letter
+                    # 1. step: add "~" before each minuscle, which is either
+                    # a) follows a '('-bracket
+                    # b) follows a conjunctor
+                    # c) follows a disjunctor
+                    # a):
+                    lines_cna[index] = re.sub(r'\(([a-z])',  r'(~\1', lines_cna[index])
+                    # b) if following a "*", the letter will be placed behind "*~"
+                    lines_cna[index] = re.sub(r'\*([a-z])',  r'*~\1', lines_cna[index])
+                    # The regex expression "\*" picks the star symbol "*" from the string.
+   
+                    # c) if following " + ", the letter will be placed behind "+ ~"
+                    lines_cna[index] = re.sub(r'\s\+\s([a-z]+)',  r' + ~\1', lines_cna[index])
+                    # in regex "\s" corresponds to spaces, "\+" to "+"
 
-                # c) if following " + ", the letter will be placed behind "+ ~"
-                lines_cna[index] = re.sub(r'\s\+\s([a-z]+)',  r' + ~\1', lines_cna[index])
-                # in regex "\s" corresponds to spaces, "\+" to "+"
-
-                # 2. step replacement of the minuscle that follow to "~" by majuscle
-                lines_cna[index] = re.sub(r'(~[a-z]+)', lambda pat: pat.group(1).upper(), lines_cna[index])
+                    # 2. step replacement of the minuscle that follow to "~" by majuscle
+                    lines_cna[index] = re.sub(r'(~[a-z]+)', lambda pat: pat.group(1).upper(), lines_cna[index])
         
-    # search for solutions that are fragments of other solutions -> delete them
-    fragment_list = []
-    for line1 in lines_cna: 
-        for line2 in lines_cna:
-            if len(line1) > len(line2):
-                # check whether all conjuncts from line2 appear in line1
-                found_all = True
-                conj_list1 = re.split(r'\)\*',line1[:-1]) # split line1 into conjuncts at occurences of ")*"
-                conj_list2 = re.split(r'\)\*',line2[:-1]) # therefore also the last ")" has to be removed
-                for conj in conj_list2:
-                    if not(conj in conj_list1):
-                        found_all = False
-                        break               # break from for-loop after finding one 
-                                            # conjunct that is not contained in other
-                                            # solution                
-                if found_all:
-                    fragment_list.append(line2)
-    
-    # now remove the marked lines from lines_cna                
-    for line in fragment_list:
-        if line in lines_cna:
-            lines_cna.remove(line)
-    
     return lines_cna
     
 def read_list_from_mlca(file_mlca):
@@ -134,52 +126,13 @@ def read_list_from_mlca(file_mlca):
     
 def compare(file_cna, file_mlca):
     lines_cna = read_list_from_cna(file_cna)
-    # timer ?? https://stackoverflow.com/questions/14920384/stop-code-after-time-period
     lines_mlca = read_list_from_mlca(file_mlca)
     
     cna_more = False
     mlca_more = False
+    
     if (set(lines_cna) - set(lines_mlca) != set()) and not(len(lines_mlca) == 0):
-        # (A) check whether additional lines_cna contain fragments of solutions from lines_mlca        
         diff = list(set(lines_cna) - set(lines_mlca))
-        for line_index in range(len(diff)-1,-1,-1):
-            is_fragm = False
-            part_list = re.split(r'\*',diff[line_index])
-            
-            for mlca_line in lines_mlca:
-                all_found = True
-                for part in part_list:
-                    if not(part in mlca_line):
-                        all_found = False
-                        break
-                
-                if all_found:
-                    is_fragm = True
-                    break
-            
-            if is_fragm:
-                del diff[line_index]
-        
-        if diff:
-            # difference list is non-empty
-            # (B) check whether missing solution is not logically equivalent to initial truth table
-            # compare truth tables of cna's solution with mlca's
-            formula_list_mlca = []
-            m_part_list = re.split(r'\=\*\(',lines_mlca[0]) # use first solution from mlca as comparison (all have the same truth table)
-            m_part_list[0] = part_list[0][1:] # remove leading "("
-            m_part_list[-1] = part_list[-1][:-1] # remove trailing ")"
-            for part in m_part_list:
-                formula_list_mlca.append(get_equiv_formula(part))
-            
-            for index in range(len(diff)-1,-1,-1):
-                part_list = re.split(r'\=\*\(', diff[index])
-                part_list[0] = part_list[0][1:] # remove leading "("
-                part_list[-1] = part_list[-1][:-1] # remove trailing ")"
-                formula_list_cna = []
-                for part in part_list:
-                    formula_list_cna.append(get_equiv_formula(part))
-                if count_true(formula_list_cna, get_components_from_formula(diff[index], ['A', 'B', 'C', 'D', 'E', 'F'])) != count_true(formula_list_mlca, get_components_from_formula(lines_mlca[0], ['A', 'B', 'C', 'D', 'E', 'F'])):
-                    del diff[index]
         
         if diff:
             # (C) check whether all causal factors that appear in asfs also appear in complex solution
@@ -191,12 +144,12 @@ def compare(file_cna, file_mlca):
             cna_more = True
             out_string = str(diff)
             out_string = re.sub(r',\s', r'\n',out_string)
-            print('cna but not mlca:\n' + out_string + '\n set ' + str(file_mlca)) # solutions in cna, missing in mlca
+            #print('cna but not mlca:\n' + out_string + '\n set ' + str(file_mlca)) # solutions in cna, missing in mlca
     if (set(lines_mlca) - set(lines_cna) != set()):
         mlca_more = True
         out_string = str(set(lines_mlca) - set(lines_cna))
         out_string = re.sub(r',\s', r'\n',out_string)
-        print('mlca but not cna:\n' + out_string + '\n set ' + str(file_mlca)) # solutions in mlca, missing in cna
+        #print('mlca but not cna:\n' + out_string + '\n set ' + str(file_mlca)) # solutions in mlca, missing in cna
         
     
     return cna_more, mlca_more, len(lines_cna), len(lines_mlca)
@@ -204,7 +157,7 @@ def compare(file_cna, file_mlca):
     
 
 if __name__ == '__main__':
-    path_to_cna_output = './cna_output/'
+    path_to_cna_output = './cna_output_final/'
     path_to_mlca_output = './mlca_output/'
     
     cna_more_counter = 0
@@ -214,6 +167,8 @@ if __name__ == '__main__':
     count_empty = 0
     diff = 0
     same_counter = 0
+    
+    out_string = ""
     
     for i in range(10001):
         filename_mlca = 'mLCA_' + str(i).zfill(5) + '.txt'
@@ -227,6 +182,7 @@ if __name__ == '__main__':
                 mlca_more_counter = mlca_more_counter + 1
                 nums_sol_more_m = nums_sol_more_m + num_solsm
                 diff = diff + num_solsm - num_solsc
+                out_string = out_string + filename_mlca + ", "
             if not(cna_more) and not(mlca_more):
                 same_counter = same_counter + 1
                 nums_sol_same = nums_sol_same + num_solsc
@@ -235,6 +191,7 @@ if __name__ == '__main__':
 
     print("cna but not mlca: " + str(cna_more_counter))                
     print("mlca but not cna: " + str(mlca_more_counter))
+    print(out_string)
     print("total number of different models: " + str(diff))
     print("total number of models in data sets with different results: " + str(nums_sol_more_m))
     print("same: " + str(same_counter))

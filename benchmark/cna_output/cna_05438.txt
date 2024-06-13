@@ -1,3 +1,22 @@
+configTable of type "cs"
+   A B C D E F | n.obs
+1  0 0 0 0 0 0 |     1
+2  1 0 0 0 0 0 |     1
+3  0 1 0 0 0 0 |     1
+4  1 1 0 0 0 0 |     1
+6  1 0 1 0 0 0 |     1
+11 0 1 0 1 0 0 |     1
+23 0 1 1 0 1 0 |     1
+24 1 1 1 0 1 0 |     1
+25 0 0 0 1 1 0 |     1
+29 0 0 1 1 1 0 |     1
+37 0 0 1 0 0 1 |     1
+44 1 1 0 1 0 1 |     1
+58 1 0 0 1 1 1 |     1
+62 1 0 1 1 1 1 |     1
+63 0 1 1 1 1 1 |     1
+64 1 1 1 1 1 1 |     1
+Total no.of.cases: 16 
 --- Coincidence Analysis (CNA) ---
 
 Factors: A, B, C, D, E, F 
@@ -5,19 +24,20 @@ Factors: A, B, C, D, E, F
 Atomic solution formulas:
 -------------------------
 Outcome E:
- solution        consistency coverage complexity inus
- B*C + b*D <-> E           1        1          4 TRUE
+ solution        consistency coverage complexity inus exhaustiveness faithfulness
+ B*C + b*D <-> E           1        1          4 TRUE              1            1
 
 Outcome F:
- solution                  consistency coverage complexity inus
- A*D + a*C*e + B*C*D <-> F           1        1          8 TRUE
- A*D + a*C*e + B*D*E <-> F           1        1          8 TRUE
+ solution                    consistency coverage complexity inus exhaustiveness faithfulness
+ A*D + a*C*e + B*C*D <-> F             1        1          8 TRUE            0.5            1
+ A*D + a*C*e + B*D*E <-> F             1        1          8 TRUE            0.5            1
+ A*D + B*C*D + a*b*C*d <-> F           1        1          9 TRUE            1.0            1
+ A*D + B*D*E + a*b*C*d <-> F           1        1          9 TRUE            0.5            1
 
 Complex solution formulas:
 --------------------------
- outcome solution                                      consistency coverage
- E,F     (B*C + b*D <-> E)*(A*D + a*C*e + B*C*D <-> F)           1        1
- E,F     (B*C + b*D <-> E)*(A*D + a*C*e + B*D*E <-> F)           1        1
- complexity inus cyclic
-         12 TRUE  FALSE
-         12 TRUE  FALSE
+ outcome solution                                        consistency coverage complexity inus exhaustiveness faithfulness coherence redundant cyclic
+ E,F     (B*C + b*D <-> E)*(A*D + a*C*e + B*C*D <-> F)             1        1         12 TRUE              1            1         1     FALSE  FALSE
+ E,F     (B*C + b*D <-> E)*(A*D + a*C*e + B*D*E <-> F)             1        1         12 TRUE              1            1         1     FALSE  FALSE
+ E,F     (B*C + b*D <-> E)*(A*D + B*C*D + a*b*C*d <-> F)           1        1         13 TRUE              1            1         1     FALSE  FALSE
+ E,F     (B*C + b*D <-> E)*(A*D + B*D*E + a*b*C*d <-> F)           1        1         13 TRUE              1            1         1     FALSE  FALSE

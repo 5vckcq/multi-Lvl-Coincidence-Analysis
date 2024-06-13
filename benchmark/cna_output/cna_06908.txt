@@ -1,3 +1,10 @@
+configTable of type "cs"
+   A B C D E F | n.obs
+14 1 0 1 1 0 0 |     1
+21 0 0 1 0 1 0 |     1
+31 0 1 1 1 1 0 |     1
+32 1 1 1 1 1 0 |     1
+Total no.of.cases: 4 
 --- Coincidence Analysis (CNA) ---
 
 Factors: A, B, C, D, E, F 
@@ -5,27 +12,23 @@ Factors: A, B, C, D, E, F
 Atomic solution formulas:
 -------------------------
 Outcome B:
- solution        consistency coverage complexity inus
- D*E <-> B                 1        1          2 TRUE
- a*D + A*E <-> B           1        1          4 TRUE
+ solution        consistency coverage complexity inus exhaustiveness faithfulness
+ D*E <-> B                 1        1          2 TRUE           0.75            1
+ a*D + A*E <-> B           1        1          4 TRUE           0.50            1
 
 Outcome D:
- solution    consistency coverage complexity inus
- A + B <-> D           1        1          2 TRUE
- B + e <-> D           1        1          2 TRUE
+ solution    consistency coverage complexity inus exhaustiveness faithfulness
+ A + B <-> D           1        1          2 TRUE           1.00            1
+ B + e <-> D           1        1          2 TRUE           0.75            1
 
 Outcome E:
- solution    consistency coverage complexity inus
- a + B <-> E           1        1          2 TRUE
- B + d <-> E           1        1          2 TRUE
+ solution    consistency coverage complexity inus exhaustiveness faithfulness
+ a + B <-> E           1        1          2 TRUE           1.00            1
+ B + d <-> E           1        1          2 TRUE           0.75            1
 
 Complex solution formulas:
 --------------------------
- outcome solution                    consistency coverage complexity inus
- D,E     (A + B <-> D)*(a + B <-> E)           1        1          4 TRUE
- D,E     (A + B <-> D)*(B + d <-> E)           1        1          4 TRUE
- D,E     (B + e <-> D)*(a + B <-> E)           1        1          4 TRUE
- cyclic
-  FALSE
-  FALSE
-  FALSE
+ outcome solution                    consistency coverage complexity inus exhaustiveness faithfulness coherence redundant cyclic
+ D,E     (A + B <-> D)*(a + B <-> E)           1        1          4 TRUE              1            1         1     FALSE  FALSE
+ D,E     (A + B <-> D)*(B + d <-> E)           1        1          4 TRUE              1            1         1     FALSE  FALSE
+ D,E     (B + e <-> D)*(a + B <-> E)           1        1          4 TRUE              1            1         1     FALSE  FALSE

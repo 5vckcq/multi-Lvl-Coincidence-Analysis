@@ -1,3 +1,14 @@
+configTable of type "cs"
+   A B C D E F | n.obs
+26 1 0 0 1 1 0 |     1
+30 1 0 1 1 1 0 |     1
+35 0 1 0 0 0 1 |     1
+44 1 1 0 1 0 1 |     1
+48 1 1 1 1 0 1 |     1
+49 0 0 0 0 1 1 |     1
+55 0 1 1 0 1 1 |     1
+61 0 0 1 1 1 1 |     1
+Total no.of.cases: 8 
 --- Coincidence Analysis (CNA) ---
 
 Factors: A, B, C, D, E, F 
@@ -5,38 +16,33 @@ Factors: A, B, C, D, E, F
 Atomic solution formulas:
 -------------------------
 Outcome A:
- solution            consistency coverage complexity inus
- f + B*D <-> A                 1        1          3 TRUE
- f + D*e <-> A                 1        1          3 TRUE
- f + c*D + C*e <-> A           1        1          5 TRUE
+ solution            consistency coverage complexity inus exhaustiveness faithfulness
+ f + B*D <-> A                 1        1          3 TRUE          0.625            1
+ f + D*e <-> A                 1        1          3 TRUE          0.625            1
+ f + c*D + C*e <-> A           1        1          5 TRUE          0.500            1
 
 Outcome B:
- solution      consistency coverage complexity inus
- e + C*d <-> B           1        1          3 TRUE
+ solution      consistency coverage complexity inus exhaustiveness faithfulness
+ e + C*d <-> B           1        1          3 TRUE          0.875            1
 
 Outcome D:
- solution      consistency coverage complexity inus
- A + b*C <-> D           1        1          3 TRUE
+ solution      consistency coverage complexity inus exhaustiveness faithfulness
+ A + b*C <-> D           1        1          3 TRUE              1            1
 
 Outcome E:
- solution      consistency coverage complexity inus
- b + a*C <-> E           1        1          3 TRUE
- b + C*d <-> E           1        1          3 TRUE
+ solution      consistency coverage complexity inus exhaustiveness faithfulness
+ b + a*C <-> E           1        1          3 TRUE          1.000            1
+ b + C*d <-> E           1        1          3 TRUE          0.875            1
 
 Outcome F:
- solution    consistency coverage complexity inus
- a + B <-> F           1        1          2 TRUE
- a + e <-> F           1        1          2 TRUE
+ solution    consistency coverage complexity inus exhaustiveness faithfulness
+ a + B <-> F           1        1          2 TRUE              1            1
+ a + e <-> F           1        1          2 TRUE              1            1
 
 Complex solution formulas:
 --------------------------
- outcome solution                                      consistency coverage
- D,E,F   (A + b*C <-> D)*(b + a*C <-> E)*(a + B <-> F)           1        1
- D,E,F   (A + b*C <-> D)*(b + a*C <-> E)*(a + e <-> F)           1        1
- D,E,F   (A + b*C <-> D)*(b + C*d <-> E)*(a + B <-> F)           1        1
- D,E,F   (A + b*C <-> D)*(b + C*d <-> E)*(a + e <-> F)           1        1
- complexity inus cyclic
-          8 TRUE  FALSE
-          8 TRUE  FALSE
-          8 TRUE  FALSE
-          8 TRUE  FALSE
+ outcome solution                                      consistency coverage complexity inus exhaustiveness faithfulness coherence redundant cyclic
+ D,E,F   (A + b*C <-> D)*(b + a*C <-> E)*(a + B <-> F)           1        1          8 TRUE              1            1         1     FALSE  FALSE
+ D,E,F   (A + b*C <-> D)*(b + a*C <-> E)*(a + e <-> F)           1        1          8 TRUE              1            1         1     FALSE  FALSE
+ D,E,F   (A + b*C <-> D)*(b + C*d <-> E)*(a + B <-> F)           1        1          8 TRUE              1            1         1     FALSE  FALSE
+ D,E,F   (A + b*C <-> D)*(b + C*d <-> E)*(a + e <-> F)           1        1          8 TRUE              1            1         1     FALSE  FALSE

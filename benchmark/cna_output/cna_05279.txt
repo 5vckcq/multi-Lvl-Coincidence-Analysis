@@ -1,3 +1,14 @@
+configTable of type "cs"
+   A B C D E F | n.obs
+2  1 0 0 0 0 0 |     1
+3  0 1 0 0 0 0 |     1
+6  1 0 1 0 0 0 |     1
+7  0 1 1 0 0 0 |     1
+8  1 1 1 0 0 0 |     1
+13 0 0 1 1 0 0 |     1
+20 1 1 0 0 1 0 |     1
+25 0 0 0 1 1 0 |     1
+Total no.of.cases: 8 
 --- Coincidence Analysis (CNA) ---
 
 Factors: A, B, C, D, E, F 
@@ -5,19 +16,16 @@ Factors: A, B, C, D, E, F
 Atomic solution formulas:
 -------------------------
 Outcome D:
- solution  consistency coverage complexity inus
- a*b <-> D           1        1          2 TRUE
+ solution  consistency coverage complexity inus exhaustiveness faithfulness
+ a*b <-> D           1        1          2 TRUE              1            1
 
 Outcome E:
- solution            consistency coverage complexity inus
- c*D + A*B*c <-> E             1        1          5 TRUE
- A*B*c + a*b*c <-> E           1        1          6 TRUE
+ solution            consistency coverage complexity inus exhaustiveness faithfulness
+ c*D + A*B*c <-> E             1        1          5 TRUE            0.5            1
+ A*B*c + a*b*c <-> E           1        1          6 TRUE            1.0            1
 
 Complex solution formulas:
 --------------------------
- outcome solution                          consistency coverage complexity inus
- D,E     (a*b <-> D)*(c*D + A*B*c <-> E)             1        1          7 TRUE
- D,E     (a*b <-> D)*(A*B*c + a*b*c <-> E)           1        1          8 TRUE
- cyclic
-  FALSE
-  FALSE
+ outcome solution                          consistency coverage complexity inus exhaustiveness faithfulness coherence redundant cyclic
+ D,E     (a*b <-> D)*(c*D + A*B*c <-> E)             1        1          7 TRUE              1            1         1     FALSE  FALSE
+ D,E     (a*b <-> D)*(A*B*c + a*b*c <-> E)           1        1          8 TRUE              1            1         1     FALSE  FALSE

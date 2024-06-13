@@ -1,3 +1,14 @@
+configTable of type "cs"
+   A B C D E F | n.obs
+5  0 0 1 0 0 0 |     1
+10 1 0 0 1 0 0 |     1
+14 1 0 1 1 0 0 |     1
+16 1 1 1 1 0 0 |     1
+17 0 0 0 0 1 0 |     1
+23 0 1 1 0 1 0 |     1
+44 1 1 0 1 0 1 |     1
+51 0 1 0 0 1 1 |     1
+Total no.of.cases: 8 
 --- Coincidence Analysis (CNA) ---
 
 Factors: A, B, C, D, E, F 
@@ -5,41 +16,32 @@ Factors: A, B, C, D, E, F
 Atomic solution formulas:
 -------------------------
 Outcome A:
- solution consistency coverage complexity inus
- D <-> A            1        1          1 TRUE
+ solution consistency coverage complexity inus exhaustiveness faithfulness
+ D <-> A            1        1          1 TRUE              1            1
 
 Outcome D:
- solution consistency coverage complexity inus
- A <-> D            1        1          1 TRUE
+ solution consistency coverage complexity inus exhaustiveness faithfulness
+ A <-> D            1        1          1 TRUE              1            1
 
 Outcome E:
- solution        consistency coverage complexity inus
- a*B + a*c <-> E           1        1          4 TRUE
- a*B + c*d <-> E           1        1          4 TRUE
- a*c + B*d <-> E           1        1          4 TRUE
- B*d + c*d <-> E           1        1          4 TRUE
+ solution        consistency coverage complexity inus exhaustiveness faithfulness
+ a*B + a*c <-> E           1        1          4 TRUE            1.0            1
+ a*B + c*d <-> E           1        1          4 TRUE            0.5            1
+ a*c + B*d <-> E           1        1          4 TRUE            0.5            1
+ B*d + c*d <-> E           1        1          4 TRUE            1.0            1
 
 Outcome F:
- solution  consistency coverage complexity inus
- B*c <-> F           1        1          2 TRUE
+ solution  consistency coverage complexity inus exhaustiveness faithfulness
+ B*c <-> F           1        1          2 TRUE              1            1
 
 Complex solution formulas:
 --------------------------
- outcome solution                                consistency coverage
- D,E,F   (A <-> D)*(a*B + a*c <-> E)*(B*c <-> F)           1        1
- A,E,F   (D <-> A)*(a*B + a*c <-> E)*(B*c <-> F)           1        1
- D,E,F   (A <-> D)*(a*B + c*d <-> E)*(B*c <-> F)           1        1
- A,E,F   (D <-> A)*(a*B + c*d <-> E)*(B*c <-> F)           1        1
- D,E,F   (A <-> D)*(a*c + B*d <-> E)*(B*c <-> F)           1        1
- A,E,F   (D <-> A)*(a*c + B*d <-> E)*(B*c <-> F)           1        1
- D,E,F   (A <-> D)*(B*d + c*d <-> E)*(B*c <-> F)           1        1
- A,E,F   (D <-> A)*(B*d + c*d <-> E)*(B*c <-> F)           1        1
- complexity inus cyclic
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
+ outcome solution                                consistency coverage complexity inus exhaustiveness faithfulness coherence redundant cyclic
+ D,E,F   (A <-> D)*(a*B + a*c <-> E)*(B*c <-> F)           1        1          7 TRUE              1            1         1     FALSE  FALSE
+ A,E,F   (D <-> A)*(a*B + a*c <-> E)*(B*c <-> F)           1        1          7 TRUE              1            1         1     FALSE  FALSE
+ D,E,F   (A <-> D)*(a*B + c*d <-> E)*(B*c <-> F)           1        1          7 TRUE              1            1         1     FALSE  FALSE
+ A,E,F   (D <-> A)*(a*B + c*d <-> E)*(B*c <-> F)           1        1          7 TRUE              1            1         1     FALSE  FALSE
+ D,E,F   (A <-> D)*(a*c + B*d <-> E)*(B*c <-> F)           1        1          7 TRUE              1            1         1     FALSE  FALSE
+ A,E,F   (D <-> A)*(a*c + B*d <-> E)*(B*c <-> F)           1        1          7 TRUE              1            1         1     FALSE  FALSE
+ D,E,F   (A <-> D)*(B*d + c*d <-> E)*(B*c <-> F)           1        1          7 TRUE              1            1         1     FALSE  FALSE
+ A,E,F   (D <-> A)*(B*d + c*d <-> E)*(B*c <-> F)           1        1          7 TRUE              1            1         1     FALSE  FALSE

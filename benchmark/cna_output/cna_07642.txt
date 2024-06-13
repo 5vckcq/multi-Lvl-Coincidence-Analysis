@@ -1,3 +1,22 @@
+configTable of type "cs"
+   A B C D E F | n.obs
+1  0 0 0 0 0 0 |     1
+5  0 0 1 0 0 0 |     1
+6  1 0 1 0 0 0 |     1
+8  1 1 1 0 0 0 |     1
+18 1 0 0 0 1 0 |     1
+19 0 1 0 0 1 0 |     1
+20 1 1 0 0 1 0 |     1
+23 0 1 1 0 1 0 |     1
+27 0 1 0 1 1 0 |     1
+28 1 1 0 1 1 0 |     1
+31 0 1 1 1 1 0 |     1
+32 1 1 1 1 1 0 |     1
+41 0 0 0 1 0 1 |     1
+45 0 0 1 1 0 1 |     1
+46 1 0 1 1 0 1 |     1
+58 1 0 0 1 1 1 |     1
+Total no.of.cases: 16 
 --- Coincidence Analysis (CNA) ---
 
 Factors: A, B, C, D, E, F 
@@ -5,19 +24,16 @@ Factors: A, B, C, D, E, F
 Atomic solution formulas:
 -------------------------
 Outcome E:
- solution              consistency coverage complexity inus
- a*B + A*c + B*D <-> E           1        1          6 TRUE
- a*B + A*c + D*f <-> E           1        1          6 TRUE
+ solution              consistency coverage complexity inus exhaustiveness faithfulness
+ a*B + A*c + B*D <-> E           1        1          6 TRUE            1.0            1
+ a*B + A*c + D*f <-> E           1        1          6 TRUE            0.5            1
 
 Outcome F:
- solution  consistency coverage complexity inus
- b*D <-> F           1        1          2 TRUE
+ solution  consistency coverage complexity inus exhaustiveness faithfulness
+ b*D <-> F           1        1          2 TRUE              1            1
 
 Complex solution formulas:
 --------------------------
- outcome solution                            consistency coverage complexity
- E,F     (a*B + A*c + B*D <-> E)*(b*D <-> F)           1        1          8
- E,F     (a*B + A*c + D*f <-> E)*(b*D <-> F)           1        1          8
- inus cyclic
- TRUE  FALSE
- TRUE  FALSE
+ outcome solution                            consistency coverage complexity inus exhaustiveness faithfulness coherence redundant cyclic
+ E,F     (a*B + A*c + B*D <-> E)*(b*D <-> F)           1        1          8 TRUE              1            1         1     FALSE  FALSE
+ E,F     (a*B + A*c + D*f <-> E)*(b*D <-> F)           1        1          8 TRUE              1            1         1     FALSE  FALSE

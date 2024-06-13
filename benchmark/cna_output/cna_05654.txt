@@ -1,3 +1,22 @@
+configTable of type "cs"
+   A B C D E F | n.obs
+1  0 0 0 0 0 0 |     1
+2  1 0 0 0 0 0 |     1
+6  1 0 1 0 0 0 |     1
+10 1 0 0 1 0 0 |     1
+19 0 1 0 0 1 0 |     1
+20 1 1 0 0 1 0 |     1
+21 0 0 1 0 1 0 |     1
+23 0 1 1 0 1 0 |     1
+24 1 1 1 0 1 0 |     1
+27 0 1 0 1 1 0 |     1
+28 1 1 0 1 1 0 |     1
+30 1 0 1 1 1 0 |     1
+31 0 1 1 1 1 0 |     1
+32 1 1 1 1 1 0 |     1
+41 0 0 0 1 0 1 |     1
+45 0 0 1 1 0 1 |     1
+Total no.of.cases: 16 
 --- Coincidence Analysis (CNA) ---
 
 Factors: A, B, C, D, E, F 
@@ -5,28 +24,22 @@ Factors: A, B, C, D, E, F
 Atomic solution formulas:
 -------------------------
 Outcome E:
- solution                consistency coverage complexity inus
- B + a*C*d + A*C*D <-> E           1        1          7 TRUE
- B + a*C*d + C*D*f <-> E           1        1          7 TRUE
- B + A*C*D + a*C*f <-> E           1        1          7 TRUE
- B + a*C*f + C*D*f <-> E           1        1          7 TRUE
+ solution                consistency coverage complexity inus exhaustiveness faithfulness
+ B + a*C*d + A*C*D <-> E           1        1          7 TRUE            1.0            1
+ B + a*C*d + C*D*f <-> E           1        1          7 TRUE            0.5            1
+ B + A*C*D + a*C*f <-> E           1        1          7 TRUE            0.5            1
+ B + a*C*f + C*D*f <-> E           1        1          7 TRUE            0.5            1
 
 Outcome F:
- solution    consistency coverage complexity inus
- a*b*D <-> F           1        1          3 TRUE
- a*D*e <-> F           1        1          3 TRUE
+ solution    consistency coverage complexity inus exhaustiveness faithfulness
+ a*b*D <-> F           1        1          3 TRUE              1            1
+ a*D*e <-> F           1        1          3 TRUE              1            1
 
 Complex solution formulas:
 --------------------------
- outcome solution                                consistency coverage
- E,F     (B + a*C*d + A*C*D <-> E)*(a*b*D <-> F)           1        1
- E,F     (B + a*C*d + A*C*D <-> E)*(a*D*e <-> F)           1        1
- E,F     (B + a*C*d + C*D*f <-> E)*(a*b*D <-> F)           1        1
- E,F     (B + A*C*D + a*C*f <-> E)*(a*b*D <-> F)           1        1
- E,F     (B + a*C*f + C*D*f <-> E)*(a*b*D <-> F)           1        1
- complexity inus cyclic
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
+ outcome solution                                consistency coverage complexity inus exhaustiveness faithfulness coherence redundant cyclic
+ E,F     (B + a*C*d + A*C*D <-> E)*(a*b*D <-> F)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+ E,F     (B + a*C*d + A*C*D <-> E)*(a*D*e <-> F)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+ E,F     (B + a*C*d + C*D*f <-> E)*(a*b*D <-> F)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+ E,F     (B + A*C*D + a*C*f <-> E)*(a*b*D <-> F)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+ E,F     (B + a*C*f + C*D*f <-> E)*(a*b*D <-> F)           1        1         10 TRUE              1            1         1     FALSE  FALSE

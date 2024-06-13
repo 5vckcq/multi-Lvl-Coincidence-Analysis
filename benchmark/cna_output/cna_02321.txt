@@ -1,3 +1,14 @@
+configTable of type "cs"
+   A B C D E F | n.obs
+10 1 0 0 1 0 0 |     1
+14 1 0 1 1 0 0 |     1
+25 0 0 0 1 1 0 |     1
+29 0 0 1 1 1 0 |     1
+31 0 1 1 1 1 0 |     1
+51 0 1 0 0 1 1 |     1
+52 1 1 0 0 1 1 |     1
+56 1 1 1 0 1 1 |     1
+Total no.of.cases: 8 
 --- Coincidence Analysis (CNA) ---
 
 Factors: A, B, C, D, E, F 
@@ -5,59 +16,40 @@ Factors: A, B, C, D, E, F
 Atomic solution formulas:
 -------------------------
 Outcome D:
- solution      consistency coverage complexity inus
- f <-> D                 1        1          1 TRUE
- b + a*C <-> D           1        1          3 TRUE
+ solution      consistency coverage complexity inus exhaustiveness faithfulness
+ f <-> D                 1        1          1 TRUE              1            1
+ b + a*C <-> D           1        1          3 TRUE              1            1
 
 Outcome E:
- solution    consistency coverage complexity inus
- a + B <-> E           1        1          2 TRUE
- a + d <-> E           1        1          2 TRUE
- a + F <-> E           1        1          2 TRUE
+ solution    consistency coverage complexity inus exhaustiveness faithfulness
+ a + B <-> E           1        1          2 TRUE              1            1
+ a + d <-> E           1        1          2 TRUE              1            1
+ a + F <-> E           1        1          2 TRUE              1            1
 
 Outcome F:
- solution        consistency coverage complexity inus
- d <-> F                   1        1          1 TRUE
- A*B + B*c <-> F           1        1          4 TRUE
- A*E + B*c <-> F           1        1          4 TRUE
+ solution        consistency coverage complexity inus exhaustiveness faithfulness
+ d <-> F                   1        1          1 TRUE            1.0            1
+ A*B + B*c <-> F           1        1          4 TRUE            1.0            1
+ A*E + B*c <-> F           1        1          4 TRUE            0.5            1
 
 Complex solution formulas:
 --------------------------
- outcome solution                                        consistency coverage
- E,F     (a + B <-> E)*(d <-> F)                                   1        1
- D,E     (f <-> D)*(a + B <-> E)                                   1        1
- E,F     (a + d <-> E)*(d <-> F)                                   1        1
- D,E     (f <-> D)*(a + d <-> E)                                   1        1
- E,F     (a + F <-> E)*(d <-> F)                                   1        1
- D,E     (f <-> D)*(a + F <-> E)                                   1        1
- D,E,F   (b + a*C <-> D)*(a + B <-> E)*(d <-> F)                   1        1
- D,E,F   (b + a*C <-> D)*(a + d <-> E)*(d <-> F)                   1        1
- D,E,F   (b + a*C <-> D)*(a + F <-> E)*(d <-> F)                   1        1
- D,E,F   (f <-> D)*(a + B <-> E)*(A*B + B*c <-> F)                 1        1
- D,E,F   (f <-> D)*(a + B <-> E)*(A*E + B*c <-> F)                 1        1
- D,E,F   (f <-> D)*(a + d <-> E)*(A*B + B*c <-> F)                 1        1
- D,E,F   (f <-> D)*(a + F <-> E)*(A*B + B*c <-> F)                 1        1
- D,E,F   (b + a*C <-> D)*(a + B <-> E)*(A*B + B*c <-> F)           1        1
- D,E,F   (b + a*C <-> D)*(a + B <-> E)*(A*E + B*c <-> F)           1        1
- D,E,F   (b + a*C <-> D)*(a + d <-> E)*(A*B + B*c <-> F)           1        1
- D,E,F   (b + a*C <-> D)*(a + d <-> E)*(A*E + B*c <-> F)           1        1
- D,E,F   (b + a*C <-> D)*(a + F <-> E)*(A*B + B*c <-> F)           1        1
- complexity inus cyclic
-          3 TRUE  FALSE
-          3 TRUE  FALSE
-          3 TRUE  FALSE
-          3 TRUE  FALSE
-          3 TRUE  FALSE
-          3 TRUE  FALSE
-          6 TRUE  FALSE
-          6 TRUE  FALSE
-          6 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          9 TRUE  FALSE
-          9 TRUE  FALSE
-          9 TRUE  FALSE
-          9 TRUE  FALSE
-          9 TRUE  FALSE
+ outcome solution                                        consistency coverage complexity inus exhaustiveness faithfulness coherence redundant cyclic
+ E,F     (a + B <-> E)*(d <-> F)                                   1        1          3 TRUE          0.625            1         1     FALSE  FALSE
+ D,E     (f <-> D)*(a + B <-> E)                                   1        1          3 TRUE          0.625            1         1     FALSE  FALSE
+ E,F     (a + d <-> E)*(d <-> F)                                   1        1          3 TRUE          1.000            1         1     FALSE  FALSE
+ D,E     (f <-> D)*(a + d <-> E)                                   1        1          3 TRUE          1.000            1         1     FALSE  FALSE
+ E,F     (a + F <-> E)*(d <-> F)                                   1        1          3 TRUE          1.000            1         1     FALSE  FALSE
+ D,E     (f <-> D)*(a + F <-> E)                                   1        1          3 TRUE          1.000            1         1     FALSE  FALSE
+ D,E,F   (b + a*C <-> D)*(a + B <-> E)*(d <-> F)                   1        1          6 TRUE          1.000            1         1     FALSE  FALSE
+ D,E,F   (b + a*C <-> D)*(a + d <-> E)*(d <-> F)                   1        1          6 TRUE          1.000            1         1     FALSE  FALSE
+ D,E,F   (b + a*C <-> D)*(a + F <-> E)*(d <-> F)                   1        1          6 TRUE          1.000            1         1     FALSE  FALSE
+ D,E,F   (f <-> D)*(a + B <-> E)*(A*B + B*c <-> F)                 1        1          7 TRUE          1.000            1         1     FALSE  FALSE
+ D,E,F   (f <-> D)*(a + B <-> E)*(A*E + B*c <-> F)                 1        1          7 TRUE          1.000            1         1     FALSE  FALSE
+ D,E,F   (f <-> D)*(a + d <-> E)*(A*B + B*c <-> F)                 1        1          7 TRUE          1.000            1         1     FALSE  FALSE
+ D,E,F   (f <-> D)*(a + F <-> E)*(A*B + B*c <-> F)                 1        1          7 TRUE          1.000            1         1     FALSE  FALSE
+ D,E,F   (b + a*C <-> D)*(a + B <-> E)*(A*B + B*c <-> F)           1        1          9 TRUE          1.000            1         1     FALSE  FALSE
+ D,E,F   (b + a*C <-> D)*(a + B <-> E)*(A*E + B*c <-> F)           1        1          9 TRUE          1.000            1         1     FALSE  FALSE
+ D,E,F   (b + a*C <-> D)*(a + d <-> E)*(A*B + B*c <-> F)           1        1          9 TRUE          1.000            1         1     FALSE  FALSE
+ D,E,F   (b + a*C <-> D)*(a + d <-> E)*(A*E + B*c <-> F)           1        1          9 TRUE          1.000            1         1     FALSE  FALSE
+ D,E,F   (b + a*C <-> D)*(a + F <-> E)*(A*B + B*c <-> F)           1        1          9 TRUE          1.000            1         1     FALSE  FALSE

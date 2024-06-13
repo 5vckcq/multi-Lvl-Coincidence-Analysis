@@ -1,3 +1,22 @@
+configTable of type "cs"
+   A B C D E F | n.obs
+2  1 0 0 0 0 0 |     1
+6  1 0 1 0 0 0 |     1
+25 0 0 0 1 1 0 |     1
+26 1 0 0 1 1 0 |     1
+27 0 1 0 1 1 0 |     1
+28 1 1 0 1 1 0 |     1
+29 0 0 1 1 1 0 |     1
+30 1 0 1 1 1 0 |     1
+31 0 1 1 1 1 0 |     1
+32 1 1 1 1 1 0 |     1
+36 1 1 0 0 0 1 |     1
+40 1 1 1 0 0 1 |     1
+49 0 0 0 0 1 1 |     1
+51 0 1 0 0 1 1 |     1
+53 0 0 1 0 1 1 |     1
+55 0 1 1 0 1 1 |     1
+Total no.of.cases: 16 
 --- Coincidence Analysis (CNA) ---
 
 Factors: A, B, C, D, E, F 
@@ -5,30 +24,25 @@ Factors: A, B, C, D, E, F
 Atomic solution formulas:
 -------------------------
 Outcome D:
- solution        consistency coverage complexity inus
- E*f <-> D                 1        1          2 TRUE
- A*E + a*f <-> D           1        1          4 TRUE
+ solution        consistency coverage complexity inus exhaustiveness faithfulness
+ E*f <-> D                 1        1          2 TRUE          1.000            1
+ A*E + a*f <-> D           1        1          4 TRUE          0.625            1
 
 Outcome E:
- solution    consistency coverage complexity inus
- a + D <-> E           1        1          2 TRUE
+ solution    consistency coverage complexity inus exhaustiveness faithfulness
+ a + D <-> E           1        1          2 TRUE              1            1
 
 Outcome F:
- solution        consistency coverage complexity inus
- a*d + B*d <-> F           1        1          4 TRUE
- a*d + B*e <-> F           1        1          4 TRUE
- B*d + d*E <-> F           1        1          4 TRUE
- B*e + d*E <-> F           1        1          4 TRUE
+ solution        consistency coverage complexity inus exhaustiveness faithfulness
+ a*d + B*d <-> F           1        1          4 TRUE           1.00            1
+ a*d + B*e <-> F           1        1          4 TRUE           0.50            1
+ B*d + d*E <-> F           1        1          4 TRUE           0.75            1
+ B*e + d*E <-> F           1        1          4 TRUE           0.75            1
 
 Complex solution formulas:
 --------------------------
- outcome solution                        consistency coverage complexity inus
- E,F     (a + D <-> E)*(a*d + B*d <-> F)           1        1          6 TRUE
- E,F     (a + D <-> E)*(a*d + B*e <-> F)           1        1          6 TRUE
- E,F     (a + D <-> E)*(B*d + d*E <-> F)           1        1          6 TRUE
- E,F     (a + D <-> E)*(B*e + d*E <-> F)           1        1          6 TRUE
- cyclic
-  FALSE
-  FALSE
-  FALSE
-  FALSE
+ outcome solution                        consistency coverage complexity inus exhaustiveness faithfulness coherence redundant cyclic
+ E,F     (a + D <-> E)*(a*d + B*d <-> F)           1        1          6 TRUE              1            1         1     FALSE  FALSE
+ E,F     (a + D <-> E)*(a*d + B*e <-> F)           1        1          6 TRUE              1            1         1     FALSE  FALSE
+ E,F     (a + D <-> E)*(B*d + d*E <-> F)           1        1          6 TRUE              1            1         1     FALSE  FALSE
+ E,F     (a + D <-> E)*(B*e + d*E <-> F)           1        1          6 TRUE              1            1         1     FALSE  FALSE

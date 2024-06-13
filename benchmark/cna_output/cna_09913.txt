@@ -1,382 +1,194 @@
---- Coincidence Analysis (CNA) ---
-
-Factors: A, B, C, D, E, F 
-
-Atomic solution formulas:
--------------------------
-Outcome A:
- solution        consistency coverage complexity inus
- d + b*f <-> A             1        1          3 TRUE
- d + C*f <-> A             1        1          3 TRUE
- b*f + B*F <-> A           1        1          4 TRUE
- b*f + c*F <-> A           1        1          4 TRUE
- B*F + C*f <-> A           1        1          4 TRUE
- C*f + c*F <-> A           1        1          4 TRUE
-
-Outcome B:
- solution        consistency coverage complexity inus
- c <-> B                   1        1          1 TRUE
- d + a*f <-> B             1        1          3 TRUE
- a*f + A*F <-> B           1        1          4 TRUE
-
-Outcome C:
- solution        consistency coverage complexity inus
- b <-> C                   1        1          1 TRUE
- A*D + a*F <-> C           1        1          4 TRUE
- A*D + D*F <-> C           1        1          4 TRUE
- A*f + a*F <-> C           1        1          4 TRUE
- A*f + D*F <-> C           1        1          4 TRUE
-
-Outcome D:
- solution    consistency coverage complexity inus
- a + b <-> D           1        1          2 TRUE
- a + C <-> D           1        1          2 TRUE
- a + f <-> D           1        1          2 TRUE
- b + f <-> D           1        1          2 TRUE
- C + f <-> D           1        1          2 TRUE
-
-Outcome F:
- solution        consistency coverage complexity inus
- d + a*b <-> F             1        1          3 TRUE
- d + a*C <-> F             1        1          3 TRUE
- A*B + a*b <-> F           1        1          4 TRUE
- A*B + a*C <-> F           1        1          4 TRUE
- a*b + A*c <-> F           1        1          4 TRUE
- A*c + a*C <-> F           1        1          4 TRUE
-
-Complex solution formulas:
---------------------------
- outcome solution                                          consistency coverage
- C,D,F   (b <-> C)*(a + b <-> D)*(d + a*b <-> F)                     1        1
- B,D,F   (c <-> B)*(a + b <-> D)*(d + a*b <-> F)                     1        1
- C,D,F   (b <-> C)*(a + b <-> D)*(d + a*C <-> F)                     1        1
- B,D,F   (c <-> B)*(a + b <-> D)*(d + a*C <-> F)                     1        1
- C,D,F   (b <-> C)*(a + C <-> D)*(d + a*b <-> F)                     1        1
- B,D,F   (c <-> B)*(a + C <-> D)*(d + a*b <-> F)                     1        1
- C,D,F   (b <-> C)*(a + C <-> D)*(d + a*C <-> F)                     1        1
- B,D,F   (c <-> B)*(a + C <-> D)*(d + a*C <-> F)                     1        1
- A,C,D   (d + b*f <-> A)*(b <-> C)*(b + f <-> D)                     1        1
- A,B,D   (d + b*f <-> A)*(c <-> B)*(b + f <-> D)                     1        1
- A,C,D   (d + b*f <-> A)*(b <-> C)*(C + f <-> D)                     1        1
- A,B,D   (d + b*f <-> A)*(c <-> B)*(C + f <-> D)                     1        1
- A,C,D   (d + C*f <-> A)*(b <-> C)*(b + f <-> D)                     1        1
- A,B,D   (d + C*f <-> A)*(c <-> B)*(b + f <-> D)                     1        1
- A,C,D   (d + C*f <-> A)*(b <-> C)*(C + f <-> D)                     1        1
- A,B,D   (d + C*f <-> A)*(c <-> B)*(C + f <-> D)                     1        1
- B,C,D   (d + a*f <-> B)*(b <-> C)*(a + f <-> D)                     1        1
- C,D,F   (b <-> C)*(a + b <-> D)*(A*B + a*b <-> F)                   1        1
- B,D,F   (c <-> B)*(a + b <-> D)*(A*B + a*b <-> F)                   1        1
- C,D,F   (b <-> C)*(a + b <-> D)*(A*B + a*C <-> F)                   1        1
- B,D,F   (c <-> B)*(a + b <-> D)*(A*B + a*C <-> F)                   1        1
- C,D,F   (b <-> C)*(a + b <-> D)*(a*b + A*c <-> F)                   1        1
- B,D,F   (c <-> B)*(a + b <-> D)*(a*b + A*c <-> F)                   1        1
- C,D,F   (b <-> C)*(a + b <-> D)*(A*c + a*C <-> F)                   1        1
- B,D,F   (c <-> B)*(a + b <-> D)*(A*c + a*C <-> F)                   1        1
- C,D,F   (b <-> C)*(a + C <-> D)*(A*B + a*b <-> F)                   1        1
- B,D,F   (c <-> B)*(a + C <-> D)*(A*B + a*b <-> F)                   1        1
- C,D,F   (b <-> C)*(a + C <-> D)*(A*B + a*C <-> F)                   1        1
- B,D,F   (c <-> B)*(a + C <-> D)*(A*B + a*C <-> F)                   1        1
- C,D,F   (b <-> C)*(a + C <-> D)*(a*b + A*c <-> F)                   1        1
- B,D,F   (c <-> B)*(a + C <-> D)*(a*b + A*c <-> F)                   1        1
- C,D,F   (b <-> C)*(a + C <-> D)*(A*c + a*C <-> F)                   1        1
- B,D,F   (c <-> B)*(a + C <-> D)*(A*c + a*C <-> F)                   1        1
- C,D,F   (b <-> C)*(a + f <-> D)*(A*B + a*b <-> F)                   1        1
- B,D,F   (c <-> B)*(a + f <-> D)*(A*B + a*b <-> F)                   1        1
- C,D,F   (b <-> C)*(a + f <-> D)*(A*B + a*C <-> F)                   1        1
- B,D,F   (c <-> B)*(a + f <-> D)*(A*B + a*C <-> F)                   1        1
- C,D,F   (b <-> C)*(a + f <-> D)*(a*b + A*c <-> F)                   1        1
- B,D,F   (c <-> B)*(a + f <-> D)*(a*b + A*c <-> F)                   1        1
- C,D,F   (b <-> C)*(a + f <-> D)*(A*c + a*C <-> F)                   1        1
- B,D,F   (c <-> B)*(a + f <-> D)*(A*c + a*C <-> F)                   1        1
- C,D,F   (b <-> C)*(b + f <-> D)*(A*B + a*b <-> F)                   1        1
- B,D,F   (c <-> B)*(b + f <-> D)*(A*B + a*b <-> F)                   1        1
- C,D,F   (b <-> C)*(b + f <-> D)*(A*B + a*C <-> F)                   1        1
- B,D,F   (c <-> B)*(b + f <-> D)*(A*B + a*C <-> F)                   1        1
- C,D,F   (b <-> C)*(b + f <-> D)*(a*b + A*c <-> F)                   1        1
- B,D,F   (c <-> B)*(b + f <-> D)*(a*b + A*c <-> F)                   1        1
- C,D,F   (b <-> C)*(b + f <-> D)*(A*c + a*C <-> F)                   1        1
- B,D,F   (c <-> B)*(b + f <-> D)*(A*c + a*C <-> F)                   1        1
- C,D,F   (b <-> C)*(C + f <-> D)*(A*B + a*b <-> F)                   1        1
- B,D,F   (c <-> B)*(C + f <-> D)*(A*B + a*b <-> F)                   1        1
- C,D,F   (b <-> C)*(C + f <-> D)*(A*B + a*C <-> F)                   1        1
- B,D,F   (c <-> B)*(C + f <-> D)*(A*B + a*C <-> F)                   1        1
- C,D,F   (b <-> C)*(C + f <-> D)*(a*b + A*c <-> F)                   1        1
- B,D,F   (c <-> B)*(C + f <-> D)*(a*b + A*c <-> F)                   1        1
- C,D,F   (b <-> C)*(C + f <-> D)*(A*c + a*C <-> F)                   1        1
- B,D,F   (c <-> B)*(C + f <-> D)*(A*c + a*C <-> F)                   1        1
- A,C,D   (b*f + B*F <-> A)*(b <-> C)*(a + b <-> D)                   1        1
- A,B,D   (b*f + B*F <-> A)*(c <-> B)*(a + b <-> D)                   1        1
- A,C,D   (b*f + B*F <-> A)*(b <-> C)*(a + C <-> D)                   1        1
- A,B,D   (b*f + B*F <-> A)*(c <-> B)*(a + C <-> D)                   1        1
- A,C,D   (b*f + B*F <-> A)*(b <-> C)*(a + f <-> D)                   1        1
- A,B,D   (b*f + B*F <-> A)*(c <-> B)*(a + f <-> D)                   1        1
- A,C,D   (b*f + B*F <-> A)*(b <-> C)*(b + f <-> D)                   1        1
- A,B,D   (b*f + B*F <-> A)*(c <-> B)*(b + f <-> D)                   1        1
- A,C,D   (b*f + B*F <-> A)*(b <-> C)*(C + f <-> D)                   1        1
- A,B,D   (b*f + B*F <-> A)*(c <-> B)*(C + f <-> D)                   1        1
- A,C,D   (b*f + c*F <-> A)*(b <-> C)*(a + b <-> D)                   1        1
- A,B,D   (b*f + c*F <-> A)*(c <-> B)*(a + b <-> D)                   1        1
- A,C,D   (b*f + c*F <-> A)*(b <-> C)*(a + C <-> D)                   1        1
- A,B,D   (b*f + c*F <-> A)*(c <-> B)*(a + C <-> D)                   1        1
- A,C,D   (b*f + c*F <-> A)*(b <-> C)*(a + f <-> D)                   1        1
- A,B,D   (b*f + c*F <-> A)*(c <-> B)*(a + f <-> D)                   1        1
- A,C,D   (b*f + c*F <-> A)*(b <-> C)*(b + f <-> D)                   1        1
- A,B,D   (b*f + c*F <-> A)*(c <-> B)*(b + f <-> D)                   1        1
- A,C,D   (b*f + c*F <-> A)*(b <-> C)*(C + f <-> D)                   1        1
- A,B,D   (b*f + c*F <-> A)*(c <-> B)*(C + f <-> D)                   1        1
- A,C,D   (B*F + C*f <-> A)*(b <-> C)*(a + b <-> D)                   1        1
- A,B,D   (B*F + C*f <-> A)*(c <-> B)*(a + b <-> D)                   1        1
- A,C,D   (B*F + C*f <-> A)*(b <-> C)*(a + C <-> D)                   1        1
- A,B,D   (B*F + C*f <-> A)*(c <-> B)*(a + C <-> D)                   1        1
- A,C,D   (B*F + C*f <-> A)*(b <-> C)*(a + f <-> D)                   1        1
- A,B,D   (B*F + C*f <-> A)*(c <-> B)*(a + f <-> D)                   1        1
- A,C,D   (B*F + C*f <-> A)*(b <-> C)*(b + f <-> D)                   1        1
- A,B,D   (B*F + C*f <-> A)*(c <-> B)*(b + f <-> D)                   1        1
- A,C,D   (B*F + C*f <-> A)*(b <-> C)*(C + f <-> D)                   1        1
- A,B,D   (B*F + C*f <-> A)*(c <-> B)*(C + f <-> D)                   1        1
- A,C,D   (C*f + c*F <-> A)*(b <-> C)*(a + b <-> D)                   1        1
- A,B,D   (C*f + c*F <-> A)*(c <-> B)*(a + b <-> D)                   1        1
- A,C,D   (C*f + c*F <-> A)*(b <-> C)*(a + C <-> D)                   1        1
- A,B,D   (C*f + c*F <-> A)*(c <-> B)*(a + C <-> D)                   1        1
- A,C,D   (C*f + c*F <-> A)*(b <-> C)*(a + f <-> D)                   1        1
- A,B,D   (C*f + c*F <-> A)*(c <-> B)*(a + f <-> D)                   1        1
- A,C,D   (C*f + c*F <-> A)*(b <-> C)*(b + f <-> D)                   1        1
- A,B,D   (C*f + c*F <-> A)*(c <-> B)*(b + f <-> D)                   1        1
- A,C,D   (C*f + c*F <-> A)*(b <-> C)*(C + f <-> D)                   1        1
- A,B,D   (C*f + c*F <-> A)*(c <-> B)*(C + f <-> D)                   1        1
- B,C,D   (c <-> B)*(A*D + a*F <-> C)*(a + f <-> D)                   1        1
- B,C,D   (c <-> B)*(A*D + D*F <-> C)*(a + f <-> D)                   1        1
- B,C,D   (c <-> B)*(A*f + a*F <-> C)*(a + b <-> D)                   1        1
- B,C,D   (c <-> B)*(A*f + a*F <-> C)*(a + C <-> D)                   1        1
- B,C,D   (c <-> B)*(A*f + a*F <-> C)*(a + f <-> D)                   1        1
- B,C,D   (c <-> B)*(A*f + a*F <-> C)*(b + f <-> D)                   1        1
- B,C,D   (c <-> B)*(A*f + a*F <-> C)*(C + f <-> D)                   1        1
- B,C,D   (c <-> B)*(A*f + D*F <-> C)*(a + f <-> D)                   1        1
- B,C,D   (a*f + A*F <-> B)*(b <-> C)*(a + b <-> D)                   1        1
- B,C,D   (a*f + A*F <-> B)*(b <-> C)*(a + C <-> D)                   1        1
- B,C,D   (a*f + A*F <-> B)*(b <-> C)*(a + f <-> D)                   1        1
- B,C,D   (a*f + A*F <-> B)*(b <-> C)*(b + f <-> D)                   1        1
- B,C,D   (a*f + A*F <-> B)*(b <-> C)*(C + f <-> D)                   1        1
- B,D,F   (d + a*f <-> B)*(a + C <-> D)*(d + a*C <-> F)               1        1
- A,B,D   (d + C*f <-> A)*(d + a*f <-> B)*(C + f <-> D)               1        1
- B,D,F   (d + a*f <-> B)*(a + C <-> D)*(A*c + a*C <-> F)             1        1
- B,D,F   (d + a*f <-> B)*(a + f <-> D)*(A*c + a*C <-> F)             1        1
- B,D,F   (d + a*f <-> B)*(C + f <-> D)*(A*c + a*C <-> F)             1        1
- C,D,F   (A*D + a*F <-> C)*(a + b <-> D)*(d + a*b <-> F)             1        1
- A,C,D   (d + b*f <-> A)*(A*D + a*F <-> C)*(b + f <-> D)             1        1
- C,D,F   (A*D + D*F <-> C)*(a + b <-> D)*(d + a*b <-> F)             1        1
- A,C,D   (d + b*f <-> A)*(A*D + D*F <-> C)*(b + f <-> D)             1        1
- C,D,F   (A*f + a*F <-> C)*(a + b <-> D)*(d + a*b <-> F)             1        1
- A,C,D   (d + b*f <-> A)*(A*f + a*F <-> C)*(b + f <-> D)             1        1
- C,D,F   (A*f + D*F <-> C)*(a + b <-> D)*(d + a*b <-> F)             1        1
- A,C,D   (d + b*f <-> A)*(A*f + D*F <-> C)*(b + f <-> D)             1        1
- B,D,F   (a*f + A*F <-> B)*(a + C <-> D)*(d + a*C <-> F)             1        1
- A,B,D   (d + C*f <-> A)*(a*f + A*F <-> B)*(C + f <-> D)             1        1
- A,B,D   (C*f + c*F <-> A)*(d + a*f <-> B)*(a + C <-> D)             1        1
- A,B,D   (C*f + c*F <-> A)*(d + a*f <-> B)*(a + f <-> D)             1        1
- A,B,D   (C*f + c*F <-> A)*(d + a*f <-> B)*(C + f <-> D)             1        1
- C,D,F   (A*D + a*F <-> C)*(a + b <-> D)*(A*B + a*b <-> F)           1        1
- C,D,F   (A*D + a*F <-> C)*(a + f <-> D)*(A*B + a*b <-> F)           1        1
- C,D,F   (A*D + a*F <-> C)*(b + f <-> D)*(A*B + a*b <-> F)           1        1
- C,D,F   (A*D + D*F <-> C)*(a + b <-> D)*(A*B + a*b <-> F)           1        1
- C,D,F   (A*D + D*F <-> C)*(a + f <-> D)*(A*B + a*b <-> F)           1        1
- C,D,F   (A*D + D*F <-> C)*(b + f <-> D)*(A*B + a*b <-> F)           1        1
- C,D,F   (A*f + a*F <-> C)*(a + b <-> D)*(A*B + a*b <-> F)           1        1
- C,D,F   (A*f + a*F <-> C)*(a + C <-> D)*(A*B + a*b <-> F)           1        1
- C,D,F   (A*f + a*F <-> C)*(a + f <-> D)*(A*B + a*b <-> F)           1        1
- C,D,F   (A*f + a*F <-> C)*(b + f <-> D)*(A*B + a*b <-> F)           1        1
- C,D,F   (A*f + a*F <-> C)*(C + f <-> D)*(A*B + a*b <-> F)           1        1
- C,D,F   (A*f + D*F <-> C)*(a + b <-> D)*(A*B + a*b <-> F)           1        1
- C,D,F   (A*f + D*F <-> C)*(a + f <-> D)*(A*B + a*b <-> F)           1        1
- C,D,F   (A*f + D*F <-> C)*(b + f <-> D)*(A*B + a*b <-> F)           1        1
- B,D,F   (a*f + A*F <-> B)*(a + b <-> D)*(A*c + a*C <-> F)           1        1
- B,D,F   (a*f + A*F <-> B)*(a + C <-> D)*(A*c + a*C <-> F)           1        1
- B,D,F   (a*f + A*F <-> B)*(a + f <-> D)*(A*c + a*C <-> F)           1        1
- B,D,F   (a*f + A*F <-> B)*(b + f <-> D)*(A*c + a*C <-> F)           1        1
- B,D,F   (a*f + A*F <-> B)*(C + f <-> D)*(A*c + a*C <-> F)           1        1
- A,C,D   (b*f + B*F <-> A)*(A*D + a*F <-> C)*(a + b <-> D)           1        1
- A,C,D   (b*f + B*F <-> A)*(A*D + a*F <-> C)*(a + f <-> D)           1        1
- A,C,D   (b*f + B*F <-> A)*(A*D + a*F <-> C)*(b + f <-> D)           1        1
- A,C,D   (b*f + B*F <-> A)*(A*D + D*F <-> C)*(a + b <-> D)           1        1
- A,C,D   (b*f + B*F <-> A)*(A*D + D*F <-> C)*(a + f <-> D)           1        1
- A,C,D   (b*f + B*F <-> A)*(A*D + D*F <-> C)*(b + f <-> D)           1        1
- A,C,D   (b*f + B*F <-> A)*(A*f + a*F <-> C)*(a + b <-> D)           1        1
- A,C,D   (b*f + B*F <-> A)*(A*f + a*F <-> C)*(a + C <-> D)           1        1
- A,C,D   (b*f + B*F <-> A)*(A*f + a*F <-> C)*(a + f <-> D)           1        1
- A,C,D   (b*f + B*F <-> A)*(A*f + a*F <-> C)*(b + f <-> D)           1        1
- A,C,D   (b*f + B*F <-> A)*(A*f + a*F <-> C)*(C + f <-> D)           1        1
- A,C,D   (b*f + B*F <-> A)*(A*f + D*F <-> C)*(a + b <-> D)           1        1
- A,C,D   (b*f + B*F <-> A)*(A*f + D*F <-> C)*(a + f <-> D)           1        1
- A,C,D   (b*f + B*F <-> A)*(A*f + D*F <-> C)*(b + f <-> D)           1        1
- A,B,D   (C*f + c*F <-> A)*(a*f + A*F <-> B)*(a + b <-> D)           1        1
- A,B,D   (C*f + c*F <-> A)*(a*f + A*F <-> B)*(a + C <-> D)           1        1
- A,B,D   (C*f + c*F <-> A)*(a*f + A*F <-> B)*(a + f <-> D)           1        1
- A,B,D   (C*f + c*F <-> A)*(a*f + A*F <-> B)*(b + f <-> D)           1        1
- A,B,D   (C*f + c*F <-> A)*(a*f + A*F <-> B)*(C + f <-> D)           1        1
- complexity inus cyclic
-          6 TRUE  FALSE
-          6 TRUE  FALSE
-          6 TRUE  FALSE
-          6 TRUE  FALSE
-          6 TRUE  FALSE
-          6 TRUE  FALSE
-          6 TRUE  FALSE
-          6 TRUE  FALSE
-          6 TRUE  FALSE
-          6 TRUE  FALSE
-          6 TRUE  FALSE
-          6 TRUE  FALSE
-          6 TRUE  FALSE
-          6 TRUE  FALSE
-          6 TRUE  FALSE
-          6 TRUE  FALSE
-          6 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          7 TRUE  FALSE
-          8 TRUE  FALSE
-          8 TRUE  FALSE
-          9 TRUE  FALSE
-          9 TRUE  FALSE
-          9 TRUE  FALSE
-          9 TRUE  FALSE
-          9 TRUE  FALSE
-          9 TRUE  FALSE
-          9 TRUE  FALSE
-          9 TRUE  FALSE
-          9 TRUE  FALSE
-          9 TRUE  FALSE
-          9 TRUE  FALSE
-          9 TRUE  FALSE
-          9 TRUE  FALSE
-          9 TRUE  FALSE
-          9 TRUE  FALSE
-          9 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
-         10 TRUE  FALSE
+configTable of type "cs"
+   A B C D E F | n.obs
+11 0 1 0 1 0 0 |     1
+14 1 0 1 1 0 0 |     1
+36 1 1 0 0 0 1 |     1
+45 0 0 1 1 0 1 |     1
+Total no.of.cases: 4 
+    outcome condition                                         consistency coverage complexity inus exhaustiveness faithfulness coherence redundant cyclic
+1   C,D,F   (b <-> C)*(a + b <-> D)*(d + a*b <-> F)                     1        1          6 TRUE              1            1         1     FALSE  FALSE
+2   B,D,F   (c <-> B)*(a + b <-> D)*(d + a*b <-> F)                     1        1          6 TRUE              1            1         1     FALSE  FALSE
+3   C,D,F   (b <-> C)*(a + b <-> D)*(d + a*C <-> F)                     1        1          6 TRUE              1            1         1     FALSE  FALSE
+4   B,D,F   (c <-> B)*(a + b <-> D)*(d + a*C <-> F)                     1        1          6 TRUE              1            1         1     FALSE  FALSE
+5   C,D,F   (b <-> C)*(a + C <-> D)*(d + a*b <-> F)                     1        1          6 TRUE              1            1         1     FALSE  FALSE
+6   B,D,F   (c <-> B)*(a + C <-> D)*(d + a*b <-> F)                     1        1          6 TRUE              1            1         1     FALSE  FALSE
+7   C,D,F   (b <-> C)*(a + C <-> D)*(d + a*C <-> F)                     1        1          6 TRUE              1            1         1     FALSE  FALSE
+8   B,D,F   (c <-> B)*(a + C <-> D)*(d + a*C <-> F)                     1        1          6 TRUE              1            1         1     FALSE  FALSE
+9   A,C,D   (d + b*f <-> A)*(b <-> C)*(b + f <-> D)                     1        1          6 TRUE              1            1         1     FALSE  FALSE
+10  A,B,D   (d + b*f <-> A)*(c <-> B)*(b + f <-> D)                     1        1          6 TRUE              1            1         1     FALSE  FALSE
+11  A,C,D   (d + b*f <-> A)*(b <-> C)*(C + f <-> D)                     1        1          6 TRUE              1            1         1     FALSE  FALSE
+12  A,B,D   (d + b*f <-> A)*(c <-> B)*(C + f <-> D)                     1        1          6 TRUE              1            1         1     FALSE  FALSE
+13  A,C,D   (d + C*f <-> A)*(b <-> C)*(b + f <-> D)                     1        1          6 TRUE              1            1         1     FALSE  FALSE
+14  A,B,D   (d + C*f <-> A)*(c <-> B)*(b + f <-> D)                     1        1          6 TRUE              1            1         1     FALSE  FALSE
+15  A,C,D   (d + C*f <-> A)*(b <-> C)*(C + f <-> D)                     1        1          6 TRUE              1            1         1     FALSE  FALSE
+16  A,B,D   (d + C*f <-> A)*(c <-> B)*(C + f <-> D)                     1        1          6 TRUE              1            1         1     FALSE  FALSE
+17  B,C,D   (d + a*f <-> B)*(b <-> C)*(a + f <-> D)                     1        1          6 TRUE              1            1         1     FALSE  FALSE
+18  C,D,F   (b <-> C)*(a + b <-> D)*(A*B + a*b <-> F)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+19  B,D,F   (c <-> B)*(a + b <-> D)*(A*B + a*b <-> F)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+20  C,D,F   (b <-> C)*(a + b <-> D)*(A*B + a*C <-> F)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+21  B,D,F   (c <-> B)*(a + b <-> D)*(A*B + a*C <-> F)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+22  C,D,F   (b <-> C)*(a + b <-> D)*(a*b + A*c <-> F)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+23  B,D,F   (c <-> B)*(a + b <-> D)*(a*b + A*c <-> F)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+24  C,D,F   (b <-> C)*(a + b <-> D)*(A*c + a*C <-> F)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+25  B,D,F   (c <-> B)*(a + b <-> D)*(A*c + a*C <-> F)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+26  C,D,F   (b <-> C)*(a + C <-> D)*(A*B + a*b <-> F)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+27  B,D,F   (c <-> B)*(a + C <-> D)*(A*B + a*b <-> F)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+28  C,D,F   (b <-> C)*(a + C <-> D)*(A*B + a*C <-> F)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+29  B,D,F   (c <-> B)*(a + C <-> D)*(A*B + a*C <-> F)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+30  C,D,F   (b <-> C)*(a + C <-> D)*(a*b + A*c <-> F)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+31  B,D,F   (c <-> B)*(a + C <-> D)*(a*b + A*c <-> F)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+32  C,D,F   (b <-> C)*(a + C <-> D)*(A*c + a*C <-> F)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+33  B,D,F   (c <-> B)*(a + C <-> D)*(A*c + a*C <-> F)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+34  C,D,F   (b <-> C)*(a + f <-> D)*(A*B + a*b <-> F)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+35  B,D,F   (c <-> B)*(a + f <-> D)*(A*B + a*b <-> F)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+36  C,D,F   (b <-> C)*(a + f <-> D)*(A*B + a*C <-> F)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+37  B,D,F   (c <-> B)*(a + f <-> D)*(A*B + a*C <-> F)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+38  C,D,F   (b <-> C)*(a + f <-> D)*(a*b + A*c <-> F)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+39  B,D,F   (c <-> B)*(a + f <-> D)*(a*b + A*c <-> F)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+40  C,D,F   (b <-> C)*(a + f <-> D)*(A*c + a*C <-> F)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+41  B,D,F   (c <-> B)*(a + f <-> D)*(A*c + a*C <-> F)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+42  C,D,F   (b <-> C)*(b + f <-> D)*(A*B + a*b <-> F)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+43  B,D,F   (c <-> B)*(b + f <-> D)*(A*B + a*b <-> F)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+44  C,D,F   (b <-> C)*(b + f <-> D)*(A*B + a*C <-> F)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+45  B,D,F   (c <-> B)*(b + f <-> D)*(A*B + a*C <-> F)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+46  C,D,F   (b <-> C)*(b + f <-> D)*(a*b + A*c <-> F)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+47  B,D,F   (c <-> B)*(b + f <-> D)*(a*b + A*c <-> F)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+48  C,D,F   (b <-> C)*(b + f <-> D)*(A*c + a*C <-> F)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+49  B,D,F   (c <-> B)*(b + f <-> D)*(A*c + a*C <-> F)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+50  C,D,F   (b <-> C)*(C + f <-> D)*(A*B + a*b <-> F)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+51  B,D,F   (c <-> B)*(C + f <-> D)*(A*B + a*b <-> F)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+52  C,D,F   (b <-> C)*(C + f <-> D)*(A*B + a*C <-> F)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+53  B,D,F   (c <-> B)*(C + f <-> D)*(A*B + a*C <-> F)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+54  C,D,F   (b <-> C)*(C + f <-> D)*(a*b + A*c <-> F)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+55  B,D,F   (c <-> B)*(C + f <-> D)*(a*b + A*c <-> F)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+56  C,D,F   (b <-> C)*(C + f <-> D)*(A*c + a*C <-> F)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+57  B,D,F   (c <-> B)*(C + f <-> D)*(A*c + a*C <-> F)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+58  A,C,D   (b*f + B*F <-> A)*(b <-> C)*(a + b <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+59  A,B,D   (b*f + B*F <-> A)*(c <-> B)*(a + b <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+60  A,C,D   (b*f + B*F <-> A)*(b <-> C)*(a + C <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+61  A,B,D   (b*f + B*F <-> A)*(c <-> B)*(a + C <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+62  A,C,D   (b*f + B*F <-> A)*(b <-> C)*(a + f <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+63  A,B,D   (b*f + B*F <-> A)*(c <-> B)*(a + f <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+64  A,C,D   (b*f + B*F <-> A)*(b <-> C)*(b + f <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+65  A,B,D   (b*f + B*F <-> A)*(c <-> B)*(b + f <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+66  A,C,D   (b*f + B*F <-> A)*(b <-> C)*(C + f <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+67  A,B,D   (b*f + B*F <-> A)*(c <-> B)*(C + f <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+68  A,C,D   (b*f + c*F <-> A)*(b <-> C)*(a + b <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+69  A,B,D   (b*f + c*F <-> A)*(c <-> B)*(a + b <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+70  A,C,D   (b*f + c*F <-> A)*(b <-> C)*(a + C <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+71  A,B,D   (b*f + c*F <-> A)*(c <-> B)*(a + C <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+72  A,C,D   (b*f + c*F <-> A)*(b <-> C)*(a + f <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+73  A,B,D   (b*f + c*F <-> A)*(c <-> B)*(a + f <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+74  A,C,D   (b*f + c*F <-> A)*(b <-> C)*(b + f <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+75  A,B,D   (b*f + c*F <-> A)*(c <-> B)*(b + f <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+76  A,C,D   (b*f + c*F <-> A)*(b <-> C)*(C + f <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+77  A,B,D   (b*f + c*F <-> A)*(c <-> B)*(C + f <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+78  A,C,D   (B*F + C*f <-> A)*(b <-> C)*(a + b <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+79  A,B,D   (B*F + C*f <-> A)*(c <-> B)*(a + b <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+80  A,C,D   (B*F + C*f <-> A)*(b <-> C)*(a + C <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+81  A,B,D   (B*F + C*f <-> A)*(c <-> B)*(a + C <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+82  A,C,D   (B*F + C*f <-> A)*(b <-> C)*(a + f <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+83  A,B,D   (B*F + C*f <-> A)*(c <-> B)*(a + f <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+84  A,C,D   (B*F + C*f <-> A)*(b <-> C)*(b + f <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+85  A,B,D   (B*F + C*f <-> A)*(c <-> B)*(b + f <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+86  A,C,D   (B*F + C*f <-> A)*(b <-> C)*(C + f <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+87  A,B,D   (B*F + C*f <-> A)*(c <-> B)*(C + f <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+88  A,C,D   (C*f + c*F <-> A)*(b <-> C)*(a + b <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+89  A,B,D   (C*f + c*F <-> A)*(c <-> B)*(a + b <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+90  A,C,D   (C*f + c*F <-> A)*(b <-> C)*(a + C <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+91  A,B,D   (C*f + c*F <-> A)*(c <-> B)*(a + C <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+92  A,C,D   (C*f + c*F <-> A)*(b <-> C)*(a + f <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+93  A,B,D   (C*f + c*F <-> A)*(c <-> B)*(a + f <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+94  A,C,D   (C*f + c*F <-> A)*(b <-> C)*(b + f <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+95  A,B,D   (C*f + c*F <-> A)*(c <-> B)*(b + f <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+96  A,C,D   (C*f + c*F <-> A)*(b <-> C)*(C + f <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+97  A,B,D   (C*f + c*F <-> A)*(c <-> B)*(C + f <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+98  B,C,D   (c <-> B)*(A*D + a*F <-> C)*(a + f <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+99  B,C,D   (c <-> B)*(A*D + D*F <-> C)*(a + f <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+100 B,C,D   (c <-> B)*(A*f + a*F <-> C)*(a + b <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+101 B,C,D   (c <-> B)*(A*f + a*F <-> C)*(a + C <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+102 B,C,D   (c <-> B)*(A*f + a*F <-> C)*(a + f <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+103 B,C,D   (c <-> B)*(A*f + a*F <-> C)*(b + f <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+104 B,C,D   (c <-> B)*(A*f + a*F <-> C)*(C + f <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+105 B,C,D   (c <-> B)*(A*f + D*F <-> C)*(a + f <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+106 B,C,D   (a*f + A*F <-> B)*(b <-> C)*(a + b <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+107 B,C,D   (a*f + A*F <-> B)*(b <-> C)*(a + C <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+108 B,C,D   (a*f + A*F <-> B)*(b <-> C)*(a + f <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+109 B,C,D   (a*f + A*F <-> B)*(b <-> C)*(b + f <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+110 B,C,D   (a*f + A*F <-> B)*(b <-> C)*(C + f <-> D)                   1        1          7 TRUE              1            1         1     FALSE  FALSE
+111 B,D,F   (d + a*f <-> B)*(a + C <-> D)*(d + a*C <-> F)               1        1          8 TRUE              1            1         1     FALSE  FALSE
+112 A,B,D   (d + C*f <-> A)*(d + a*f <-> B)*(C + f <-> D)               1        1          8 TRUE              1            1         1     FALSE  FALSE
+113 B,D,F   (d + a*f <-> B)*(a + C <-> D)*(A*c + a*C <-> F)             1        1          9 TRUE              1            1         1     FALSE  FALSE
+114 B,D,F   (d + a*f <-> B)*(a + f <-> D)*(A*c + a*C <-> F)             1        1          9 TRUE              1            1         1     FALSE  FALSE
+115 B,D,F   (d + a*f <-> B)*(C + f <-> D)*(A*c + a*C <-> F)             1        1          9 TRUE              1            1         1     FALSE  FALSE
+116 C,D,F   (A*D + a*F <-> C)*(a + b <-> D)*(d + a*b <-> F)             1        1          9 TRUE              1            1         1     FALSE  FALSE
+117 A,C,D   (d + b*f <-> A)*(A*D + a*F <-> C)*(b + f <-> D)             1        1          9 TRUE              1            1         1     FALSE  FALSE
+118 C,D,F   (A*D + D*F <-> C)*(a + b <-> D)*(d + a*b <-> F)             1        1          9 TRUE              1            1         1     FALSE  FALSE
+119 A,C,D   (d + b*f <-> A)*(A*D + D*F <-> C)*(b + f <-> D)             1        1          9 TRUE              1            1         1     FALSE  FALSE
+120 C,D,F   (A*f + a*F <-> C)*(a + b <-> D)*(d + a*b <-> F)             1        1          9 TRUE              1            1         1     FALSE  FALSE
+121 A,C,D   (d + b*f <-> A)*(A*f + a*F <-> C)*(b + f <-> D)             1        1          9 TRUE              1            1         1     FALSE  FALSE
+122 C,D,F   (A*f + D*F <-> C)*(a + b <-> D)*(d + a*b <-> F)             1        1          9 TRUE              1            1         1     FALSE  FALSE
+123 A,C,D   (d + b*f <-> A)*(A*f + D*F <-> C)*(b + f <-> D)             1        1          9 TRUE              1            1         1     FALSE  FALSE
+124 B,D,F   (a*f + A*F <-> B)*(a + C <-> D)*(d + a*C <-> F)             1        1          9 TRUE              1            1         1     FALSE  FALSE
+125 A,B,D   (d + C*f <-> A)*(a*f + A*F <-> B)*(C + f <-> D)             1        1          9 TRUE              1            1         1     FALSE  FALSE
+126 A,B,D   (C*f + c*F <-> A)*(d + a*f <-> B)*(a + C <-> D)             1        1          9 TRUE              1            1         1     FALSE  FALSE
+127 A,B,D   (C*f + c*F <-> A)*(d + a*f <-> B)*(a + f <-> D)             1        1          9 TRUE              1            1         1     FALSE  FALSE
+128 A,B,D   (C*f + c*F <-> A)*(d + a*f <-> B)*(C + f <-> D)             1        1          9 TRUE              1            1         1     FALSE  FALSE
+129 B,C,D   (d + a*f <-> B)*(A*D + a*F <-> C)*(a + f <-> D)             1        1          9 TRUE              1            1         1     FALSE  FALSE
+130 B,C,D   (d + a*f <-> B)*(A*D + D*F <-> C)*(a + f <-> D)             1        1          9 TRUE              1            1         1     FALSE  FALSE
+131 B,C,D   (d + a*f <-> B)*(A*f + a*F <-> C)*(a + C <-> D)             1        1          9 TRUE              1            1         1     FALSE  FALSE
+132 B,C,D   (d + a*f <-> B)*(A*f + a*F <-> C)*(a + f <-> D)             1        1          9 TRUE              1            1         1     FALSE  FALSE
+133 B,C,D   (d + a*f <-> B)*(A*f + a*F <-> C)*(C + f <-> D)             1        1          9 TRUE              1            1         1     FALSE  FALSE
+134 B,C,D   (d + a*f <-> B)*(A*f + D*F <-> C)*(a + f <-> D)             1        1          9 TRUE              1            1         1     FALSE  FALSE
+135 C,D,F   (A*D + a*F <-> C)*(a + b <-> D)*(A*B + a*b <-> F)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+136 C,D,F   (A*D + a*F <-> C)*(a + f <-> D)*(A*B + a*b <-> F)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+137 C,D,F   (A*D + a*F <-> C)*(b + f <-> D)*(A*B + a*b <-> F)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+138 C,D,F   (A*D + D*F <-> C)*(a + b <-> D)*(A*B + a*b <-> F)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+139 C,D,F   (A*D + D*F <-> C)*(a + f <-> D)*(A*B + a*b <-> F)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+140 C,D,F   (A*D + D*F <-> C)*(b + f <-> D)*(A*B + a*b <-> F)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+141 C,D,F   (A*f + a*F <-> C)*(a + b <-> D)*(A*B + a*b <-> F)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+142 C,D,F   (A*f + a*F <-> C)*(a + C <-> D)*(A*B + a*b <-> F)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+143 C,D,F   (A*f + a*F <-> C)*(a + f <-> D)*(A*B + a*b <-> F)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+144 C,D,F   (A*f + a*F <-> C)*(b + f <-> D)*(A*B + a*b <-> F)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+145 C,D,F   (A*f + a*F <-> C)*(C + f <-> D)*(A*B + a*b <-> F)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+146 C,D,F   (A*f + D*F <-> C)*(a + b <-> D)*(A*B + a*b <-> F)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+147 C,D,F   (A*f + D*F <-> C)*(a + f <-> D)*(A*B + a*b <-> F)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+148 C,D,F   (A*f + D*F <-> C)*(b + f <-> D)*(A*B + a*b <-> F)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+149 B,D,F   (a*f + A*F <-> B)*(a + b <-> D)*(A*c + a*C <-> F)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+150 B,D,F   (a*f + A*F <-> B)*(a + C <-> D)*(A*c + a*C <-> F)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+151 B,D,F   (a*f + A*F <-> B)*(a + f <-> D)*(A*c + a*C <-> F)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+152 B,D,F   (a*f + A*F <-> B)*(b + f <-> D)*(A*c + a*C <-> F)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+153 B,D,F   (a*f + A*F <-> B)*(C + f <-> D)*(A*c + a*C <-> F)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+154 A,C,D   (b*f + B*F <-> A)*(A*D + a*F <-> C)*(a + b <-> D)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+155 A,C,D   (b*f + B*F <-> A)*(A*D + a*F <-> C)*(a + f <-> D)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+156 A,C,D   (b*f + B*F <-> A)*(A*D + a*F <-> C)*(b + f <-> D)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+157 A,C,D   (b*f + B*F <-> A)*(A*D + D*F <-> C)*(a + b <-> D)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+158 A,C,D   (b*f + B*F <-> A)*(A*D + D*F <-> C)*(a + f <-> D)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+159 A,C,D   (b*f + B*F <-> A)*(A*D + D*F <-> C)*(b + f <-> D)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+160 A,C,D   (b*f + B*F <-> A)*(A*f + a*F <-> C)*(a + b <-> D)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+161 A,C,D   (b*f + B*F <-> A)*(A*f + a*F <-> C)*(a + C <-> D)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+162 A,C,D   (b*f + B*F <-> A)*(A*f + a*F <-> C)*(a + f <-> D)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+163 A,C,D   (b*f + B*F <-> A)*(A*f + a*F <-> C)*(b + f <-> D)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+164 A,C,D   (b*f + B*F <-> A)*(A*f + a*F <-> C)*(C + f <-> D)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+165 A,C,D   (b*f + B*F <-> A)*(A*f + D*F <-> C)*(a + b <-> D)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+166 A,C,D   (b*f + B*F <-> A)*(A*f + D*F <-> C)*(a + f <-> D)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+167 A,C,D   (b*f + B*F <-> A)*(A*f + D*F <-> C)*(b + f <-> D)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+168 A,B,D   (C*f + c*F <-> A)*(a*f + A*F <-> B)*(a + b <-> D)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+169 A,B,D   (C*f + c*F <-> A)*(a*f + A*F <-> B)*(a + C <-> D)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+170 A,B,D   (C*f + c*F <-> A)*(a*f + A*F <-> B)*(a + f <-> D)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+171 A,B,D   (C*f + c*F <-> A)*(a*f + A*F <-> B)*(b + f <-> D)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+172 A,B,D   (C*f + c*F <-> A)*(a*f + A*F <-> B)*(C + f <-> D)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+173 B,C,D   (a*f + A*F <-> B)*(A*D + a*F <-> C)*(a + b <-> D)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+174 B,C,D   (a*f + A*F <-> B)*(A*D + a*F <-> C)*(a + f <-> D)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+175 B,C,D   (a*f + A*F <-> B)*(A*D + a*F <-> C)*(b + f <-> D)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+176 B,C,D   (a*f + A*F <-> B)*(A*D + D*F <-> C)*(a + b <-> D)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+177 B,C,D   (a*f + A*F <-> B)*(A*D + D*F <-> C)*(a + f <-> D)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+178 B,C,D   (a*f + A*F <-> B)*(A*D + D*F <-> C)*(b + f <-> D)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+179 B,C,D   (a*f + A*F <-> B)*(A*f + a*F <-> C)*(a + b <-> D)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+180 B,C,D   (a*f + A*F <-> B)*(A*f + a*F <-> C)*(a + C <-> D)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+181 B,C,D   (a*f + A*F <-> B)*(A*f + a*F <-> C)*(a + f <-> D)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+182 B,C,D   (a*f + A*F <-> B)*(A*f + a*F <-> C)*(b + f <-> D)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+183 B,C,D   (a*f + A*F <-> B)*(A*f + a*F <-> C)*(C + f <-> D)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+184 B,C,D   (a*f + A*F <-> B)*(A*f + D*F <-> C)*(a + b <-> D)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+185 B,C,D   (a*f + A*F <-> B)*(A*f + D*F <-> C)*(a + f <-> D)           1        1         10 TRUE              1            1         1     FALSE  FALSE
+186 B,C,D   (a*f + A*F <-> B)*(A*f + D*F <-> C)*(b + f <-> D)           1        1         10 TRUE              1            1         1     FALSE  FALSE

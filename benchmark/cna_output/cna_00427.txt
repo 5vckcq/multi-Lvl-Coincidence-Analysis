@@ -1,3 +1,22 @@
+configTable of type "cs"
+   A B C D E F | n.obs
+8  1 1 1 0 0 0 |     1
+16 1 1 1 1 0 0 |     1
+33 0 0 0 0 0 1 |     1
+34 1 0 0 0 0 1 |     1
+38 1 0 1 0 0 1 |     1
+41 0 0 0 1 0 1 |     1
+42 1 0 0 1 0 1 |     1
+46 1 0 1 1 0 1 |     1
+51 0 1 0 0 1 1 |     1
+52 1 1 0 0 1 1 |     1
+53 0 0 1 0 1 1 |     1
+55 0 1 1 0 1 1 |     1
+59 0 1 0 1 1 1 |     1
+60 1 1 0 1 1 1 |     1
+61 0 0 1 1 1 1 |     1
+63 0 1 1 1 1 1 |     1
+Total no.of.cases: 16 
 --- Coincidence Analysis (CNA) ---
 
 Factors: A, B, C, D, E, F 
@@ -5,22 +24,18 @@ Factors: A, B, C, D, E, F
 Atomic solution formulas:
 -------------------------
 Outcome E:
- solution        consistency coverage complexity inus
- a*C + B*c <-> E           1        1          4 TRUE
- a*C + B*F <-> E           1        1          4 TRUE
+ solution        consistency coverage complexity inus exhaustiveness faithfulness
+ a*C + B*c <-> E           1        1          4 TRUE            1.0            1
+ a*C + B*F <-> E           1        1          4 TRUE            0.5            1
 
 Outcome F:
- solution        consistency coverage complexity inus
- b + E <-> F               1        1          2 TRUE
- a + b + c <-> F           1        1          3 TRUE
+ solution        consistency coverage complexity inus exhaustiveness faithfulness
+ b + E <-> F               1        1          2 TRUE              1            1
+ a + b + c <-> F           1        1          3 TRUE              1            1
 
 Complex solution formulas:
 --------------------------
- outcome solution                            consistency coverage complexity
- E,F     (a*C + B*c <-> E)*(b + E <-> F)               1        1          6
- E,F     (a*C + B*c <-> E)*(a + b + c <-> F)           1        1          7
- E,F     (a*C + B*F <-> E)*(a + b + c <-> F)           1        1          7
- inus cyclic
- TRUE  FALSE
- TRUE  FALSE
- TRUE  FALSE
+ outcome solution                            consistency coverage complexity inus exhaustiveness faithfulness coherence redundant cyclic
+ E,F     (a*C + B*c <-> E)*(b + E <-> F)               1        1          6 TRUE              1            1         1     FALSE  FALSE
+ E,F     (a*C + B*c <-> E)*(a + b + c <-> F)           1        1          7 TRUE              1            1         1     FALSE  FALSE
+ E,F     (a*C + B*F <-> E)*(a + b + c <-> F)           1        1          7 TRUE              1            1         1     FALSE  FALSE
