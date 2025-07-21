@@ -1,56 +1,54 @@
-# multi-lvl-Coincidence-Analysis
+# multi-Lvl-Coincidence-Analysis
 
-## mLCA.py
-
-Python script that generates the possible causal diagrams either from a truth table in csv-format or the R output of cna using the latex template Latex_Template.tex. The template file must be in the same folder as the script file. 
-
-**This is the main file (to be executed).**
-
-The input data has to be specified when launching the script either by adding the parameter "--csv FILEPATH" or "--r-import FILEPATH".
+multi-Lvl-Coincidence-Analysis (mLCA) is a Python package for causal-mechanistic modeling. The core function of the package is to derive causal-mechanistic models from coincidence data tables. The resulting models are visualized using Ti<em>k</em>Z.
 
 
-* If you want to use a csv-table, type:
-  
-  python PATH_TO_SCRIPT_FILE/causal_structure_truth_table_to_pdf_graph.py --csv PATH_TO_CSV_FILE/FILENAME
+## Installation
 
-  It is assumed that the column heads of the csv-table contain the labels of the causal factors.
-  The following cell entries are interpreted as True: "1", "T", "t", "w", "W", "true", "True". The strings "0", "F", "f", "false", "False" are interpreted as False.
-  Admissible column separators are ":", ",", ";", "|" and "_".
-  
-  It is possible to include information on the causal order and on constitutive levels:
-  * If the character "<" appears in one row, the respective causal factor and all factors in columns to its right are considered of a higher causal order than those of the columns to its left.
-  * The entry "<<" is interpreted as level-separator. The respective factor and those of the columns to its right are assigned to a higher level than those factors related to the columns to its left.
+Install the required Python packages from environment.yml using conda. Running the main script mlca.py requires a latex distribution installed on the system, as well as the Ti<em>k</em>Z library for latex.
 
-* Alternatively, mLCA can work with the output of cna (so far only for Boolean variables). 
+## Usage
 
-  python PATH_TO_SCRIPT_FILE/causal_structure_truth_table_to_pdf_graph.py --r-import PATH_TO_CNA_OUTPUT/FILENAME
-  
-  The script reads the list of causal factors and the atomic solution formulae from the cna-output. The order relation from cna will be reinterpreted as level separator.
+We provide an (experimental) graphical interface. To run it type:
+```
+$ python mlca-gui.py
+```
+You can also use the command line application. In this case you have to specify the path to your data table by replacing 'PATH' in
+```
+$ python mLCA.py --csv PATH
+```
+Alternatively, when using mLCA alongside the R packages cna or QCA, you have to save the output from these packages in a textfile (see the R-scripts in the samples folder for an instruction on how to do this) and indicate the path to this file with 
+```
+$ python mLCA.py --r-import PATH
+```
+If any causal ordering has been defined in cna or QCA, it will be reinterpreted as level separation in mLCA.
 
-
-
-Further optional arguments are:
-* The script can be executed with the optional argument "-bw" (alternatively "--blackwhite"), which changes the output from colored graphs into black/white. The argument "-c" (resp. "--color") forces   the color mode, which is currently set as standard.
+Further optional arguments can be appended:
+* "-bw" (alternatively "--blackwhite") changes the output from colored graphs into black/white. The argument "-c" (resp. "--color") forces the color mode, which is currently set as default.
 * If the tex-formated formulae should be exported into a separate file, the optional argument "-fl" (or "--fulllist") should be set.
-* In general, all causal structures that are logically compatible with the input data are generated. In case of co-extensive causal factors, this results in enormous amounts of solutions. If only the  most simple solutions are wanted, use the option "-s" (or "--simple"). Then, the results should be the same as those of cna.
+* By default complex relations between co-extensive variables are excluded, which makes mLCA for single level models comparable to cna. If all possible models should be generated, this can be done by adding the argument "-c" or "--complex".
 
-**Dependencies**
+### Preparing the data tables
 
-Running the script requires besides a Python3 environment, a latex distribution installed on the system running this script, as well as the jinja2, pandas and itertools Python3 libraries and the TikZ library for latex. The graphical interface requires also the python packages tkinter and pymupdf.
+The table head of the csv-table should contain the labels for the causal factors.
+The following entries in the cells in the table body are interpreted as True: "1", "T", "t", "w", "W", "true", "True". The strings "0", "F", "f", "false", "False" are interpreted as False.
+Admissible column separators are ":", ",", ";", "|" and "_".
+  
+It is possible to include information on the causal order and on constitutive levels. In order to do so, add the following separators after the last row of truth values:
+* The entry "<<" is interpreted as level-separator. The respective factor and those of the columns to its right are assigned to a higher level than those factors corresponding to the columns to its left.
+* The character "<" marks the causal stream within the same constitutive level. Variables in columns to the left cannot be effects to the variable associated with this column or to its right.
 
-## mlca-gui.py
+### Customizing the graphical output
 
-Run this file for a simple graphical user interface.
+The causal-mechanistic hypergraphs are generated using the tex-template file Latex_Template.tex. You can modify it at will to change all further outputs. You can also modify the generated output_graph.tex to customize an individual hypergraph.
 
+## Documentation
 
-## Latex_Template.tex
-
-This template sets the environment for plotting the obtained mechanisms. It can be modified at will but must not be renamed.
-
+cf. comments in source code
 
 ## samples
 
-A folder that contains some samples either truth tables in csv-format or R-scripts that make use of the cna-package. Some of the examples model multi level mechanisms. The content of this folder is not required for running the script.
+The folder samples contains some examples for truth tables in csv-format or R-scripts that make use of the cna-package. Some of the examples model multi-level mechanisms.
 
 **sample_1**
 > single level causal structure
