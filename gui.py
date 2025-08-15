@@ -1,3 +1,13 @@
+#Graphical User Interface for mLCA
+#Provides three modes to pass data tables to mLCA:
+# (1) via a graphical table - click on fields to change the values
+#     content is saved as csv file and then proceeds like (2)
+# (2) from a csv file on disk which can be selected from a file selector
+# (3) from a text file containing QCA or CNA output, can be selected
+#     using a file selector
+# Output is displayed in a simple pdf viewer with possibility to turn
+# pages and to zoom
+
 # to do:
 # 1) add possiblity to enter constraints
 # 2) show coincidence table when importing data from csv
@@ -13,7 +23,7 @@ from tkinter import PhotoImage
 
 import os
 import math
-import fitz # pdf operations from pymupdf package  -> new dependency pymupdf
+import fitz # pdf operations from pymupdf package  -> extra dependency pymupdf for GUI
 from PIL import Image, ImageTk
 
 import string # provides list of letters
@@ -21,13 +31,12 @@ import csv
 import time
 from datetime import datetime
 
-import mLCA
+import cli
 
 
-
-version = "1.0"
-default_num_conf = 20
-default_num_var = 5
+# starting values for table
+default_num_conf = 20 # number of rows (=number of configurations)
+default_num_var = 5 # numer of columns (=number of variables)
 entry_list = [] # list to keep track of all generated entry widgets for table cells
 
 pdf_width = 560
@@ -65,6 +74,7 @@ class PDFObject:
 class NotebookGridApp:
     def __init__(self, root):
         self.root = root
+        version = '' # MARKR TEST
         self.root.title("mLCA " + version)
         
         self.current_page = 0
@@ -371,14 +381,14 @@ class NotebookGridApp:
             self.export_to_csv(file_path)
             time.sleep(1) # wait a second for writting csv file to disk
             # run mLCA in csv-mode
-            mLCA.main(input_file=file_path, input_type='csv', force_mode=force_mode)
+            cli.main(input_file=file_path, input_type='csv', force_mode=force_mode)
             
         elif self.notebook.index("current") == 1:
             # work with csv file from drive
-            mLCA.main(input_file=self.label_file_csv.cget("text"), input_type='csv', force_mode=force_mode)
+            cli.main(input_file=self.label_file_csv.cget("text"), input_type='csv', force_mode=force_mode)
         elif self.notebook.index("current") == 2:
             # use R-output file
-            mLCA.main(input_file=self.label_file_cna.cget("text"), input_type='R', force_mode=force_mode)
+            cli.main(input_file=self.label_file_cna.cget("text"), input_type='R', force_mode=force_mode)
         
         # now display pdf
         time.sleep(1) # wait a second

@@ -1,55 +1,65 @@
 #!/usr/bin/env python3
 
-# file: mLCA.py
+# file: mlca.py
+"""
+This file contains the main functions of multi-Lvl-Coincidence-Analysis (mLCA), a package to
+generate multi-level causal-mechanistic models from Boolean data tables that are provided with
+tiered list of causal factors (assignment to constitutive levels).
+It generates causal hypergraphs for each unique solution. These are finally exported
+into a graph in Latex TikZ-code. Therefore Tex and the tikz library have to be installed on the system running this package.
 
-# This script generates multi-level causal-mechanistic models from Boolean data tables that are provided with
-# tiered list of causal factors (assignment to constitutive levels).
-# It generates causal graphs for each unique solution. These are finally exported
-# into a graph in Latex TikZ-code. Therefore latex and the tikz library have to be installed on the system running this script. 
+The data tables can be processed in three different ways: A) as csv-files with Boolean data (for details on formatting requirements
+see obtain_equivalence_formulae.py), B) reading the atomic solutions from the output of the R-package cna,
+C) or from the output of the QCA package. If any of the two latter options is used, it is assumed that causal factors pertaining to
+different levels are separated by the causal ordering relation "<".
+Relations between factors of different levels are not considered as causal but constitution relations.
 
-# The data tables can be processed in three different ways: A) as csv-files with Boolean data (for details on formatting requirements
-# see obtain_equivalence_formulae.py), B) reading the atomic solutions from the output of the R-package cna,
-# C) or from the output of the QCA package. If any of the two latter options is used, it is assumed that causal factors pertaining to
-# different levels are separated by the causal ordering relation "<".
-# Relations between factors of different levels are not considered as causal but constitution relations.
+mLCA proceeds in eight main steps:
+step 1: obtains lists of the causal factors with level assignment, identifies the equivalence formulae
+step 2: categorises them into constitution relations and causal relations of different levels,
+        already discards all formulae that do not fit in any of these categories (function read_input)
+step 3: obtains the list of all causal structures that are compatible with the causal relations (function find_structures)
+step 4: determines a non-strict total order of the causal factors of each constitutive level
+step 5: prepares the lists for the graphical output (grouping of related causal factors, discarding of some constitution relations)
+step 6: translating the obtained structures into a graphical output via Latex
+"""
 
-# It proceeds in eight main steps:
-# step 1: obtains lists of the causal factors with level assignment, identifies the equivalence formulae
-# step 2: categorises them into constitution relations and causal relations of different levels,
-#         already discards all formulae that do not fit in any of these categories (function read_input)
-# step 3: obtains the list of all causal structures that are compatible with the causal relations (function find_structures)
-# step 4: determines a non-strict total order of the causal factors of each constitutive level
-# step 5: prepares the lists for the graphical output (grouping of related causal factors, discarding of some constitution relations)
-# step 6: translating the obtained structures into a graphical output via Latex
-
-
-import os                          # operating system interfaces is required to find the files in the local path
-import sys                         # system-specific parameters and functions, needed to get optional script arguments
-import codecs                      # for en- and decoding of strings (esp. to write tex-files in utf-8)
-import re                          # regex for complex search patterns in strings
-import itertools                   # itertools provides functions to obtain all permutations of a string and Cartesian products of lists
-import time                        # for measuring the run time
 import copy
+import itertools                   # itertools provides functions to obtain all permutations of a string and Cartesian products of lists
+import re                          # regex for complex search patterns in strings
 
-from auxiliary_functions import *
-# further file that contains functions for deriving equivalence formulae from a given truth table:
-from obtain_equivalence_formulae import read_data_from_csv 
-# functions for plotting the results:
-from plot_graph import *
 
-def is_transitive(formula_list, factor_list):
-    # checks whether the list of formula constitutes a transitive relation of the involved causal factors
-    # e.g. A->B, B->C, but not A->B, B->C,C->A
-    # returns the truth value
-    # and order_factor_list = a list of causal phases/orders
-    # if factor_list is empty, returns True and the empty list
-    
+from utils import powerset, sort_by_second, list_comparison, flatten_nested_list, find_causal_factors, \
+    get_causal_prefactors, get_equiv_formula, get_components_from_formula, get_formula_level, \
+        get_factor_order, get_ordered_dnf, get_clusters, count_true, get_coextensive_factors
+
+def is_transitive(formula_list: list, factor_list: list) -> tuple[list, bool]:
+    """Function that checks whether the list of causal relations is transitive for the causal factors
+    from factor_list, e.g., A->B, B->C is transitive, but A->B, B->C, C->A is not.
+    If it is transitive, the function defines a causal ordering on factor_list and returns
+    it in a nested list.
+
+    Parameters
+    __________
+
+    formula_list : list of tuples of str
+        list of equivalence formulae, first element
+    factor_list : list of str or list of list of str or list of list of str
+
+    Returns
+    _______
+    bool
+        True if value whether transitive
+        False otherwise
+    order_factor_list : list of lists of str or list of str
+        If first returned value is False, return the initial factor_list.
+        If first returned value is True, return a nested list of causal factors
+        subdivided by their causal order of the form order_factor_list[ORDER][FACTOR].
+        list is empty if factor_list is empty
+    """
     # flatten factor_list in case that the list is nested
     if factor_list:
-        if type(factor_list[0]) == list:
-                factor_list = [x for sub_list in factor_list for x in sub_list]
-                if type(factor_list[0]) == list:
-                    factor_list = [x for sub_list in factor_list for x in sub_list]
+        factor_list = flatten_nested_list(factor_list)
 
     # a new list of the form order_factor_list[ORDER][FACTOR]
     order_factor_list = []
@@ -203,7 +213,19 @@ def is_transitive(formula_list, factor_list):
     
     return not(circular), order_factor_list          
                 
-def reduce_structural_redundancy(factor_list, formula_list, reduced_solutions_list = [], already_tested = []):
+def reduce_structural_redundancy(factor_list: list, formula_list: list, reduced_solutions_list = [], already_tested = []) -> tuple[bool, list]:
+    """descriptionHIERHIERHIER
+
+    Parameters
+    __________
+    parameter
+
+    Returns
+    _______
+    bool
+
+    list
+    """
     # input: list of causal factors
     #        list of equivalence relations between causal factors
     #        reduced_solutions_list - list of already reduced solutions (needed for passing results from recursive calls), 
@@ -427,13 +449,13 @@ def minimise_constitution_relations(level_factor_list_order, level, level_equiv_
     return return_list, color_map, color_index
 
 
-def arrange_factors(level_factor_list_order, level_equiv_list, constitution_relation_list, mode): 
+def arrange_factors(level_factor_list_order, level_equiv_list, constitution_relation_list, mode):
     # step 5:
     # prepares the factor list for plotting such that the nodes are arranged to minimise crossings of vertices
     # A: factors of same level and order zero are grouped when belonging to the same constitution relation
     # B: factors of same level and subsequent orders are arranged such that arrow crossing in the causal graphs becomes minimised
     # (in a very rudimentary way)
-    # C: discards constitution relations for middle terms    
+    # C: discards constitution relations for middle terms
     
     ################################################################################
     # step 5: rearranging the factors for optimised placement in the output graphs #
@@ -468,8 +490,8 @@ def arrange_factors(level_factor_list_order, level_equiv_list, constitution_rela
             
                 dictionary[fac] = constitute # add a new dictionary entry
     
-            # fill first order of new_level_factor_list_order according to dictionary            
-            
+            # fill first order of new_level_factor_list_order according to dictionary
+
             # get first key of dictionary and add it as first element into new_level_factor_list_order[m][0]
 
             c_fac = ""   # dictionary[c_fac] will be used as comparison value to find the other factors with the same target
@@ -485,7 +507,7 @@ def arrange_factors(level_factor_list_order, level_equiv_list, constitution_rela
                 c_fac = level_factor_list_order[m][0][0] 
             
             new_level_factor_list_order[m][0].append(c_fac)
-            
+
             counter = 0
             while len(level_factor_list_order[m][0]) > len(new_level_factor_list_order[m][0]) :
                 # as long as the dictionary contains more entries than the new factor list
@@ -523,55 +545,55 @@ def arrange_factors(level_factor_list_order, level_equiv_list, constitution_rela
 
     # end for loop over the levels        
     
-    max_level = len(level_factor_list_order) - 1    
-    new_level_factor_list_order.append([]) # append sublist for the highest level    
-    new_level_factor_list_order[max_level].append([]) # append subsublist for the zeroth order on the highest level    
-    
+    max_level = len(level_factor_list_order) - 1
+    new_level_factor_list_order.append([]) # append sublist for the highest level
+    new_level_factor_list_order[max_level].append([]) # append subsublist for the zeroth order on the highest level
+
     for fac in level_factor_list_order[max_level][0] :
         new_level_factor_list_order[max_level][0].append(fac)
-        
+
     ##############################################################################################################################
     # step 5B: factors of same level and subsequent orders are arranged such that arrow crossing in the causal graphs is reduced #
     ##############################################################################################################################
-        
+
     for m in range(len(level_factor_list_order)) :
         fac_counter = 0
         for o in range(len(level_factor_list_order[m]) - 1) : # go through all orders but the last
-        
+
             new_level_factor_list_order[m].append([]) # append a subsublist for order o+1 on level m
 
             for fac in new_level_factor_list_order[m][o] :
-                for formula in level_equiv_list[m] : 
+                for formula in level_equiv_list[m] :
                     if fac in get_components_from_formula(formula[0], level_factor_list_order) and (get_factor_order(formula[1], level_factor_list_order) == o+1) and not(formula[1] in new_level_factor_list_order[m][o+1]) :
                         # if the considered factor appears on the left side of formula
                         # AND the factor on formula's right side is of the subsequent order
                         # AND that factor is not in new_level_factor list yet
-                        
+
                         new_level_factor_list_order[m][o+1].append(formula[1]) # then add this factor
                         fac_counter = fac_counter + 1
 
             # end of loop over new_level_factor_list_order[m][o]
-            
+
         # end of loop over orders
-        
+
         # add all factors that have not been categorised in any order into max order + 1
         total_level_factor_list = []
         for order in level_factor_list_order[m]:
             for fac in order:
                 total_level_factor_list.append(fac)
-                
+
         if fac_counter < len(total_level_factor_list):
             for order in new_level_factor_list_order[m]:
                 for fac in order:
                     if fac in total_level_factor_list:
                         total_level_factor_list.remove(fac)
-            
+
             if total_level_factor_list:
                 new_level_factor_list_order[m].append([])
-                new_level_factor_list_order[m][len(new_level_factor_list_order[m])-1].extend(total_level_factor_list)     
-                       
+                new_level_factor_list_order[m][len(new_level_factor_list_order[m])-1].extend(total_level_factor_list)
+
     # end of loop over levels
-    
+
     ##################################################
     # step 5C: reduce the constitution_relation_list #
     ##################################################
@@ -580,21 +602,180 @@ def arrange_factors(level_factor_list_order, level_equiv_list, constitution_rela
     # in case that the plot mode is color, a color map is created, with different specifications for text color and node color
     # this is done here, since some constitution relations to be discarded are needed for determining the colors of all nodes
     color_map = { "draw" : {}, "text" : {}}
-    
+
     # standard color for all factors is black
     for m in range(len(new_level_factor_list_order)) :
         for o in range(len(new_level_factor_list_order[m])) :
             for e in range(len(new_level_factor_list_order[m][o])):
                 color_map["draw"][new_level_factor_list_order[m][o][e]] = "black"
                 color_map["text"][new_level_factor_list_order[m][o][e]] = "black"
-    
+
     new_constitution_relation_list = []
     for m in range(1,len(new_level_factor_list_order)) :
         partial_const_list, color_map, color_index = minimise_constitution_relations(new_level_factor_list_order, m, level_equiv_list, constitution_relation_list, color_map, mode, color_index)
-        new_constitution_relation_list.extend(partial_const_list)  
-    
+        new_constitution_relation_list.extend(partial_const_list)
+
     return new_level_factor_list_order, new_constitution_relation_list, color_map, level_equiv_list
 
+
+def determine_constitution_relations(level_factor_list_order, level_equiv_list, constitution_relation_list):
+    # step 5a: [HIERHIERHIER]
+    # determine constitution relations
+    # among others, discards constitution relations for middle terms
+
+    ########################################################################################################
+    # step 5A: group factors of order zero and same level if they belong to the same constitution relation #
+    ########################################################################################################
+
+    dictionary = {} # create a dictionary, for each lower level factor, the upper level factor it is a constituent of will be added
+
+    for m in range(len(level_factor_list_order) - 1) :
+        # highest level has not to be considered as constituents
+
+        new_level_factor_list_order.append([]) # append a sublist for each level
+        new_level_factor_list_order[m].append([]) # in the sublist for level m append a subsublist for the first order factors
+
+        if constitution_relation_list :
+            # constitution_relation_list is not empty
+            # use the constitution relations to group the factors that belong to the same upper factor
+
+            for fac in level_factor_list_order[m][0] :
+                # for each factor of first order
+                constitute = ""  # the upper level factor fac is a part of
+                for formula in constitution_relation_list :
+                    if fac in get_components_from_formula(formula[0], level_factor_list_order) :
+                        constitute = formula[1]
+                        break # break from formula loop (one factor might appear in several constitution relations, but only one can be
+                        # considered for constructing an ordering)
+
+                dictionary[fac] = constitute # add a new dictionary entry
+
+            # fill first order of new_level_factor_list_order according to dictionary
+
+            # get first key of dictionary and add it as first element into new_level_factor_list_order[m][0]
+
+            c_fac = ""   # dictionary[c_fac] will be used as comparison value to find the other factors with the same target
+            for fac in dictionary :
+                if get_formula_level(fac, level_factor_list_order) == m :
+                    if dictionary[fac] != "" :
+                        # start value of c_fac should be some factor with dictionary[c_fac] != "" if possible
+                        c_fac = fac
+                        break   # end for loop after first dictionary entry with an assigned upper level factor has been found
+
+            if c_fac == "" :
+                # if no factor of first order is linked to any factor of an upper level, start with the first one from the original list
+                c_fac = level_factor_list_order[m][0][0]
+
+            new_level_factor_list_order[m][0].append(c_fac)
+
+            counter = 0
+            while len(level_factor_list_order[m][0]) > len(new_level_factor_list_order[m][0]) :
+                # as long as the dictionary contains more entries than the new factor list
+
+                if not(level_factor_list_order[m][0][counter] in new_level_factor_list_order[m][0]) :
+                    # if the factor with index counter is not yet in the new list
+                    # add, if
+                    if c_fac == "" :
+                        # there is no current upper level target assigned
+                        new_level_factor_list_order[m][0].append(level_factor_list_order[m][0][counter])
+                        # set the upper level target to that of the indexed factor
+                        c_fac = level_factor_list_order[m][0][counter]
+                        # reset counter to be sure that we start at the beginning of level_factor_list_order[m][0]
+                        counter = -1
+
+                    elif dictionary[level_factor_list_order[m][0][counter]] == dictionary[c_fac] :
+                        # the target of the indexed factor is the same as that of c_fac
+                        new_level_factor_list_order[m][0].append(level_factor_list_order[m][0][counter])
+
+                # adjust the counter for the next run through the loop
+                if counter == len(level_factor_list_order[m][0]) - 1 :
+                    counter = 0
+                    c_fac = ""
+                else :
+                    counter = counter + 1
+
+        # end constitution_relation_list is not empty
+
+        else :
+            # constitution_relation_list is empty
+            # keep the order of factors from level_factor_list_order[m][0]
+
+            for fac in level_factor_list_order[m][0] :
+                new_level_factor_list_order[m][0].append(fac)
+
+    # end for loop over the levels
+
+    max_level = len(level_factor_list_order) - 1
+    new_level_factor_list_order.append([]) # append sublist for the highest level
+    new_level_factor_list_order[max_level].append([]) # append subsublist for the zeroth order on the highest level
+
+    for fac in level_factor_list_order[max_level][0] :
+        new_level_factor_list_order[max_level][0].append(fac)
+
+    ##############################################################################################################################
+    # step 5B: factors of same level and subsequent orders are arranged such that arrow crossing in the causal graphs is reduced #
+    ##############################################################################################################################
+
+    for m in range(len(level_factor_list_order)) :
+        fac_counter = 0
+        for o in range(len(level_factor_list_order[m]) - 1) : # go through all orders but the last
+
+            new_level_factor_list_order[m].append([]) # append a subsublist for order o+1 on level m
+
+            for fac in new_level_factor_list_order[m][o] :
+                for formula in level_equiv_list[m] :
+                    if fac in get_components_from_formula(formula[0], level_factor_list_order) and (get_factor_order(formula[1], level_factor_list_order) == o+1) and not(formula[1] in new_level_factor_list_order[m][o+1]) :
+                        # if the considered factor appears on the left side of formula
+                        # AND the factor on formula's right side is of the subsequent order
+                        # AND that factor is not in new_level_factor list yet
+
+                        new_level_factor_list_order[m][o+1].append(formula[1]) # then add this factor
+                        fac_counter = fac_counter + 1
+
+            # end of loop over new_level_factor_list_order[m][o]
+
+        # end of loop over orders
+
+        # add all factors that have not been categorised in any order into max order + 1
+        total_level_factor_list = []
+        for order in level_factor_list_order[m]:
+            for fac in order:
+                total_level_factor_list.append(fac)
+
+        if fac_counter < len(total_level_factor_list):
+            for order in new_level_factor_list_order[m]:
+                for fac in order:
+                    if fac in total_level_factor_list:
+                        total_level_factor_list.remove(fac)
+
+            if total_level_factor_list:
+                new_level_factor_list_order[m].append([])
+                new_level_factor_list_order[m][len(new_level_factor_list_order[m])-1].extend(total_level_factor_list)
+
+    # end of loop over levels
+
+    ##################################################
+    # step 5C: reduce the constitution_relation_list #
+    ##################################################
+    # preparing the color_map for colored graphs
+    color_index = 0 # set index of first color
+    # in case that the plot mode is color, a color map is created, with different specifications for text color and node color
+    # this is done here, since some constitution relations to be discarded are needed for determining the colors of all nodes
+    color_map = { "draw" : {}, "text" : {}}
+
+    # standard color for all factors is black
+    for m in range(len(new_level_factor_list_order)) :
+        for o in range(len(new_level_factor_list_order[m])) :
+            for e in range(len(new_level_factor_list_order[m][o])):
+                color_map["draw"][new_level_factor_list_order[m][o][e]] = "black"
+                color_map["text"][new_level_factor_list_order[m][o][e]] = "black"
+
+    new_constitution_relation_list = []
+    for m in range(1,len(new_level_factor_list_order)) :
+        partial_const_list, color_map, color_index = minimise_constitution_relations(new_level_factor_list_order, m, level_equiv_list, constitution_relation_list, color_map, mode, color_index)
+        new_constitution_relation_list.extend(partial_const_list)
+
+    return new_level_factor_list_order, new_constitution_relation_list, color_map, level_equiv_list
 
 
 # main functions start here
@@ -1000,7 +1181,7 @@ def find_structures(in_level_factor_list, in_level_equiv_list, mode=["bw","simpl
     #                   "complex" emits further models with more complex relations between co-extensive 
     #                    factors (not only A <-> B, B <-> C, etc., but also A*B <-> C, A + B <-> C) 
     # pos_caus_cond - list of equivalence relations that are required to appear in each model (by default empty) # MARKER TO-DO to be integrated into the code
-    # neg_caus_cond - list of equivalence relations that must not appear in any model (by default empty)
+    # neg_caus_cond - list of equivalence relations that must not appear in any model (by default empty) # MARKER TO-DO to be integrated
     #
     # Since combining all causal relations that can logically be generated from the truth table
     # can lead to various causal relations for the same effect, as well as formulae where an effect
@@ -1660,11 +1841,19 @@ def find_structures(in_level_factor_list, in_level_equiv_list, mode=["bw","simpl
 
 
    
-def create_separtate_formula_list(formula_list):
-   # if the optional parameter "-fl" or "--fulllist" has been set,
-   # create also a text file listing all possible causal structures as tex-formulae
+def create_separtate_formula_list(formula_list: list) -> None:
+    """Creates a text file listing all possible causal structures as tex-formulae.
+
+    Parameters
+    __________
+    formula_list : list of str
+        list of formulae to be exported in tex-file, expected to be already converted
+        into tex-syntax
+    """
+
+    # used in case that the optional parameter "-fl" or "--fulllist" has been set
    
-    output_file = "output_formula_list.tex"
+    output_file = "output_formula_list.tex" # define name of output file
     
     # write the formulae to output_file
     f = open(output_file, 'w')
@@ -1673,278 +1862,7 @@ def create_separtate_formula_list(formula_list):
      f.write('\n')  # line break after each formula
     f.close()      
       
-                   
-def main(input_file="", input_type="", force_mode=""):
-    # main function
-    latex_template_file = "Latex_Template.tex"
-    start_time = time.time()
-    
-    level_factor_list = []               # declaration of the factor list    
-    order_input_information = []
-    abort = False
-    
-    # sys.argv is the list of arguments given when executing the script.
-    # e.g. "python script.py --csv" contains two arguments "script.py" (the script name ifself is one element of sys.argv) and "--csv"
-    for i in range(len(sys.argv)):
-        if sys.argv[i] == "--r-import" or input_type == "R":
-            # "--r-import" is the command to use the text output of a r-script (cna or QCA) 
-            if i < len(sys.argv) or input_file != "":
-                if i < len(sys.argv) and sys.argv[i] == "--r-import":
-                    input_file = sys.argv[i+1] # assume that the next argument is path to the r-output file
-    
-                # step 1 function read_input -> converts cna/QCA output into lists of causal factors and equivalence relations
-                # if the output is not as expected, stop the procedure with abort = True
-                if os.path.exists(input_file):
-                    abort, level_factor_list, equiv_list = read_input(input_file)
-                    if not(abort):
-                        # classify the equivalence relations into causal relations (level_equiv_list) subdivided by constitutive level
-                        # or into constitution relations
-                        level_equiv_list, constitution_relation_list = categorise_formulae(equiv_list, level_factor_list)
-                        
-                else:
-                    # input_file does not exist
-                    abort = True
-                    print("Error: Expected input data file " + input_file + " has not been found in path folder.")
-            
-            else:
-                # no input_file specified
-                abort = True
-                print("Error: Missing expected file path after \"--r-import\" command.")
-                
-            
-            break # break from loop over script parameters after "--r-import" has been found
-        
-        
-        elif sys.argv[i] == "--csv" or input_type == "csv": 
-            # Read truth table from csv-file and generate equivalence formulae
-            if i < len(sys.argv) or input_file != "":
-                if sys.argv[i] == "--csv" and i < len(sys.argv):
-                    input_file = sys.argv[i+1] # assume that the next argument is path to the csv table
-                if os.path.exists(input_file):
-                    # execute function from obtain_equivalence_formulae.py
-                    abort, level_factor_list, equiv_list, order_input_information = read_data_from_csv(input_file)
-                        
-                    if not(abort):
-                        # classify the equivalence relations into causal relations (level_equiv_list) subdivided by constitutive level
-                        # or into constitution relations
-                        level_equiv_list, constitution_relation_list = categorise_formulae(equiv_list, level_factor_list)
-
-                    else:
-                        print("Error while reading the input file " + input_file)
-                
-                else:
-                    # input_file does not exist
-                    abort = True
-                    print("Error: Expected input data file " + input_file + " has not been found in path folder.")
-                
-            
-            else:
-                # no input_file specified
-                abort = True
-                print("Error: Missing expected file path after \"--csv\" command.")
-            
-            break # break from loop over script parameters after "--csv" has been found
-    
-    if not(level_factor_list) and not(abort):
-        # level_factor_list is still empty -> probably neither "--csv", nor "--r-import" has been found as argument
-        # in case that neither "--csv", nor "--r-import" parameter has been specified raise error, due to
-        # missing input data
-        abort = True
-        print("Error: Expected input data not found\n Use either \"--csv FILEPATH_TO_CSV_TABLE\" or \"--r-import FILEPATH_TO_R_OUTPUT\" to specify the path to the input data.")    
-    
-    if not(abort) :                
-        # check whether special options like color mode or output of the full list of formulae has been activated
-        mode = []  # list of special output modes depending on optional parameters (see below)
-            
-        # prepare these special modes
-        # there are two plot modes possible:
-        # "bw" - black/white
-        # "color" - in color
-        # The plot mode can be specified when running the script by adding "-c" or "-bw" respectively.
-        mode.append("color") # Standard mode is color.
-            
-        if any(arg == "-c" or arg == "--color" for arg in sys.argv) or "color" in force_mode: 
-            # sys.argv is the list of arguments given when executing the script.
-            if not("color" in mode):
-                mode.append("color")                          # e.g. python script.py -c (The script ifself is one element of sys.argv.)
-        elif any(arg == "-bw" or arg == "--blackwhite" for arg in sys.argv) : 
-            # further case for black/white
-            if not("bw" in mode):
-                mode.append("bw")
-                # remove the standard mode
-                mode.remove("color")
-                
-            
-        # further option: Exports a second pdf-file containing the full list of possible causal structures as formulae            
-        if any(arg == "-fl" or arg == "--fulllist" for arg in sys.argv) or "fulllist" in force_mode: 
-            # sys.argv is the list of arguments given when executing the script.
-            mode.append("fulllist")                       # e.g. python script.py -c -fl (The script ifself is one element of sys.argv.)
-            separate_formula_list = []                    # list of formulae in tex-code
-                
-        # simple mode does not derive complex structures between co-extensive factors
-        # results of simple mode should be the same as those of cna
-        if any(arg == "-c" or arg == "--complex" for arg in sys.argv) or "complex" in force_mode: 
-            pass                                          # e.g. python script.py -c (The script ifself is one element of sys.argv.)
-        else:                                             # default behaviour: simple mode without complex structures between
-            mode.append("simple")                         # co-extensive factors
-
-        # prepare the list for the tex-code        
-        tex_table = []
-         
-        # step 3 generate all possible solutions for the underlying causal structure
-        solution_term_list = find_structures(level_factor_list, level_equiv_list, mode)
-        # step 4: determine the causal order
-        complete_sol_list = []
-        for sol in solution_term_list:
-            noncircular, list_of_pairs = reduce_redundancies(level_factor_list, sol)  
-            if noncircular:
-                for pair in list_of_pairs:  # pair is a 2-tuple of [0]: level factor order list and [1]: list of causal relations        
-                    if not(pair in complete_sol_list):
-                        complete_sol_list.append(pair) # complete_sol_list is a list of tuples [0]: factor list nested by level and causal ordering,
-                                                       # [1]: causal relations list, nested by level
-            
-        # check whether some solutions are fragment of others -> ignore them
-        for i in range(len(complete_sol_list)-1,-1,-1):
-            for sol in complete_sol_list:
-                if sol != complete_sol_list[i]:
-                    fragment = True
-                    for lvl in range(len(complete_sol_list[i][1])):            
-                        for formula in complete_sol_list[i][1][lvl]:
-                            if not(formula in sol[1][lvl]):
-                                fragment = False
-                                break # break from for-loop over formulae once one has been found that is not included in sol
-                        if not(fragment):
-                            break # break from for-loop over levels once one formula has been found that is not included in sol
-                    if fragment:
-                        del complete_sol_list[i] # remove fragment from list of solutions
-                        break # break from for-loop over solutions once one has been found that includes all formulae of complete_sol_list[i]
-        
-        total_solutions = len(complete_sol_list)
-        print("Time needed to find all " + str(total_solutions) + " solutions " + str(round(time.time() - start_time,2)) + " seconds.")      
-       
-         
-        # prepare each solution individually for graphical output
-        sol_counter = 0
-        
-        for sol in complete_sol_list:            
-            # prepare a local version of level_equiv_list
-            new_level_equiv_list = []
-            for i in range(len(level_factor_list)) :
-                new_level_equiv_list.append([])
-       
-            for eq_lvl in sol[1]:   # sol[1] is a nested list of equivalence relations that constitutes one causal model
-                for formula in eq_lvl :
-                    new_level_equiv_list[get_formula_level(formula[0], level_factor_list)].append(formula)
-
-            # step 5: arrange the factors for improved placement in the plot
-            # also get rid of unnecessary constitution graphs
-            # (only the outer left and outer right part of the structure constituting a higher level factor should be drawn)
-            new_level_factor_list_order, new_constitution_relation_list, color_map, new_level_equiv_list = arrange_factors(sol[0], new_level_equiv_list, constitution_relation_list, mode) # sol[0] is the
-            # corresponding level_factor_list_order to sol[1] (the level_equiv_list)
-            
-            # check for uncategorised causal factors
-            aux_factor_list = [] # list of factors that appear in new_level_equiv
-            for lvl in new_level_equiv_list:
-                for formula in lvl:                    
-                    aux_factor_list.extend(get_components_from_formula(formula[0], level_factor_list))
-                    aux_factor_list.append(formula[1])
-            
-            aux_factor_list = list(set(aux_factor_list))
-            
-            # are all factors of aux_factor_list in some level and order of new_level_factor_list_order?
-            found_all = True
-            for factor in aux_factor_list:
-                found = False
-                for lvl in new_level_factor_list_order:
-                    for order in lvl:
-                        for fac in order:
-                            if factor == fac:
-                                found = True
-                                break
-                        if found: break
-                    if found: break
-                    
-                if not(found):
-                    found_all = False
-                    total_solutions = total_solutions - 1 # do not count this solution
-                    break
-                    
-            # continue only with solutions where all factors are categorised
-            if found_all:
-                # check whether the intra-level causal ordering conforms the input on the causal ordering
-                
-                # translate the order information from new_level_factor_list_order into a nested list (by levels) of
-                # binary order relations (fac[i], fac[j]) iff fac[i] is of same level but lower order than fac[j]
-                order_relations = []
-                for lvl in range(len(new_level_factor_list_order)):
-                    order_relations.append([]) # append a new sublist per constitutive level
-                    for id_order in range(len(new_level_factor_list_order[lvl])):
-                        for fac in new_level_factor_list_order[lvl][id_order]:
-                            for id_order_2 in range(id_order + 1,len(new_level_factor_list_order[lvl])):
-                                # run over all higher orders
-                                for fac_2 in new_level_factor_list_order[lvl][id_order_2]:
-                                    new_pair = (fac, fac_2)
-                                    order_relations[lvl].append(new_pair)
-                
-                order_preserved = True
-                
-                for lvl in range(len(order_relations)):
-                    # check whether there are any re-specified causal order information
-                    if lvl <= len(order_input_information) and order_input_information:
-                        # the input information is consistent with the obtained causal order of the particular solution
-                        # iff the set of the input order relations is a subset of the obtained order relations (per level)
-                        if not(set(order_input_information[lvl]).issubset(order_relations[lvl])):
-                            order_preserved = False
-                            total_solutions = total_solutions - 1 # do not count this solution
-                            break
-                
-                
-                # limiting the output to 1000 solutions
-                # remove the respective condition in the if-clause if more solutions are required
-                if order_preserved and sol_counter < 1000:
-                    #############################################
-                    # step 6: graphical output as a graph in pdf                         
-                    # generating the tex-code 
-                    sol_counter = sol_counter + 1
-                    try:
-                        st = print_structure_in_tikz_plot(new_level_factor_list_order, new_level_equiv_list, new_constitution_relation_list, color_map)
-                    except:
-                        st = ""
-                            
-                    # subtitle of the graph will be the formula in tex-math syntax
-                    subtitle = convert_formula_to_tex_code(new_level_equiv_list)
-                    subtitle = "\\tiny " + subtitle # formulae might be quite long, so subtitle should be written in tiny
-                        
-                    # counter enumerates the solutions
-                    entry = (sol_counter, st, subtitle)
-                    tex_table.append(entry)
-            
-        # after one entry for each solution has been generated in tex_table compile the pdf
-        if tex_table:
-            # if tex_table is non-empty
-            if os.path.exists(latex_template_file) :
-                create_pdf(tex_table, latex_template_file, total_solutions)
-                print("Number of solutions " + str(total_solutions))        
-                if total_solutions > 1000:
-                    print("More than 1000 solutions obtained, plotting only the first 1000.")
-            else :
-                abort = True
-                print("Error: Cannot plot the graphs since the expected template file " + latex_template_file + " does not exist in path folder.")
-            if "fulllist" in mode:
-                # when in fulllist mode, add the formulae to the list to be exported
-                for sol in solution_term_list:
-                    separate_formula_list.append("$" + convert_formula_to_tex_code(sol) + "$")       
-                # create file
-                create_separtate_formula_list(separate_formula_list)
-             
-            # print the duration of the total run time into the console
-            print("Total run time " + str(round(time.time() - start_time,2)) + " seconds.")  
-            
-        else:
-            # solution_list is empty
-            # no solution survived selection of valid solutions
-            print("No valid complex solution formula has been found in " + input_file + ".") 
                     
 if __name__ == '__main__':
-    # start main() function when the py-file is executed
-    main()
+    # executed when the py-file is executed
+    print('Either run the command line application cli.py or the graphical user interface gui.py.')

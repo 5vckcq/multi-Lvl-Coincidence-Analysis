@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# file: obtain_equivalence_formulae.py
+# file: atomic_formulae.py
 
 # Generates atomic solution formulae from Boolean coincidence data tables
 
@@ -8,13 +8,25 @@ import re                 # regex for complex search patterns in strings
 import pandas as pd       # for reading csv files that contain truth tables
 import itertools          # itertools provides functions to obtain all permutations of a string and Cartesian products of lists
 import multiprocessing    # multiprocessing and functools for multicore usage
-from auxiliary_functions import get_components_from_formula, get_factor_level, get_factor_order, get_equiv_formula
+from utils import get_components_from_formula, get_factor_level, get_factor_order, get_equiv_formula
 
 def list_to_string(in_list):
-    # converts a nested list of the form out_list[DISJUNCT][CONJUNCT] or 
-    # a list simple list of the form out_list[CONJUNCT] into a string
-    # which connects disjuncts by " + " and conjuncts by "*"
-    
+    """Converts a nested list of the form in_list[DISJUNCT][CONJUNCT] or
+    a list simple list of the form in_list[CONJUNCT] into a string
+    which connects disjuncts by " + " and conjuncts by "*"
+
+    Parameters
+    __________
+    in_list: list of lists of str or list of str
+
+    Returns
+    _______
+    str
+        String elements of list of lowest order are connected by '*',
+        sublists by ' + ', if in_list is empty, return ''
+
+    """
+
     if in_list: # list is not empty
         if type(in_list[0]) == list: # list is nested
             return ' + '.join(['*'.join(disj) for disj in in_list])
@@ -22,11 +34,23 @@ def list_to_string(in_list):
             return "*".join(in_list)
     else:
         return ""
-    
+
 
 def string_to_list(st):
-    # converts a string of disjunctive normal form into a nested list
-    # out_list[DISJUNCT][CONJUNCT]
+    """Converts a string into nested list:
+    ' + ' separates sublists, '*' elements of the sublists
+
+    Parameters
+    __________
+    st: str
+        String, expected to express a DNF with disjunctor ' + ' and
+        conjunctor '*'
+
+    Returns
+    _______
+    list of lists of str
+        nested list of form out_list[DISJUNCT][CONJUNCT]
+    """
     out_list = []
     disj_list = re.split(r'\s*\+\s*', st)
     for disj in disj_list:
@@ -34,25 +58,31 @@ def string_to_list(st):
 
     return out_list
 
-def negate_formula(in_formula):
-    # negates each entry in in_formula
+def find_effects(formula: list, factor_list: list) -> list:
+    """Determines which elements from factor_list are dependent variables (effects)
+    given the dependencies expressed in formula.
+    Causal factors are effects only if they do not satisfy either of three conditions:
+    1) the causal factor is one in every line of the configuration table (in this case they are irrelevant)
+    2) it is zero in every line of the configuration table (same as 1)
+    3) two lines in the table differ only by the value of the factor (this means they might only be first causes)
+    These conditions follow M. Baumgartner (2009) "Uncovering deterministic causal structures: a Boolean
+    approach", p. 83.
+    Returns the list of effects.
 
-    neg_formula = {}
-    # convert the input formula in a list of its disjuncts
-    if in_formula:
-        for i in in_formula:
-            neg_formula[i] = not(in_formula[i])  
-    
-    return neg_formula
-    
-def find_effects(formula, factor_list):
-    # returns the list of effects in a formula generated from a configuration table
-    #
-    # causal factors are effects only if they do not satisfy either of three conditions
-    # 1) the causal factor is one in every line of the configuration table (in this case they are irrelevant)
-    # 2) it is zero in every line of the configuration table (same as 1)
-    # 3) two lines in the table differ only by the value of the factor (this means they might only be first causes)
-    
+    Parameters
+    __________
+    formula: list of str
+        list of string, it is assumed that each element is a conjunctive formula of
+        the factors appearing from factor_list
+    factor_list: list of str
+        list of the potential variables of formula
+
+    Returns
+    _______
+    list of str
+        list of elements from factor_list that do not satisfy any of the conditions 1)-3)
+    """
+
     # start with the full list of causal factors and reduce it accordingly to 1)-3) until only effects remain
     effect_list = [x for x in factor_list]
     for i in range(len(effect_list)-1,-1,-1):
@@ -71,7 +101,7 @@ def find_effects(formula, factor_list):
                 if not(st in term):
                     cond = False
                     break
-            
+
             if not(cond):
                 for term in formula:
                     for sec_term in formula:
@@ -87,9 +117,9 @@ def find_effects(formula, factor_list):
                                 if not((fac == effect_list[i] and st in sec_term) or (fac == st and effect_list[i] in sec_term) or fac in sec_term):
                                     sec_cond = False
                                     break
-                            
+
                         if sec_cond:
-                            break        
+                            break
                     if sec_cond:
                         cond = sec_cond
                         break
@@ -97,20 +127,46 @@ def find_effects(formula, factor_list):
             # delete the causal factor if either of the three exclusion criteria is true
             print(effect_list[i] + " discarded. It has no causal relevance for any other causal factor.")
             del effect_list[i]
-            
+
     return effect_list
-    
-def get_instance_formula_to_factor(in_formula, factor, level_factor_list_order):
-    # the instance function of a factor is obtained by removing that factor or its negation from each of the conjunct
-    # and setting its value to True or False respectively
+
+def get_instance_formula_to_factor(in_formula: list, factor: str, level_factor_list_order: list) -> dict:
+    """Derives the instance function for factor from the formula in_formula.
+    The instance function of a factor is obtained by removing that factor or its negation from each of the
+    conjuncts in in_formula and setting its value to True or False respectively.
+    For computational effiency, formulae that mix different levels and do not satisfy the conditions
+    on constitution relations are reduced such that factors from other levels than the level of factor
+    are discarded.
+    Returns the instance formula as a dictionary in which the formulae (in form of lists) are the keys,
+    and the respective truth values the corresponding dicitonary values.
+
+    Parameters
+    __________
+    in_formula: list of lists of str
+        nested list of strings, expected to have the form [DISJUNCTS][CONJUNCTS]
+        each conjunct is either a factor from level_factor_list_order or a negated
+        factor (='~' + factor)
+    factor: str
+        factor whose instance function is to be generated
+    level_factor_list_order: list of lists of lists of str
+        nested list of factors, form [LEVEL][CAUSAL_ORDER][FACTOR]
+        expected to contain all
+
+    Returns
+    _______
+    dict
+        dictionary representing the instance function for factor, keys are formulae in form of lists,
+        the values are Boolean
+    """
+
     output = {}
-    
+
     full_formula = [x for x in in_formula]
-    
+
     factor_level = get_factor_level(factor, level_factor_list_order)
     factor_order = get_factor_order(factor, level_factor_list_order)
 
-    
+
     for lvl in range(len(level_factor_list_order)):
         for order in range(len(level_factor_list_order[lvl])):
             # removing all factors of different level from the instance function
@@ -128,7 +184,7 @@ def get_instance_formula_to_factor(in_formula, factor, level_factor_list_order):
                             full_formula[term].remove(neg_fac)
                             #full_formula[term] = full_formula[term].replace(factor,"")
 
-            
+
     neg_fac = "~" + factor
     for term in full_formula:
         if factor in term:
@@ -139,7 +195,7 @@ def get_instance_formula_to_factor(in_formula, factor, level_factor_list_order):
             aux = [x for x in term]
             aux.remove(neg_fac)
             output[list_to_string(aux)] = False
-    
+
     # test the instance formula for wrong entries due to truncation
     delete_list = [] # list of wrong entries in output
     for disj_ins in output:
@@ -148,7 +204,7 @@ def get_instance_formula_to_factor(in_formula, factor, level_factor_list_order):
         else:
             neg_fac = factor
 
-        for disj in full_formula:    
+        for disj in full_formula:
             found_all = True
             for term in string_to_list(disj_ins)[0]:
                 if not(term in disj):
@@ -159,37 +215,37 @@ def get_instance_formula_to_factor(in_formula, factor, level_factor_list_order):
                 # if not: add the entry to delete_list and remove it from the instance function
                 if neg_fac in disj:
                     delete_list.append(disj_ins)
-                    
+
     if delete_list:
         # delete_list is non empty
         # remove the list entries from the dictionary output
         delete_list = list(set(delete_list)) # get rid of potential dublicates
         for entry in delete_list:
-            del output[entry]            
-    
+            del output[entry]
+
     return output
 
 def reduce_term_by(term, literal):
     #
     if term == literal:
-        # if term is atomic 
+        # if term is atomic
         # return empty string because no reducted term exists
         return ""
     else:
-        # term is a complex        
+        # term is a complex
         st = literal + "*"
         if term.find(st) > 0 or term.find(st) == -1:
             # literal is not first conjunct
             # then cut string of conjunctions to the left
             st = "*" + literal
         return term.replace(st,"")
-        
+
 def contains_term(original_term, comparison_term):
     # in: original_term - a string
     #     comparison_term - another string
     # out: truth value whether original_term is contained in comparison_term
     #      "contains" can imply that e.g. "A*C" is contained in "A*B*C"
-    
+
     if original_term == "":
         return False
     else:
@@ -199,11 +255,11 @@ def contains_term(original_term, comparison_term):
             if not(fac in string_to_list(comparison_term)[0]):
                 all_found = False
                 break
-        
+
         return all_found
 
-def absorb_terms(arg): 
-    # in: tuple of arguments: 
+def absorb_terms(arg):
+    # in: tuple of arguments:
     # arg[0] - is a nested list arg[0][LIST OF CONJUNCTS][CONJUNCTS]
     # arg[1] - is a nested list, which should include arg[0]; arg[1][LIST OF DISJUNCTS][LIST OF CONJUNCTS][CONJUNCTS]
     # out: the nested listed reduced by the absorption rule
@@ -216,30 +272,30 @@ def distribution(formula):
     # applies the distribution rule on a logical formula given as a string as often as possible
     # then applies the absorption rule to simplify the resulting formula as often as possible
     # returns the simplified formula as a string
-    
+
     # as long as formula has a conjunctor right before or after a bracket
     if (formula.find(")*") > -1 or formula.find("*(") > -1):
-                
+
         formula = formula[:-1] # get rid of trailing ")"
         conj_list = re.split(r'\)\*', formula) # list of conjuncts of formula
         conj_list = [conj[1:] for conj in conj_list] # get rid of leading "("
-        
+
         disj_list = [] # list of disjuncts per conjunct
         for conj in conj_list:
-            disj_list.append(re.split(r'\s*\+\s*', conj))        
+            disj_list.append(re.split(r'\s*\+\s*', conj))
         # disj_list is a list [[d11, d12, ...], [d21, d22, ... ],  ...] with dij being the j-th disjunct in conjunct i
-        
+
         # rebuild formula
         formula = list_to_string([[*x] for x in itertools.product(*disj_list)])
-        
+
         disj_list.clear()
         conj_list.clear()
-        
-        
+
+
         disj_list = re.split(r'\s*\+\s*', formula) # list of disjuncts of new formula
-        
+
         #conj_list = [list(set(re.split(r'\*', disj))).sort() for disj in disj_list] # doesn't work
-        
+
         conj_list = []
         set_disjuncts = set() # set in place of a list automatically discards duplicates
         for disj in disj_list:
@@ -248,54 +304,54 @@ def distribution(formula):
                 a.sort()
                 conj_list.append(a)
                 set_disjuncts.add(disj)
-        
+
         new_list = []
         for disj in conj_list:
             if not(disj in new_list):
-                new_list.append(disj)   
-        
-        # simplify by absorption (a*b*c*d*e + a*c*d <-> a*c*d)        
-        
+                new_list.append(disj)
+
+        # simplify by absorption (a*b*c*d*e + a*c*d <-> a*c*d)
+
         # start working on all CPUs
         arguments = ([f, new_list] for f in new_list)
         with multiprocessing.Pool() as pool:
 	        # call the function for each item in parallel
             absorbed_terms = pool.map(absorb_terms, arguments)
-        
+
         pool.close()
         pool.join()
 
-        new_list = [i for i in new_list if i not in absorbed_terms]        
+        new_list = [i for i in new_list if i not in absorbed_terms]
 
         new_list.sort()
         # translate formula encoded in the nested list of disjuncts of conjuncts into a string
         formula = list_to_string(new_list)
 
-    return formula        
-    
+    return formula
+
 def get_prime_implicants(instance_formula, factor, level_factor_list):
     # prime implicants are obtained by comparing the min-terms of positive instance function
-    # with those of the negative instance function 
+    # with those of the negative instance function
     # - if a section of one positive min-term is not part of any negative min term,
     #   that positive min-term can be reduced to this section
     # - if every section is a part of at least one negative min term, the considered term is a prime factor
     #   of the positive instance function
-    
-    
+
+
     # get number of True terms in instance_formula
     num_entries = 1
     for disj in instance_formula:
         if num_entries < len(get_components_from_formula(disj, level_factor_list)):
             num_entries = len(get_components_from_formula(disj, level_factor_list))
-    
-    
+
+
     reduced_term_list = []
     prime_imp_list = []
     # prepare sub-lists of reduced_term_list
     for k in range(num_entries,-1,-1):
         reduced_term_list.append([])
 
-    
+
     for term in instance_formula:
         if instance_formula[term]:
             reduced_term_list[num_entries].append(term)
@@ -307,8 +363,8 @@ def get_prime_implicants(instance_formula, factor, level_factor_list):
                 any_lit_found = True
                 term_list = string_to_list(term)[0]
                 # reduce term by one of its literals and check whether the reduced fragments is not contained in any negative term
-                for lit in term_list: 
-                    
+                for lit in term_list:
+
                     # check only fragments that are neither already known to be not contained in any negative term
                     # (that are not listed in reduced_term_list[k-1]), nor empty strings
                     if not(reduce_term_by(term, lit) in reduced_term_list[k-1]) and reduce_term_by(term, lit) != "":
@@ -326,24 +382,24 @@ def get_prime_implicants(instance_formula, factor, level_factor_list):
                             # for being a prime implicator
                             reduced_term_list[k-1].append(reduce_term_by(term, lit))
 
-                    
+
                 if any_lit_found: # if all fragments resulting from deleting a literal from term are contained in negative instance terms,
                     # then term is a prime implicator
                     prime_imp_list.append(term)
                     #print('\x1b[0;36;40m' + str(term) + " added to PI list.\x1b[0m") #dummy-print
-    
+
     # add atomic prime implicants
     if reduced_term_list[1]:
         for at_term in reduced_term_list[1]:
             if not(at_term in prime_imp_list):
                 prime_imp_list.append(at_term)
-   
+
     for n_pi in range(len(prime_imp_list)-1,-1,-1):
         for pi in prime_imp_list:
             if contains_term(pi, prime_imp_list[n_pi]) and not(pi == prime_imp_list[n_pi]):
                 del prime_imp_list[n_pi]
                 break
-    
+
     return prime_imp_list
 
 def get_rdnf(pi_list, formula, factor_list):
@@ -353,10 +409,10 @@ def get_rdnf(pi_list, formula, factor_list):
     #               = keys are the min terms of the formula, True or False their
     #                 truth values
     # out: solution_list - list of strings - contains all solutions each item is the string of a reduced disjunctive normal form of formula
-    
+
     solutions_list = []
     out_formula = ""
-    
+
     # define list of essential prime implicants
     e_pi_list = []
     # check for essential prime implicants
@@ -367,7 +423,7 @@ def get_rdnf(pi_list, formula, factor_list):
             for lit in pi_list:
                 if contains_term(lit,term):
                     aux_list.append(lit)
-            
+
             if not(aux_list):
                 # no pi found that makes this min-term true, should never happen
                 print("Problem: No prime implicant has been found for " + str(term))
@@ -379,10 +435,10 @@ def get_rdnf(pi_list, formula, factor_list):
                 else:
                     # several prime implicants cover term
                     uncovered_terms[term] = aux_list
-    
+
 
     # simplest case would be that the disjunction of essential prime implicants covers al min terms
-    # check if this the case 
+    # check if this the case
     all_covered = True
     for term in uncovered_terms:
         covered = False
@@ -393,13 +449,13 @@ def get_rdnf(pi_list, formula, factor_list):
         all_covered = all_covered and covered
         if not(all_covered):
             break
-            
-                
+
+
     # the corresponding formula:
     for epi in e_pi_list:
         out_formula = out_formula + " + " + epi
     out_formula = out_formula[3:] # remove the leading " + "
-    
+
     if all_covered:
         # first case: disjunction of all essential prime implicants covers all min terms
         # there is only one solution
@@ -412,15 +468,15 @@ def get_rdnf(pi_list, formula, factor_list):
         # C) transform it into disjunctive normal form
         # D) simplify it by applying idempotence and absorption law
         # -> each disjunct of the remaining formula is one solution + to be added to the disjunction of essential PIs
-        
+
         # create a dictionary for PIs
         dict_pi = {}
         for i in range(len(pi_list)):
             abbr = "PI" + str(i)
             dict_pi[pi_list[i]] = abbr
-            
+
         aux_formula = "("
-        
+
         for u_term in uncovered_terms:
             # check whether one essential PI covers u_term
             e_covered = False
@@ -445,7 +501,7 @@ def get_rdnf(pi_list, formula, factor_list):
 
         # every disjunct of aux_formula constitutes one solution
         sol_list = re.split(r'\s*\+\s*',aux_formula)
-        
+
         for sol in sol_list:
             # in each solution "*" are to be changed into " + " (part of Petrick's algorithm)
             st = sol.replace("*"," + ")
@@ -458,7 +514,7 @@ def get_rdnf(pi_list, formula, factor_list):
                 # if there is no contribution by ePI, remove the leading and trailing bracket
                 st = st[1:]
                 if len(sol_list) == 1:
-                    # remove 
+                    # remove
                     st = st[:-1]
             elif len(st) > 0 and st[-1] == ")":
                 st = st[:-1]
@@ -466,8 +522,8 @@ def get_rdnf(pi_list, formula, factor_list):
                 # remove trailing " + "
                 st = st[:-3]
 
-            solutions_list.append(st)        
-    
+            solutions_list.append(st)
+
     # remove solutions that are disjunctions of other solutions (if A <-> B then A + C <-> B should not be in the list of solutions)
     for n_sol in range(len(solutions_list)-1,-1,-1):
         list1 = get_components_from_formula(solutions_list[n_sol], factor_list)
@@ -479,11 +535,11 @@ def get_rdnf(pi_list, formula, factor_list):
                     if not(fac in list1):
                         cond = False
                         break
-                
+
                 if cond:
                     del solutions_list[n_sol]
                     break
-                            
+
     return solutions_list
 
 def get_truth_table_from_file(file_path):
@@ -491,23 +547,23 @@ def get_truth_table_from_file(file_path):
     # in: file_path - string - path to csv-file
     # out: factor_list - list of strings - list of column heads in csv-file = list of causal factors
     #      formula - string - logical formula derived from csv-truth table
-    
+
     # different strings that will be interpreted as True
     true_values = [1, "1", "T", "t", "w", "W", "true", "True", True]
-    # different strings that will be interpreted as False    
+    # different strings that will be interpreted as False
     false_values = [0, "0", "F", "f", "false", "False", False]
-    
+
     # read csv file into df, assume that the column separators are one character from sep
-    df = pd.read_csv(file_path, sep='[:,;|_]', engine='python')    
+    df = pd.read_csv(file_path, sep='[:,;|_]', engine='python', index_col = False)
 
     factor_list = df.columns.tolist()
     level_factor_order_list = [] # declare nested lists of causal factors by constitution level and causal ordering:
     # level_factor_order_list[LEVEL][ORDER][FACTOR]
     level_factor_order_list.append([])   # declare lists for zeroth level
     level_factor_order_list[0].append([])  # zeroth order
-    
+
     order_information = "" # variable to mark the row that contains the information on the causal and constitution ordering
-    
+
     formula = ""
     # go through the data frame and get the respective logical formula
     for index, row in df.iterrows():
@@ -520,11 +576,11 @@ def get_truth_table_from_file(file_path):
             elif row[col] == "<" or row[col] == "<<":
                  # this row contains information on the causal and constitutional separation of the causal factors
                  order_information = row
-                
+
         if formula_row != "":
             # add the disjunctor for the next row
             formula = formula + formula_row + " + "
-    
+
     if not(type(order_information) == str):
         # categorise the causal factors
         level = 0 # start with level zero
@@ -540,19 +596,19 @@ def get_truth_table_from_file(file_path):
                 # add new causal phase for the current level
                 level_factor_order_list[level].append([])
                 order = order + 1
-            
+
             level_factor_order_list[level][order].append(col)
     else:
         # no order information given -> all factors are of zeroth order and zeroth level
         level_factor_order_list[0][0].extend(factor_list)
-    
+
     # remove "*" at the beginning of each disjunct
     formula = formula.replace(" *"," ")
     # remove the leading "*" and the trailing " + "
     formula = formula[1:-3]
     return level_factor_order_list, factor_list, formula
 
-         
+
 def read_data_from_csv(file_path):
     # (1) reads the csv file under file_path
     #     converts the truth table into a logical formula via get_truth_table_from_file
@@ -565,16 +621,16 @@ def read_data_from_csv(file_path):
     # level_factor_list - a nested list of causal factors subdivided by constitution levels
     # list_equiv_tuple - list of pairs, each pair corresponds to an obtained equivalence formulae
     #                    in form of: element[0] <-> element[1]
-    # order_input_information - nested list of pairs, for each constitution level, the order information are translated into 
+    # order_input_information - nested list of pairs, for each constitution level, the order information are translated into
     #                           binary relations between factors (fac[0], fac[1]) means: fac[0] < fac[1]
-    
+
     list_equiv_formula = []
     list_equiv_tuple = []
     level_factor_list = []
     order_input_information = []
-    
+
     # determine the list of causal factors and the min-term formula from the truth table
-    level_factor_order_list, factor_list, formula_st = get_truth_table_from_file(file_path)  
+    level_factor_order_list, factor_list, formula_st = get_truth_table_from_file(file_path)
 
 
     # translate the information on the causal ordering within each level into the nested list order_input_information
@@ -587,17 +643,17 @@ def read_data_from_csv(file_path):
                     for fac_2 in level_factor_order_list[lvl][id_order_2]:
                         new_pair = (fac, fac_2)
                         order_input_information[lvl].append(new_pair)
-    
-    
+
+
     if factor_list and formula_st != "":
-        # transform the formula from string into a nested list 
+        # transform the formula from string into a nested list
         # elements are the disjuncts of the min-term formula as lists of the conjuncts each disjunct
         # formula[DISJUNCT][CONJUNCT]
         formula = string_to_list(formula_st)
-        
-        # determine which causal factors might be effects       
+
+        # determine which causal factors might be effects
         effects_list = find_effects(string_to_list(formula_st),factor_list)
-        
+
         # check for co-extensive factors - only for one factor of each set of co-extensive factors,
         # the prime implicants have to be determined
         list_of_coextensives = [] # this becomes a nested list: every sublist contains factors that are mutually coextensive
@@ -612,7 +668,7 @@ def read_data_from_csv(file_path):
                     ((neg_i in disj) and not(neg_j in disj)) or ((neg_j in disj) and not(neg_i in disj))):
                         co_ext = False # two factors are not coextensive if one or its negation appears in one disjunct but the other
                         break          # does not
-                
+
                 if co_ext:
                     if not(list_of_coextensives): # if list of coextensives is still empty
                         list_of_coextensives.append([]) # append an empty sublist
@@ -621,7 +677,7 @@ def read_data_from_csv(file_path):
                     else: # list is non-empty search for a sublist that contains effects_list[i]
                         new_list = True
                         for sublist in list_of_coextensives:
-                            if ((effects_list[i] in sublist) or (effects_list[j] in sublist)): 
+                            if ((effects_list[i] in sublist) or (effects_list[j] in sublist)):
                                 # at least one of both factors is already contained in one sublist of coextensive factors
                                 new_list = False
                                 if not(effects_list[i] in sublist): # and effects_list[i] is not,
@@ -634,19 +690,27 @@ def read_data_from_csv(file_path):
                             list_of_coextensives[-1].append(effects_list[i]) # append effects_list[i]
                             list_of_coextensives[-1].append(effects_list[j]) # and effects_list[j]
 
-        # remove all but one factor of each set of coextensive factors
+        # keep only one factor per level of each set of coextensive factors
+        # only keep the last element (will be factor of highest order within that level)
         if list_of_coextensives: # list is not empty
             for sublist in list_of_coextensives:
-                for i in range(1,len(sublist)):
-                    print('Factor ' + str(sublist[i]) +  " is coextensive with " + str(sublist[0]))
-                    effects_list.remove(sublist[i])
-        
+                if len(sublist) > 1:
+                    for level in level_factor_order_list:
+                        found_one = False
+                        for order in reversed(level):
+                            for factor in order:
+                                if factor in sublist:
+                                    if not(found_one):
+                                        found_one = True
+                                    else:
+                                        effects_list.remove(factor)
+
         for fac in effects_list:
-            # for each of these factors: 
+            # for each of these factors:
             # determine its instance formula (the min-term equivalence formula to fac)
             i_formula = get_instance_formula_to_factor(string_to_list(formula_st), fac, level_factor_order_list)
 
-            
+
             # determine the prime implicants of this instance formula
             pi_list = get_prime_implicants(i_formula, fac, level_factor_order_list)
 
@@ -657,19 +721,41 @@ def read_data_from_csv(file_path):
                     # since sol is equivalent to fac, append the equivalence-operator and the second equivalent (fac)
                     sol = sol + " <-> " + fac
                     list_equiv_formula.append(sol)
-        
+
         # add equivalence relations for coextensive factors
         if list_of_coextensives:
-            for sublist in list_of_coextensives:
-                for i in range(1,len(sublist)):
-                    # replace sublist[0] by sublist[i] and vice versa in the equivalence formulae for sublist[0]
-                    for formula in list_equiv_formula:
-                        if formula[-1] == sublist[0]:
-                            st = formula[:-1].replace(sublist[i],sublist[0]) # the new formula is the old one without the last
-                            st = st + sublist[i] # expression and with all occurences of sublist[i] replaced by sublist[0]
-                            # then append sublist[i] as second equivalent of the equivalence formula
-                            list_equiv_formula.append(st) # add the new formula to the formulae list
-        
+            for effect in effects_list:
+                for sublist in list_of_coextensives:
+                    if effect in sublist:
+                        for fac in sublist:
+                            if not(fac in effects_list) and not (fac == effect) and (get_factor_level(fac, level_factor_order_list) == get_factor_level(effect, level_factor_order_list)):
+                                # replace effect by fac and vice versa in the equivalence formulae for effect
+                                for formula in list_equiv_formula:
+                                    lgth = len(effect)
+                                    if formula.endswith(effect):
+                                        # skip formula if cause-term contains factor of higher causal order than fac
+                                        skip = False
+                                        # case 1: fac is cause and effect of higher order than fac
+                                        if (formula.find(fac) > -1) and (get_factor_order(fac, level_factor_order_list) < get_factor_order(effect, level_factor_order_list)):
+                                            skip = True
+                                        # case 2: another factor of higher order than fac is among causes
+                                        if not(skip):
+                                            for index, order in enumerate(level_factor_order_list[get_factor_level(fac, level_factor_order_list)]):
+                                                if index > get_factor_order(fac, level_factor_order_list):
+                                                    for f in order:
+                                                        if (f != effect) and (formula.find(f) > -1):
+                                                            skip = True
+                                                            break # break from for-loop over factors
+                                                if skip:
+                                                    break # break from for-loop over orders
+
+                                        if not(skip):
+                                            st = formula[:-lgth].replace(fac,effect) # the new formula is the old one without the last
+                                            st = st + fac # expression and with all occurences of fac replaced by effect
+                                            # then append fac as second equivalent of the equivalence formula
+                                            list_equiv_formula.append(st) # add the new formula to the formulae list
+                        break # break from for-loop over sublists
+
         if list_equiv_formula:
             abort = False
             # transform the list of strings into a list of pairs, such that element[0] <-> element[1]
@@ -677,8 +763,8 @@ def read_data_from_csv(file_path):
         else:
             # obtained list of equivalence formulae is empty
             abort = True
-        
-        
+
+
         # create level_factor_list
         for lvl in range(len(level_factor_order_list)):
             level_factor_list.append([])
@@ -687,19 +773,19 @@ def read_data_from_csv(file_path):
     else:
         # factor_list is empty
         abort = True
-    
+
     return abort, level_factor_list, list_equiv_tuple, order_input_information
-                   
+
 def main():
     # main function
     file_path = "samples/sample_2-csv.csv"
     _, fa_l_list, list_equiv_formula, _ = read_data_from_csv(file_path)
-    
-    
-    
 
-    
-                     
+
+
+
+
+
 if __name__ == '__main__':
     # start main() when executing this script file
     main()

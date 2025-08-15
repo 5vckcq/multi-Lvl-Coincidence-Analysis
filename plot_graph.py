@@ -7,13 +7,13 @@ import re                          # regex for complex search patterns in string
 import jinja2                      # Latex interface
 import codecs                      # for en- and decoding of strings (esp. to write tex-files in utf-8)
 
-from auxiliary_functions import get_components_from_formula, get_factor_level, get_factor_order, get_formula_level, get_formula_order
+from utils import get_components_from_formula, get_factor_level, get_factor_order, get_formula_level, get_formula_order
 
 # syntax definitions for Latex expressions
 latex_jinja_env = jinja2.Environment(
-	block_start_string = '\BLOCK{',
+	block_start_string = '\\BLOCK{',
 	block_end_string = '}',
-	variable_start_string = '\VAR{',
+	variable_start_string = '\\VAR{',
 	variable_end_string = '}',
 	autoescape = False,
 	loader = jinja2.FileSystemLoader(os.path.abspath('.')))
@@ -26,7 +26,7 @@ def convert_formula_to_tex_code(solution):
     tex_code = "$"
     for lvl in solution:
         for term in lvl:
-            tex_code = tex_code + "(" + term[0].replace("*", " \cdot ").replace("~", "\\neg ") + "\leftrightarrow " + term[1] + ")\cdot"
+            tex_code = tex_code + "(" + term[0].replace("*", " \\cdot ").replace("~", "\\neg ") + "\\leftrightarrow " + term[1] + ")\\cdot"
                         
     tex_code = tex_code[:-5] + "$"  # remove the "\cdot" at the end of the last term
     return tex_code
@@ -59,11 +59,11 @@ def convert_causal_relation(formula, level_factor_list_order, tex_code, color, c
     for o in range(len(level_factor_list_order[level])) :
         for fac in level_factor_list_order[level][o] :
             if fac == formula[0] :  # the left side of formula equals one factor from the factor list
-                st = "\draw[->, " + color + "] (" + fac + ".east) -- (" + formula[1] + ".west);"
+                st = "\\draw[->, " + color + "] (" + fac + ".east) -- (" + formula[1] + ".west);"
                 break    # stop after the factor has been found
             elif formula[0] == "~" + fac : # the left side of formula equals the negation of one factor from the factor list
                 color_neg = color_map["draw"][fac]
-                st = "\\node[neg, " + color_neg + "] (" + fac + "neg) at ([xshift=\LNeg]" + fac + ".south east) {};\n\draw[->, " + color + "] (" + fac + "neg) -- (" + formula[1] + ");"
+                st = "\\node[neg, " + color_neg + "] (" + fac + "neg) at ([xshift=\\LNeg]" + fac + ".south east) {};\n\\draw[->, " + color + "] (" + fac + "neg) -- (" + formula[1] + ");"
                 break # stop after the factor has been found
                            
     if st == "":
@@ -74,7 +74,7 @@ def convert_causal_relation(formula, level_factor_list_order, tex_code, color, c
             ################
             
             # create a list of the possibly complex disjuncts of formula
-            disjunctor_list = re.split("\s*\+\s*", formula[0])  
+            disjunctor_list = re.split("\\s*\\+\\s*", formula[0])
             
             
             for disj in disjunctor_list : 
@@ -88,42 +88,9 @@ def convert_causal_relation(formula, level_factor_list_order, tex_code, color, c
                 if disj in get_components_from_formula(formula[0], level_factor_list_order):
                     # case A: the discunct is one causal factor
                     
-                    """ START COMMENTED OUT
-                    # in order to prevent overlapping horizontal arrows                    
-                    # get positions of disj and formula[1] in their respective level_factor_list_order sublists
-                    # first position i of disj
-                    found = False
-                    for order in level_factor_list_order[level]:
-                       for i in range(len(order)):
-                           if order[i] == disj:
-                               found = True
-                               break
-                       if found: break
-                    
-                    # now position j of formula[1]
-                    found = False
-                    for order in level_factor_list_order[level]:
-                       for j in range(len(order)):
-                           if order[j] == formula[1]:
-                               found = True
-                               break
-                       if found: break
-
-                    if i == j:
-                        # a straight arrow is drawn from source factor.north east to target factor.west
-                        st = st + "% simple disjunction with shifted starting point\n"
-                        st = st + "\draw[->, " + color + "] (" + disj + ".north east) to (" + formula[1] + ".west);\n"
-                    else:
-                        # a straight arrow is drawn from source factor to target factor
-                        st = st + "% simple disjunction\n"
-                        st = st + "\draw[->, " + color + "] (" + disj + ".east) to (" + formula[1] + ".west);\n"
-                
-                    END COMMENTED OUT
-                    """
-                    # alternative:
                     # a straight arrow is drawn from source factor.north east to target factor.west
                     st = st + "% simple disjunction with shifted starting point\n"
-                    st = st + "\draw[->, " + color + "] (" + disj + ".north east) to (" + formula[1] + ".west);\n"
+                    st = st + "\\draw[->, " + color + "] (" + disj + ".north east) to (" + formula[1] + ".west);\n"
                     
                 elif disj.find("*") > -1 :
                     # case B: the disjunct is a conjunction
@@ -133,7 +100,7 @@ def convert_causal_relation(formula, level_factor_list_order, tex_code, color, c
                     # placed one right (with a slight upward shift) to factor of the highest causal order
                     # second, this junction point is connected with the target factor by a straight arrow like
                     # in case A)
-                    conjunctor_list = re.split("\*", disj)
+                    conjunctor_list = re.split("\\*", disj)
                     
                     # set the junction of the conjuncts
                     # place it beside the (first) conjunct of the highest causal order (the factor that is most to the right in the graph)
@@ -151,13 +118,13 @@ def convert_causal_relation(formula, level_factor_list_order, tex_code, color, c
                     
                     if get_factor_order(f_fac, level_factor_list_order) < get_factor_order(formula[1], level_factor_list_order) :
                         # this is the normal non-circular case
-                        position = "at ([xshift=\hDisjConj, yshift=\\vDisjConj]" + f_fac + ".east)"
+                        position = "at ([xshift=\\hDisjConj, yshift=\\vDisjConj]" + f_fac + ".east)"
                         circular = False
                     else:
                         # circular case, f_fac has the same horizontal coordinate as the target factor,
                         # so the junction should not be placed to the right of f_fac but to the left
                         
-                        position = "at ([xshift=\hcDisjConj, yshift=\\vDisjConj]" + f_fac + ".west)"
+                        position = "at ([xshift=\\hcDisjConj, yshift=\\vDisjConj]" + f_fac + ".west)"
                         circular = True
                     
                     # Attention: It might happen that several disjuncts of conjuncts meet at the same factor f_fac,
@@ -167,31 +134,26 @@ def convert_causal_relation(formula, level_factor_list_order, tex_code, color, c
                         # this position has already been specified in earlier vertices (tex_code) or this one
                         # -> shift it above by \tDisjConj
                         if circular :
-                            position = "at ([xshift=\hcDisjConj, yshift={\\vDisjConj + " + str(q) + "*\\tDisjConj}]" + f_fac + ".west)"
+                            position = "at ([xshift=\\hcDisjConj, yshift={\\vDisjConj + " + str(q) + "*\\tDisjConj}]" + f_fac + ".west)"
                         else :
-                            position = "at ([xshift=\hDisjConj, yshift={\\vDisjConj + " + str(q) + "*\\tDisjConj}]" + f_fac + ".east)"
+                            position = "at ([xshift=\\hDisjConj, yshift={\\vDisjConj + " + str(q) + "*\\tDisjConj}]" + f_fac + ".east)"
                         
                         q = q + 1
                         
                     st = st  + "% junction of the conjuncts\n\\node[aux, " + color + "] (" + cross_point + "aux) " + position + " {};\n% partial arrows from the conjuncts to the junction\n"
                         
                     
-                    
-                        
-                    
-
-                    
                     for conj in conjunctor_list :
                         # now connect the conjuncts with the junction
                         if conj[0] == "~" and conj[1:] in get_components_from_formula(disj, level_factor_list_order) :
                             # case B i) the conjunct is a negated factor
                             color_neg = color_map["draw"][conj[1:]]
-                            st = st  + "\\node[neg, " + color_neg + "] (" + conj[1:] + "neg) at ([xshift=\LNeg]" + conj[1:] + ".south east) {};\n"
-                            st = st + "\draw[conjunctonsegment, " + color + "] (" + conj[1:] + "neg) to (" + cross_point + "aux);\n"
+                            st = st  + "\\node[neg, " + color_neg + "] (" + conj[1:] + "neg) at ([xshift=\\LNeg]" + conj[1:] + ".south east) {};\n"
+                            st = st + "\\draw[conjunctonsegment, " + color + "] (" + conj[1:] + "neg) to (" + cross_point + "aux);\n"
                             
                         elif conj in get_components_from_formula(disj, level_factor_list_order) :
                             # case B ii) the conjunct is a mere factor
-                            st = st + "\draw[conjunctonsegment, " + color + "] (" + conj + ".east) to (" + cross_point + "aux);\n"
+                            st = st + "\\draw[conjunctonsegment, " + color + "] (" + conj + ".east) to (" + cross_point + "aux);\n"
                             
                         else :
                             # Is there anything else that might happen??
@@ -203,12 +165,12 @@ def convert_causal_relation(formula, level_factor_list_order, tex_code, color, c
                     st_conj = "$"
                     for conj in conjunctor_list :
                         if conj[0] == "~" :
-                            st_conj = st_conj + "\\neg " + conj[1:] + "\cdot "                    
+                            st_conj = st_conj + "\\neg " + conj[1:] + "\\cdot "
                         else :
-                            st_conj = st_conj + conj + "\cdot "
+                            st_conj = st_conj + conj + "\\cdot "
                         
                     st_conj = st_conj[:-6] + "$"
-                    st = st + "% arrow from junction to target factor\n\draw[->, " + color + "] (" + cross_point + "aux) -- (" + formula[1] + ".west) node[draw=none,text=black,fill=none,font=\\tiny,pos=0,sloped,above=\LabelDist] {\scalebox{.3}{" + st_conj + "}};\n"
+                    st = st + "% arrow from junction to target factor\n\\draw[->, " + color + "] (" + cross_point + "aux) -- (" + formula[1] + ".west) node[draw=none,text=black,fill=none,font=\\tiny,pos=0,sloped,above=\\LabelDist] {\\scalebox{.3}{" + st_conj + "}};\n"
                 
                 elif (disj[0] == "~") and (disj[1:] in get_components_from_formula(formula[0], level_factor_list_order)) :
                     # case C: the disjunction is a negated factor
@@ -219,8 +181,8 @@ def convert_causal_relation(formula, level_factor_list_order, tex_code, color, c
                     
                     st = st + "% negated disjunct\n"
                     color_neg = color_map["draw"][disj[1:]]
-                    st = st  + "\\node[neg, " + color_neg + "] (" + disj[1:] + "neg) at ([xshift=\LNeg]" + disj[1:] + ".south east) {};\n"
-                    st = st + "\draw[->, " + color + "] (" + disj[1:] + "neg) to (" + formula[1] + ".west);\n"
+                    st = st  + "\\node[neg, " + color_neg + "] (" + disj[1:] + "neg) at ([xshift=\\LNeg]" + disj[1:] + ".south east) {};\n"
+                    st = st + "\\draw[->, " + color + "] (" + disj[1:] + "neg) to (" + formula[1] + ".west);\n"
                 
                 
                 else :
@@ -240,7 +202,7 @@ def convert_causal_relation(formula, level_factor_list_order, tex_code, color, c
             # the only difference is that we here do not deal with a subformula of formula[0], but the whole
             
             # place junction of the conjuncts
-            st = "% junction of the conjuncts\n\\node[aux, " + color + "] (" + formula[1] + "aux) at ([xshift=\LConj]" + formula[1] + ".west) {};\n% partial arrows from the conjuncts to the junction\n"
+            st = "% junction of the conjuncts\n\\node[aux, " + color + "] (" + formula[1] + "aux) at ([xshift=\\LConj]" + formula[1] + ".west) {};\n% partial arrows from the conjuncts to the junction\n"
             
             # plot the arrows from the conjuncts to the junction
             for conj in get_components_from_formula(formula[0], level_factor_list_order) :
@@ -251,16 +213,16 @@ def convert_causal_relation(formula, level_factor_list_order, tex_code, color, c
                     # assumption: a conjunction chain can only contain a factor or its negation
                     # (otherwise the subsequent "else" has to be changed into a new "if")
                     color_neg = color_map["draw"][conj]
-                    st = st  + "\\node[neg, " + color_neg + "] (" + conj + "neg) at ([xshift=\LNeg]" + conj + ".south east) {};\n"
-                    st = st + "\draw[conjunctonsegment, " + color + "] (" + conj + "neg) to (" + formula[1] + "aux);\n"
+                    st = st  + "\\node[neg, " + color_neg + "] (" + conj + "neg) at ([xshift=\\LNeg]" + conj + ".south east) {};\n"
+                    st = st + "\\draw[conjunctonsegment, " + color + "] (" + conj + "neg) to (" + formula[1] + "aux);\n"
                 else :
                     # case B: factor conj occurs non-negated
                     
-                    st = st + "\draw[conjunctonsegment, " + color + "] (" + conj + ".east) to (" + formula[1] + "aux);\n"
+                    st = st + "\\draw[conjunctonsegment, " + color + "] (" + conj + ".east) to (" + formula[1] + "aux);\n"
             
             # draw arrow from junction to target factor
             # experimental with tiny label above vertex
-            st = st + "% arrow from junction to target factor\n\draw[->, " + color + "] (" + formula[1] + "aux) -- (" + formula[1] + ") node[draw=none, text=black, fill=none, font=\\tiny, above=\LabelDist, pos=0, sloped] {\scalebox{.3}{$" + formula[0].replace("*", "\cdot ").replace("~", "\\neg ") + "$}};\n"
+            st = st + "% arrow from junction to target factor\n\\draw[->, " + color + "] (" + formula[1] + "aux) -- (" + formula[1] + ") node[draw=none, text=black, fill=none, font=\\tiny, above=\\LabelDist, pos=0, sloped] {\\scalebox{.3}{$" + formula[0].replace("*", "\\cdot ").replace("~", "\\neg ") + "$}};\n"
             
         else :
             # this should never happen
@@ -301,15 +263,15 @@ def convert_constitution_relation(formula, level_factor_list_order, constitution
     for fac in get_components_from_formula(formula[0], level_factor_list_order) :           
         if c_left and not(c_right) :
             # case 1: leftside relation
-            st = st + "\draw[crelationleft, " + color + "] (" + fac + ".north west) to (" + formula[1] + ".south);\n"
+            st = st + "\\draw[crelationleft, " + color + "] (" + fac + ".north west) to (" + formula[1] + ".south);\n"
     
         elif not(c_left) and c_right :
             # case 2: rightside relation
-            st = st + "\draw[crelationright, " + color + "] (" + fac + ".north east) to (" + formula[1] + ".south);\n"
+            st = st + "\\draw[crelationright, " + color + "] (" + fac + ".north east) to (" + formula[1] + ".south);\n"
     
         elif c_left and c_right: 
             # case 3: single component
-            st = st + "\draw[crelationstraight, " + color + "] (" + fac + ".north) to (" + formula[1] + ".south);\n"
+            st = st + "\\draw[crelationstraight, " + color + "] (" + fac + ".north) to (" + formula[1] + ".south);\n"
     
     return st
     
@@ -353,7 +315,7 @@ def print_structure_in_tikz_plot(level_factor_list_order, level_equiv_list, cons
                 
                 if o == 0 :
                     # highlight incoming factors
-                    tex_code = tex_code + "\hilightsource{" + e + "};\n"
+                    tex_code = tex_code + "\\hilightsource{" + e + "};\n"
                 
                 
                 if not(any(e in get_components_from_formula(formula[0], level_factor_list_order) for formula in level_equiv_list[m])) :
@@ -361,24 +323,24 @@ def print_structure_in_tikz_plot(level_factor_list_order, level_equiv_list, cons
                     # They do not appear on the complex side of a causal relation.
                     
                     # highlight outgoing factors
-                    tex_code = tex_code + "\hilighttarget{" + e + "};\n"
+                    tex_code = tex_code + "\\hilighttarget{" + e + "};\n"
                 
                 # prepare the variable placement for the next factor
-                placement = "[above= \LvDist of " + e + "]"
+                placement = "[above= \\LvDist of " + e + "]"
                 # the next factor of the same level and causal order will be positioned above by \LvDist
                 
             # factors of the subsequent order -> next factor will be placed to the right of the bottom factor of the current order
             
 
             if level_factor_list_order[m][o] != []:
-                placement = "[right= \LhDist of " + level_factor_list_order[m][o][0] + "]"
+                placement = "[right= \\LhDist of " + level_factor_list_order[m][o][0] + "]"
             
             if len(level_factor_list_order[m][o]) > max_num_factors_order :
                 max_num_factors_order = len(level_factor_list_order[m][o])
                 
         # factors of the subsequent level -> next factor will be shifted upwards by \iLvDist
         # more precisely: \iLvDist  + height of the current level (= max_num_factors_order * \LvDist) above the first factor of this level
-        placement = "[above= {" + str(max_num_factors_order) + "*\LvDist + " + str(max_num_factors_order - 2) + "* \HeightNode  + \iLvDist} of " + level_factor_list_order[m][0][0] + "]"
+        placement = "[above= {" + str(max_num_factors_order) + "*\\LvDist + " + str(max_num_factors_order - 2) + "* \\HeightNode  + \\iLvDist} of " + level_factor_list_order[m][0][0] + "]"
         
     ######################################################
     # step 3: plot the causal and constitution relations #
@@ -399,7 +361,7 @@ def print_structure_in_tikz_plot(level_factor_list_order, level_equiv_list, cons
                 
             tex_code = tex_code + convert_causal_relation(formula, level_factor_list_order, tex_code, color, color_map) + "\n\n"
     
-    tex_code = tex_code  + "\n% constitution relations\n"        
+    tex_code = tex_code  + "\n% constitution relations\n"
     for formula in constitution_relation_list:
         tex_code = tex_code  + "% formula: "  + formula[0] + " <-> " + formula[1] + "\n"
         
@@ -408,7 +370,7 @@ def print_structure_in_tikz_plot(level_factor_list_order, level_equiv_list, cons
         if color_map["text"][formula[1]] != "black" :
             color = color_map["text"][formula[1]]
         
-        tex_code = tex_code + convert_constitution_relation(formula, level_factor_list_order, constitution_relation_list, color) + "\n"  
+        tex_code = tex_code + convert_constitution_relation(formula, level_factor_list_order, constitution_relation_list, color) + "\n"
     
     return tex_code   
       
