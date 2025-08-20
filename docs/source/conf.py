@@ -13,7 +13,7 @@ import mlca
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'multi-lvl-Coincidence Analysis'
+project = 'multi-Lvl-Coincidence Analysis'
 copyright = '2025, Johannes Mierau'
 author = 'Johannes Mierau'
 
@@ -45,7 +45,7 @@ html_theme_options = {
     'logo': "mlca-logo.png",
     "description" : "Causal-mechanistic modeling using Coincidence Analysis",
     'github_user': '5vckcq',
-    'github_repo': 'multi-lvl-Coincidence-Analysis',
+    'github_repo': 'multi-Lvl-Coincidence-Analysis',
 }
 
 
