@@ -1,5 +1,5 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Docs](https://app.readthedocs.org/projects/multi-Lvl-coincidence-analysis/badge/?version=latest&style=flat)](https://multi-Lvl-coincidence-analysis.readthedocs.io/en/latest/)
+[![Docs](https://app.readthedocs.org/projects/multi-lvl-coincidence-analysis/badge/?version=latest&style=flat)](https://multi-Lvl-coincidence-analysis.readthedocs.io/en/latest/)
 
 # multi-Lvl-Coincidence-Analysis
 
