@@ -3,6 +3,10 @@
 
 # multi-Lvl-Coincidence-Analysis
 
+<p align="center" width="100%">
+    <img width="33%" src="./config/mlca-logo.png"> 
+</p>
+
 multi-Lvl-Coincidence-Analysis (mLCA) is a Python package for causal-mechanistic modeling. The core function of the package is to derive causal-mechanistic models from coincidence data tables. The resulting models are visualized using Ti<em>k</em>Z.
 
 
