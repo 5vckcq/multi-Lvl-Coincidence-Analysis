@@ -63,7 +63,7 @@ The causal-mechanistic hypergraphs are generated using the TeX-template file Lat
 
 ## Documentation
 
-cf. comments in source code
+see docs or 
 
 ## samples
 
