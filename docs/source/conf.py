@@ -26,7 +26,7 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.intersphinx', # Cross-references to other projects
               "sphinx.ext.coverage", # Collects doc coverage stats
               #"sphinx.ext.viewcode", # Links to highlighted source code (i.e. "[source]" button)
-              'autoapi.sphinx',
+              'autoapi.extension',
               #"sphinx_automodapi.automodapi", # Automatically generates module documentation
               #"sphinx_automodapi.smart_resolver", # Helps resolving some imports
               "numpydoc", # Support for the NumPy docstring format
