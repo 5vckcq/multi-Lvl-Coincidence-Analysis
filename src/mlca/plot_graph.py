@@ -2,12 +2,24 @@
 
 # file: plot_graph.py
 
+"""Contains functions to plot causal-mechanistic models from lists of logical equivalence relations that
+are interpreted as causal and constitution relations. Hypergraphs are created using the TikZ library for
+TeX.
+"""
+
 import os                          # operating system interfaces is required to find the files in the local path
 import re                          # regex for complex search patterns in strings
 import jinja2                      # Latex interface
 import codecs                      # for en- and decoding of strings (esp. to write tex-files in utf-8)
+from pathlib import Path           # navigating paths
 
 from utils import get_components_from_formula, get_factor_level, get_factor_order, get_formula_level, get_formula_order
+
+__all__ = ("convert_formula_to_tex_code",
+           "convert_causal_relation",
+           "convert_constitution_relation",
+           "print_structure_in_tikz_plot",
+           "create_pdf")
 
 # syntax definitions for Latex expressions
 latex_jinja_env = jinja2.Environment(
@@ -16,13 +28,26 @@ latex_jinja_env = jinja2.Environment(
 	variable_start_string = '\\VAR{',
 	variable_end_string = '}',
 	autoescape = False,
-	loader = jinja2.FileSystemLoader(os.path.abspath('.')))
+	loader=jinja2.FileSystemLoader('../../config')
+    )
 
-def convert_formula_to_tex_code(solution):
-    # converts a full solution for a structure into its corresponding logical formula in tex-syntax
-    # solution is expected to be a list of levels, which is a list of formulae, each of which is 2-tuple: first element is the possibly
-    # complex left-side term of an equivalence formula, the second element is the atomic right-side term
-    # solution[LEVEL][FORMULA][(LEFT TERM, RIGHT TERM)]
+def convert_formula_to_tex_code(solution: list) -> str:
+    """Converts a full solution for a structure into its corresponding logical formula in tex-syntax.
+    solution is expected to be a list of levels, which is a list of formulae, each of which is 2-tuple: first element is the possibly
+    complex left-side term of an equivalence formula, the second element is the atomic right-side term
+    solution[LEVEL][FORMULA][(LEFT TERM, RIGHT TERM)]
+
+    Parameters
+    __________
+    solution: list of lists of tuples of str
+        represents a nested list of equivalence formulae
+
+    Returns
+    _______
+    str
+        tex-code for writing solution as a logical formula
+    """
+
     tex_code = "$"
     for lvl in solution:
         for term in lvl:
@@ -31,9 +56,32 @@ def convert_formula_to_tex_code(solution):
     tex_code = tex_code[:-5] + "$"  # remove the "\cdot" at the end of the last term
     return tex_code
     
-def convert_causal_relation(formula, level_factor_list_order, tex_code, color, color_map):
-    # translates a formula of causal relations into TikZ-Latex code
-    # returns the code as string
+def convert_causal_relation(formula: tuple, level_factor_list_order: list, tex_code: str, color: str, color_map: dict) -> str:
+    """Translates a formula of causal relations into TikZ-Latex code
+    Returns the code as string.
+
+    Parameters
+    __________
+    formula: tuple of str
+        a tuple expressing an equivalence relation with first element being a DNF, second element
+        being an atomic term
+    level_factor_list_order: list of lists of lists of str
+        nested list of factors, assumed to contain all factors that appear in formula
+    tex_code: str
+        string containing the tex-code of the previous elements of the hypergraph,
+        it is relevant to avoid overlaps of nodes
+    color: str
+        name of the color in which this section of the hypergraph is drawn
+    color_map: dict
+        dictionary whose keys are 'draw' and 'text' for each factor, the values are
+        the names of colors in which the nodes are drawn ('draw') and in which their
+        labels are written ('text')
+
+    Returns
+    _______
+    str
+        TikZ-Latex code corresponding to formula
+    """
     
     st = ""  # output code
     ###########################################
@@ -236,9 +284,27 @@ def convert_causal_relation(formula, level_factor_list_order, tex_code, color, c
     return st
     
     
-def convert_constitution_relation(formula, level_factor_list_order, constitution_relation_list, color) :
-    # converts a formula of constitution relations into TikZ-Latex code
-    # returns the code as string
+def convert_constitution_relation(formula: tuple, level_factor_list_order: list, constitution_relation_list: list, color: str) -> str:
+    """Converts a formula of constitution relations into TikZ-Latex code.
+    Returns the code as string.
+
+    Parameters
+    __________
+    formula: tuple of str
+        a tuple expressing an equivalence relation with first element being a DNF, second element
+        being an atomic term
+    level_factor_list_order: list of lists of lists of str
+        nested list of factors, assumed to contain all factors that appear in formula
+    constitution_relation_list: list of tuples of str
+        list of all constitution relations
+    color: str
+        name of the color in which this section of the hypergraph is drawn
+
+    Returns
+    _______
+    str
+        TikZ-Latex code corresponding to formula
+    """
     
     st = ""
     
@@ -275,10 +341,30 @@ def convert_constitution_relation(formula, level_factor_list_order, constitution
     
     return st
     
-def print_structure_in_tikz_plot(level_factor_list_order, level_equiv_list, constitution_relation_list, color_map) :
-    # Prepares the TikZ code for plotting one solution
-    # a) places the causal factors as nodes separated by causal order (horizontally) and constitutive level (vertically)
-    # b) adds the causal and constitution relations as vertices between nodes
+def print_structure_in_tikz_plot(level_factor_list_order: list, level_equiv_list: list, constitution_relation_list: list, color_map: dict) -> str:
+    """Prepares the TikZ code for plotting one solution
+    a) places the causal factors as nodes separated by causal order (horizontally) and constitutive level (vertically)
+    b) adds the causal and constitution relations as vertices between nodes
+
+    Parameters
+    __________
+    level_factor_list_order: list of lists of lists of str
+        nested list of factors, assumed to contain all factors that appear in formula
+    level_equiv_list: list of lists of tuple of str
+        nested list of causal relations
+    constitution_relation_list: list of tuples of str
+        list of all constitution relations
+    color_map: dict
+        dictionary whose keys are 'draw' and 'text' for each factor, the values are
+        the names of colors in which the nodes are drawn ('draw') and in which their
+        labels are written ('text')
+
+    Returns
+    _______
+    str
+        TikZ-Latex code corresponding to the model characterized by level_equiv_list and
+        constitution_relation_list
+    """
     
     ######################################
     # step 1: preparing the output files #
@@ -374,10 +460,20 @@ def print_structure_in_tikz_plot(level_factor_list_order, level_equiv_list, cons
     
     return tex_code   
       
-def create_pdf(tex_code_table, latex_template_file, total_solutions):
-   # creates a pdf of tex_code_table
-   # Latex_Template assumes that tex_code_table is a table of pairs of a number (used to reference the index of the element) and
-   # a string that contains valid TikZ code.
+def create_pdf(tex_code_table: list, latex_template_file: str, total_solutions: int) -> None:
+    """Creates a pdf from the list tex_code_table.
+    The Latex template assumes that tex_code_table is a list of pairs of a number (used to reference the index of the element) and
+    a string that contains valid TikZ code.
+
+    Parameters
+    __________
+    tex_code_table: list of tuples of (int, str)
+        list of pairs, first element is index of solution, second is tex-code for hypergraph to this solution
+    latex_template_file: str
+        path to the template file
+    total_solutions: int
+        number of possible causal-mechanistic models
+    """
    
     output_file = "output_graph.tex"
     # defining the template (already prepared file)
@@ -389,18 +485,27 @@ def create_pdf(tex_code_table, latex_template_file, total_solutions):
     
     
     # save the generated string as tex file
-    f = open(output_file, 'wb')
+    output_path = Path('..').joinpath('..').joinpath('output') # path for exported pdf and tex files
+    output_path.mkdir(parents=True, exist_ok=True) # create folder if it does not exist yet
+    output_file_path = str(output_path.joinpath(output_file))
+    f = open(output_file_path, 'wb')
     f.write(render.encode('utf-8'))
     f.close()
     
     
     # compile this tex file with pdflatex -- requires the Latex compiler to be installed on the executing system
-    with codecs.open(str(output_file), "w","utf-8") as letter:
+    with codecs.open(str(output_file_path), "w","utf-8") as letter:
         letter.write(render);
         letter.close();
-        os.system("pdflatex -interaction=batchmode " + str(output_file))
+        os.system("pdflatex -interaction=batchmode " + str(output_file_path))
         print('File ' + str(output_file[:-4]) + '.pdf created.')
     
     # remove automatically generated log files
-    os.remove(str(output_file[:-4]+".log"))
-    os.remove(str(output_file[:-4]+".aux"))    
+    file_extensions = ['log', 'pdf', 'aux']
+    for file in Path.cwd().glob('*'):
+        extension = file.suffix.strip('.')
+        if extension in file_extensions:
+            if extension != 'pdf':
+                file.unlink()
+            else:
+                file.replace(output_path.joinpath(file.name))

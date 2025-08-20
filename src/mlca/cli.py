@@ -5,22 +5,18 @@
 This script generates multi-level causal-mechanistic models from Boolean data tables that are provided with
 tiered list of causal factors (assignment to constitutive levels).
 It generates causal graphs for each unique solution. These are finally exported
-into a graph in Latex TikZ-code. Therefore latex and the tikz library have to be installed on the system running this script.
+into a graph in Latex TikZ-code.
 
-The data tables can be processed in three different ways: A) as csv-files with Boolean data (for details on formatting requirements
-see obtain_equivalence_formulae.py), B) reading the atomic solutions from the output of the R-package cna,
-C) or from the output of the QCA package. If any of the two latter options is used, it is assumed that causal factors pertaining to
-different levels are separated by the causal ordering relation "<".
-Relations between factors of different levels are not considered as causal but constitution relations.
+It proceeds in seven main steps:
 
-It proceeds in eight main steps:
-step 1: obtains lists of the causal factors with level assignment, identifies the equivalence formulae
-step 2: categorises them into constitution relations and causal relations of different levels,
-        already discards all formulae that do not fit in any of these categories (function read_input)
-step 3: obtains the list of all causal structures that are compatible with the causal relations (function find_structures)
-step 4: determines a non-strict total order of the causal factors of each constitutive level
-step 5: prepares the lists for the graphical output (grouping of related causal factors, discarding of some constitution relations)
-step 6: translating the obtained structures into a graphical output via Latex
+1. obtains lists of the causal factors with level assignment, identifies the equivalence formulae
+2. categorises them into constitution relations and causal relations of different levels,
+   already discards all formulae that do not fit in any of these categories (function read_input)
+3. obtains the list of all causal structures that are compatible with the causal relations (function find_structures)
+4. determines a non-strict total order of the causal factors of each constitutive level
+5. derives constitution relations between factors of different levels
+6. prepares the lists for the graphical output (grouping of related causal factors, discarding of some constitution relations)
+7. translates the obtained structures into a graphical output via Latex
 """
 
 import codecs                      # for en- and decoding of strings (esp. to write tex-files in utf-8)
@@ -28,6 +24,7 @@ import os                          # operating system interfaces is required to 
 import sys                         # system-specific parameters and functions, needed to get optional script arguments
 import time                        # for measuring the run time
 
+__all__ = ("main")
 
 from utils import get_formula_level, get_components_from_formula
 # further file that contains functions for deriving equivalence formulae from a given truth table:
@@ -38,8 +35,9 @@ import mlca
 
 
 def main(input_file="", input_type="", force_mode=""):
-    # main function
-    latex_template_file = "config/Latex_Template.tex"
+    """Function to generate multi-level causal mechanistic models from data tables
+    """
+    latex_template_file = "Latex_Template.tex"#str(Path("..").resolve().joinpath("config").joinpath("Latex_Template.tex"))
     start_time = time.time()
     
     level_factor_list = []               # declaration of the factor list    
@@ -282,20 +280,16 @@ def main(input_file="", input_type="", force_mode=""):
         # after one entry for each solution has been generated in tex_table compile the pdf
         if tex_table:
             # if tex_table is non-empty
-            if os.path.exists(latex_template_file) :
-                plot_graph.create_pdf(tex_table, latex_template_file, total_solutions)
-                print("Number of solutions " + str(total_solutions))
-                if total_solutions > 1000:
-                    print("More than 1000 solutions obtained, plotting only the first 1000.")
-            else :
-                abort = True
-                print("Error: Cannot plot the graphs since the expected template file " + latex_template_file + " does not exist in path folder.")
+            plot_graph.create_pdf(tex_table, latex_template_file, total_solutions)
+            print("Number of solutions " + str(total_solutions))
+            if total_solutions > 1000:
+                print("More than 1000 solutions obtained, plotting only the first 1000.")
             if "fulllist" in mode:
                 # when in fulllist mode, add the formulae to the list to be exported
                 for sol in solution_term_list:
                     separate_formula_list.append("$" + convert_formula_to_tex_code(sol) + "$")       
                 # create file
-                mlca.create_separtate_formula_list(separate_formula_list)
+                mlca.create_separate_formula_list(separate_formula_list)
              
             # print the duration of the total run time into the console
             print("Total run time " + str(round(time.time() - start_time,2)) + " seconds.")  

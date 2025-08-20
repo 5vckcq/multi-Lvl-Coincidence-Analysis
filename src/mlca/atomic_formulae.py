@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 #
 # file: atomic_formulae.py
-
-# Generates atomic solution formulae from Boolean coincidence data tables
-
+"""
+Functions to derive atomic solution formulae from Boolean coincidence data tables
+"""
 import re                 # regex for complex search patterns in strings
 import pandas as pd       # for reading csv files that contain truth tables
 import itertools          # itertools provides functions to obtain all permutations of a string and Cartesian products of lists
@@ -61,12 +61,16 @@ def string_to_list(st):
 def find_effects(formula: list, factor_list: list) -> list:
     """Determines which elements from factor_list are dependent variables (effects)
     given the dependencies expressed in formula.
+
     Causal factors are effects only if they do not satisfy either of three conditions:
+
     1) the causal factor is one in every line of the configuration table (in this case they are irrelevant)
     2) it is zero in every line of the configuration table (same as 1)
     3) two lines in the table differ only by the value of the factor (this means they might only be first causes)
+
     These conditions follow M. Baumgartner (2009) "Uncovering deterministic causal structures: a Boolean
     approach", p. 83.
+
     Returns the list of effects.
 
     Parameters
@@ -132,11 +136,13 @@ def find_effects(formula: list, factor_list: list) -> list:
 
 def get_instance_formula_to_factor(in_formula: list, factor: str, level_factor_list_order: list) -> dict:
     """Derives the instance function for factor from the formula in_formula.
+
     The instance function of a factor is obtained by removing that factor or its negation from each of the
     conjuncts in in_formula and setting its value to True or False respectively.
     For computational effiency, formulae that mix different levels and do not satisfy the conditions
     on constitution relations are reduced such that factors from other levels than the level of factor
     are discarded.
+
     Returns the instance formula as a dictionary in which the formulae (in form of lists) are the keys,
     and the respective truth values the corresponding dicitonary values.
 
@@ -225,8 +231,27 @@ def get_instance_formula_to_factor(in_formula: list, factor: str, level_factor_l
 
     return output
 
-def reduce_term_by(term, literal):
-    #
+def reduce_term_by(term: str, literal: str) -> str:
+    """Removes the string literal from the string term. If term starts
+    with literal, the string literal + '*' is removed from term, otherwise
+    the string '*' + literal.
+
+    It is used to remove literal from a chain of conjuncts in the string term.
+
+    Parameters
+    __________
+    term: str
+        string to be reduced, expected to express a conjunctive
+        formula with conjunctor '*'
+    literal: str
+        string which should be removed from term
+
+    Returns
+    _______
+    str
+        term reduced by literal + '*' or '*' + literal
+    """
+
     if term == literal:
         # if term is atomic
         # return empty string because no reducted term exists
@@ -240,12 +265,24 @@ def reduce_term_by(term, literal):
             st = "*" + literal
         return term.replace(st,"")
 
-def contains_term(original_term, comparison_term):
-    # in: original_term - a string
-    #     comparison_term - another string
-    # out: truth value whether original_term is contained in comparison_term
-    #      "contains" can imply that e.g. "A*C" is contained in "A*B*C"
+def contains_term(original_term: str, comparison_term: str) -> bool:
+    """Checks whether original_term contains all substrings of comparison_term,
+    possibly not in one piece, but spaced out over original_term.
 
+    Parameters
+    __________
+    original_term: str
+        string in which is searched for comparison_term
+    comparison_term: str
+        string which is searched for
+
+    Returns
+    _______
+    bool
+        truth value of whether original_term contains comparison_term
+    """
+
+    #Contains may mean that e.g. "A*C" is contained in "A*B*C".
     if original_term == "":
         return False
     else:
@@ -258,20 +295,47 @@ def contains_term(original_term, comparison_term):
 
         return all_found
 
-def absorb_terms(arg):
-    # in: tuple of arguments:
-    # arg[0] - is a nested list arg[0][LIST OF CONJUNCTS][CONJUNCTS]
-    # arg[1] - is a nested list, which should include arg[0]; arg[1][LIST OF DISJUNCTS][LIST OF CONJUNCTS][CONJUNCTS]
-    # out: the nested listed reduced by the absorption rule
+def absorb_terms(arg: tuple) -> list:
+    """Applies the absorption rule a*b*c*d*e + a*c*d <-> a*c*d to simplify a DNF which is
+    passed to this function in form of a nested list.
+
+    Returns the simplified DNF as nested list.
+
+    Parameters
+    __________
+    arg: tuple
+        arg[0] - is a nested list arg[0][LIST OF CONJUNCTS][CONJUNCTS]
+        arg[1] - is a nested list, arg[1][LIST OF DISJUNCTS][LIST OF CONJUNCTS][CONJUNCTS],
+                 it should include arg[0]
+
+    Returns
+    _______
+    list of lists of str
+        nested list of the form [DISJUNCTS][CONJUNCTS] corresponding to
+        arg[1] after applying the absorption rule
+    """
+
     # absorption rule: in the list of disjunctions, discard disjuncts that can be formed by conjuncting terms to other disjuncts of the list
-    # so: if all elemts of a list of conjuncts are completely contain in another, discard the larger list
+    # so: if all elemts of a list of conjuncts are completely contained in another, discard the larger list
     return [[disj for disj in arg[1] if all([x in conj_2 for x in conj] for conj in disj)] for conj_2 in arg[0]]
 
 
-def distribution(formula):
-    # applies the distribution rule on a logical formula given as a string as often as possible
-    # then applies the absorption rule to simplify the resulting formula as often as possible
-    # returns the simplified formula as a string
+def distribution(formula: str) -> str:
+    """Applies the distribution rule on a logical formula given as a string as often as possible,
+    then applies the absorption rule to simplify the resulting formula as often as possible.
+
+    Returns the simplified formula as a string.
+
+    Parameters
+    __________
+    formula: str
+        expected to express a DNF with disjunctor ' + ' and conjunctor '*'
+
+    Returns
+    _______
+    str
+        simplified formula after applying distribution and absorption rules
+    """
 
     # as long as formula has a conjunctor right before or after a bracket
     if (formula.find(")*") > -1 or formula.find("*(") > -1):
@@ -329,13 +393,31 @@ def distribution(formula):
 
     return formula
 
-def get_prime_implicants(instance_formula, factor, level_factor_list):
-    # prime implicants are obtained by comparing the min-terms of positive instance function
-    # with those of the negative instance function
-    # - if a section of one positive min-term is not part of any negative min term,
-    #   that positive min-term can be reduced to this section
-    # - if every section is a part of at least one negative min term, the considered term is a prime factor
-    #   of the positive instance function
+def get_prime_implicants(instance_formula: dict, factor: str, level_factor_list: list) -> list:
+    """Applies the Quine-McCluskey algorithm to obtain prime implicants by comparing the
+    min-terms of positive instance function with those of the negative instance function:
+
+    - if a section of one positive min-term is not part of any negative min term,
+      that positive min-term can be reduced to this section
+    - if every section is a part of at least one negative min term, the considered term is a prime factor
+      of the positive instance function
+
+    Parameters
+    __________
+    instance_formula: dict
+        dictionary with keys: conjunctive formulae in form of lists,
+        values: truth value
+    factor: str
+        factor for whose instance function the prime implicants are derived
+    level_factor_list: list of lists of str
+        nested list of factors, expected to contain all variables in
+        instance_function and factor
+
+    Returns
+    _______
+    list of str
+        list of prime implicants for the instance formula for factor
+    """
 
 
     # get number of True terms in instance_formula
@@ -402,13 +484,25 @@ def get_prime_implicants(instance_formula, factor, level_factor_list):
 
     return prime_imp_list
 
-def get_rdnf(pi_list, formula, factor_list):
-    # obtains reduced disjunctive normal form by Petrick's algorithm
-    # in: pi_list - list of strings = list of all prime implicants
-    #     formula - dictionary of strings with all values either True or False
-    #               = keys are the min terms of the formula, True or False their
-    #                 truth values
-    # out: solution_list - list of strings - contains all solutions each item is the string of a reduced disjunctive normal form of formula
+def get_rdnf(pi_list: list, formula: dict, factor_list: list) -> list:
+    """Obtains reduced disjunctive normal form using Petrick's algorithm.
+
+    Parameters
+    __________
+    pi_list: list of str
+        list of prime implicants
+    formula: dict
+        dictionary of strings with all values either True or False
+        = keys are the min terms of the formula, True or False their
+        truth values
+    factor_list: list of str
+        expected to express a DNF with disjunctor ' + ' and conjunctor '*'
+
+    Returns
+    _______
+    list of str
+        contains all solutions each item is the string of a reduced disjunctive normal form of formula
+    """
 
     solutions_list = []
     out_formula = ""
@@ -542,11 +636,26 @@ def get_rdnf(pi_list, formula, factor_list):
 
     return solutions_list
 
-def get_truth_table_from_file(file_path):
-    # reads a csv file into a data frame
-    # in: file_path - string - path to csv-file
-    # out: factor_list - list of strings - list of column heads in csv-file = list of causal factors
-    #      formula - string - logical formula derived from csv-truth table
+def get_truth_table_from_file(file_path: str) -> tuple:
+    """Reads a csv file into a pandas data frame with Boolean entries.
+
+    Returns the list factors (=column heads) and a string expressing
+    the logical formula that corresponds to the truth table, when
+    all columns of a row are connected by conjunctors and the rows
+    by disjunctors.
+
+    Parameters
+    __________
+    file_path: str
+        path to csv-file
+
+    Returns
+    _______
+    list of str
+        list of column heads in csv-file = list of factors
+    str
+        logical formula derived from csv-truth table
+    """
 
     # different strings that will be interpreted as True
     true_values = [1, "1", "T", "t", "w", "W", "true", "True", True]
@@ -609,21 +718,34 @@ def get_truth_table_from_file(file_path):
     return level_factor_order_list, factor_list, formula
 
 
-def read_data_from_csv(file_path):
-    # (1) reads the csv file under file_path
-    #     converts the truth table into a logical formula via get_truth_table_from_file
-    #     determines the causal factors and any given information on constitution levels and causal order
-    # (2) derives instance formulae for all causal factors that might be effects from the obtained total formula
-    # (3) obtains the prime implicants for each instance formula
-    # (4) transforms the instance formulae into disjunctive normal forms by means of the prime implicants
-    # output:
-    # abort - Boolean value, False in case that any error occurred (invalid input), True otherwise
-    # level_factor_list - a nested list of causal factors subdivided by constitution levels
-    # list_equiv_tuple - list of pairs, each pair corresponds to an obtained equivalence formulae
-    #                    in form of: element[0] <-> element[1]
-    # order_input_information - nested list of pairs, for each constitution level, the order information are translated into
-    #                           binary relations between factors (fac[0], fac[1]) means: fac[0] < fac[1]
+def read_data_from_csv(file_path: str) -> tuple:
+    """Main function of atomic_formulae.py.
 
+    (1) reads the csv file under file_path
+        converts the truth table into a logical formula via get_truth_table_from_file
+        determines the causal factors and any given information on constitution levels and causal order
+    (2) derives instance formulae for all causal factors that might be effects from the obtained total formula
+    (3) obtains the prime implicants for each instance formula
+    (4) transforms the instance formulae into disjunctive normal forms by means of the prime implicants
+
+    Parameters
+    __________
+    file_path: str
+        path to csv-file
+
+    Returns
+    _______
+    bool
+        Boolean value for error tracking, False in case that any error occurred (invalid input), True otherwise
+    list of lists of str
+        a nested list of causal factors subdivided by constitution levels
+    list of tuples of str
+        list of pairs, each pair corresponds to an obtained equivalence formulae
+        in form of: element[0] <-> element[1]
+    list of lists of tuples
+        nested list of pairs, for each constitution level, the order information are translated into
+        binary relations between factors (fac[0], fac[1]) means: fac[0] < fac[1]
+    """
     list_equiv_formula = []
     list_equiv_tuple = []
     level_factor_list = []

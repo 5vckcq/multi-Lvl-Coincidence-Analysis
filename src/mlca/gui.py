@@ -1,13 +1,15 @@
-#Graphical User Interface for mLCA
-#Provides three modes to pass data tables to mLCA:
-# (1) via a graphical table - click on fields to change the values
-#     content is saved as csv file and then proceeds like (2)
-# (2) from a csv file on disk which can be selected from a file selector
-# (3) from a text file containing QCA or CNA output, can be selected
-#     using a file selector
-# Output is displayed in a simple pdf viewer with possibility to turn
-# pages and to zoom
+"""Graphical User Interface for mLCA
+Provides three modes to pass data tables to mLCA:
 
+1. via a graphical table - click on fields to change the values
+   content is saved as csv file and then proceeds like (2)
+2. from a csv file on disk which can be selected from a file selector
+3. from a text file containing QCA or CNA output, can be selected
+   using a file selector
+
+Output is displayed in a simple pdf viewer with possibility to turn
+pages and to zoom.
+"""
 # to do:
 # 1) add possiblity to enter constraints
 # 2) show coincidence table when importing data from csv
@@ -22,8 +24,9 @@ from tkinter import filedialog
 from tkinter import PhotoImage
 
 import os
+from pathlib import Path           # navigating paths
 import math
-import fitz # pdf operations from pymupdf package  -> extra dependency pymupdf for GUI
+import pymupdf # pdf operations from pymupdf package  -> extra dependency pymupdf for GUI
 from PIL import Image, ImageTk
 
 import string # provides list of letters
@@ -32,7 +35,9 @@ import time
 from datetime import datetime
 
 import cli
+import mlca
 
+__all__ = ()
 
 # starting values for table
 default_num_conf = 20 # number of rows (=number of configurations)
@@ -48,7 +53,7 @@ class PDFObject:
         # creating the file path
         self.filepath = filepath
         # opening the pdf document
-        self.pdf = fitz.open(self.filepath)
+        self.pdf = pymupdf.open(self.filepath)
         # loading the first page of the pdf document
         self.first_page = self.pdf.load_page(0)
         # getting the height and width of the first page
@@ -60,7 +65,7 @@ class PDFObject:
     def get_page(self, page_num, zoom_modifier=0):
         # loading the page
         page = self.pdf.load_page(page_num)
-        mat = fitz.Matrix(int(self.zoom + zoom_modifier), int(self.zoom + zoom_modifier))
+        mat = pymupdf.Matrix(int(self.zoom + zoom_modifier), int(self.zoom + zoom_modifier))
         # gets the image of the page
         pix = page.get_pixmap(matrix=mat)
         
@@ -74,8 +79,7 @@ class PDFObject:
 class NotebookGridApp:
     def __init__(self, root):
         self.root = root
-        version = '' # MARKR TEST
-        self.root.title("mLCA " + version)
+        self.root.title("mLCA " + mlca.__version__)
         
         self.current_page = 0
         self.numPages = None
@@ -378,6 +382,9 @@ class NotebookGridApp:
             file_path = "dataset_" + now.strftime("%Y_%m_%d_%H_%M_%S") + ".csv" # 
             
             # export as csv
+            output_path = Path('..').joinpath('..').joinpath('csv_files') # path for exported csv files
+            output_path.mkdir(parents=True, exist_ok=True) # create folder if it does not exist yet
+            file_path = str(output_path.joinpath(file_path))
             self.export_to_csv(file_path)
             time.sleep(1) # wait a second for writting csv file to disk
             # run mLCA in csv-mode
@@ -482,7 +489,7 @@ class NotebookGridApp:
         
     # function for opening pdf files
     def open_file(self):
-        filepath = "output_graph.pdf"
+        filepath = str(Path('..').joinpath('..').joinpath('output').joinpath("output_graph.pdf"))
         # checking if the file exists
         if filepath:
             # declaring the path

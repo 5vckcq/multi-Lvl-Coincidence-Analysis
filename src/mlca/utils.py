@@ -2,10 +2,12 @@
 
 # file: utils.py
 
+"""utility functions, mostly string and list comparisons
+"""
+
 import re                          # regex for complex search patterns in strings
 import itertools                   # itertools provides functions to obtain all permutations of a string and Cartesian products of lists
 
-# utility functions, mostly string and list comparisons
 def powerset(in_set: set) -> set:
     """Returns the powerset of the input in_set.
 
@@ -118,10 +120,12 @@ def find_causal_factors(st):
     
 
 def get_causal_prefactors(factor: str, formula_list: list, factor_list: list) -> list :
-    """Returns a list of prefactors to a given factor. Prefactors are defined recursively.
-    A prefactor of first order is a factor that appears in the first element of a tuple whose
-    second element is equal to the given factor. Factors that appear in the first element of
-    tuples whose second element is a prefactor of order n are prefactors of order n+1.
+    """Returns a list of prefactors to a given factor.
+
+    Prefactors are defined recursively. A prefactor of first order is a factor that
+    appears in the first element of a tuple whose second element is equal to the
+    given factor. Factors that appear in the first element of tuples whose second
+    element is a prefactor of order n are prefactors of order n+1.
 
     Parameters
     __________
@@ -157,6 +161,7 @@ def get_causal_prefactors(factor: str, formula_list: list, factor_list: list) ->
     
 def get_equiv_formula(st: str) -> tuple:
     """Transforms a string into a tuple of strings (a,b) with the following characteristics:
+
     * The substring " <-> " within the input st separates a from b. If st does not contain " <-> ", b=''. If
       st contains multiple " <-> ", b includes everything between the the first two instances of the separator.
     * Any white spaces or substrings followed by white spaces in a are removed.

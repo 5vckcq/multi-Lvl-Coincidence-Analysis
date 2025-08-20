@@ -7,7 +7,7 @@ multi-Lvl-Coincidence-Analysis (mLCA) is a Python package for causal-mechanistic
 
 ## Installation
 
-Install the required Python packages from environment.yml using mamba or conda. 
+We recommend to install the required Python packages from environment.yml using mamba or conda. 
 ```
 $ mamba env create -f environment.yml
 ```
@@ -59,7 +59,7 @@ It is possible to include information on the causal order and on constitutive le
 
 ### Customizing the graphical output
 
-The causal-mechanistic hypergraphs are generated using the TeX-template file Latex_Template.tex in the config-folder. You can modify it at will to change all further outputs. You can also modify the generated output_graph.tex to customize an individual hypergraph.
+The causal-mechanistic hypergraphs are generated using the TeX-template file Latex_Template.tex in the config folder. You can modify it at will to change all further outputs. You can also modify the generated output_graph.tex to customize an individual hypergraph.
 
 ## Documentation
 
