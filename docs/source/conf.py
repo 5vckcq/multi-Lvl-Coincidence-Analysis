@@ -42,6 +42,10 @@ html_domain_indices = True
 
 html_theme_options = {
     'nosidebar': False,
+    'logo': "mlca-logo.png",
+    "description" : "Causal-mechanistic modeling using Coincidence Analysis",
+    'github_user': '5vckcq',
+    'github_repo': 'https://github.com/5vckcq/multi-lvl-Coincidence-Analysis',
 }
 
 
