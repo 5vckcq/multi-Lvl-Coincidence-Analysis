@@ -7,6 +7,8 @@
 multi-lvl-Coincidence Analysis documentation
 ============================================
 
+Source Repository: https://github.com/5vckcq/multi-lvl-Coincidence-Analysis
+
 .. toctree::
    :maxdepth: 4
    :caption: Contents:

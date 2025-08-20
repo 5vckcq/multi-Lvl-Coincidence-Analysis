@@ -898,16 +898,6 @@ def read_data_from_csv(file_path: str) -> tuple:
 
     return abort, level_factor_list, list_equiv_tuple, order_input_information
 
-def main():
-    # main function
-    file_path = "samples/sample_2-csv.csv"
-    _, fa_l_list, list_equiv_formula, _ = read_data_from_csv(file_path)
-
-
-
-
-
-
 if __name__ == '__main__':
-    # start main() when executing this script file
-    main()
+    # when executing this script file
+    print('Either run the command line application cli.py or the graphical user interface gui.py.')

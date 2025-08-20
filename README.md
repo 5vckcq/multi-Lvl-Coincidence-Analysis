@@ -17,21 +17,21 @@ Running the main script further requires a TeX distribution installed on the sys
 
 ## Usage
 
-We provide a graphical interface. To run it type:
+We provide a graphical interface. To run it go to src/mlca and type:
 ```
 $ python gui.py
 ```
 It offers three modes to pass the coincidence data to mLCA.
 1. via an interactive table  
 First, set the number of variables (columns) and of configurations (rows) to the correct values. You can then click on any field to change its value from 0 to 1 or vice versa. The initially empty row at the bottom is for separating the constitutive levels and optionally for defining a causal ordering like it is possible in QCA and cna. '<<' means that the variable corresponding to this column and all to its right are of a higher constitutive level than those to its left. Similarly, '<' means that this variable and those to its right are of higher causal order within the same constitutive level compared to the variables to the left of this column.
-The table is automatically saved as a csv-file once you click on the button 'Run mLCA', which initialises the generation of possible causal-mechanistic models.
+The table is automatically saved as a csv-file in the directory csv_files once you click on the button 'Run mLCA', which initialises the generation of possible causal-mechanistic models.
 2. from a csv file stored on the system  
 Select 'Import data from csv' in top menu and click on 'Select File' to open a file selector. After selecting the required file click on 'Run mLCA'.
 3. from the output of either QCA or cna saved in a text file  
 Select 'Import data from QCA/CNA' in top menu and click on 'Select File' to open a file selector. After selecting the required file click on 'Run mLCA'.
 
 After calculating the possible models, their visualizations are displayed on the right part of the GUI. You can browse through the different models using the buttons 'Previous' and 'Next'. To zoom use 'Zoom in' and 'Zoom out'. 
-The generated hypergraphs are also saved in a separate pdf-file.
+The generated hypergraphs are also saved in a separate pdf-file in the output directory.
 
 You can also use the command line application. In this case you can choose between the options 2. and 3. from above. You have to specify the path to your data table by replacing 'PATH' in
 ```
