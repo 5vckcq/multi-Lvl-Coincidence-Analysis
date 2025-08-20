@@ -34,8 +34,13 @@ import plot_graph
 import mlca
 
 
-def main(input_file="", input_type="", force_mode=""):
+def main(input_file="", input_type="", force_mode="") -> str:
     """Function to generate multi-level causal mechanistic models from data tables
+
+    Returns
+    _______
+    str
+       name of created pdf file
     """
     latex_template_file = "Latex_Template.tex"#str(Path("..").resolve().joinpath("config").joinpath("Latex_Template.tex"))
     start_time = time.time()
@@ -43,6 +48,8 @@ def main(input_file="", input_type="", force_mode=""):
     level_factor_list = []               # declaration of the factor list    
     order_input_information = []
     abort = False
+
+    pdf_file = ""
     
     # sys.argv is the list of arguments given when executing the script.
     # e.g. "python script.py --csv" contains two arguments "script.py" (the script name ifself is one element of sys.argv) and "--csv"
@@ -280,7 +287,7 @@ def main(input_file="", input_type="", force_mode=""):
         # after one entry for each solution has been generated in tex_table compile the pdf
         if tex_table:
             # if tex_table is non-empty
-            plot_graph.create_pdf(tex_table, latex_template_file, total_solutions)
+            pdf_file = plot_graph.create_pdf(tex_table, latex_template_file, total_solutions)
             print("Number of solutions " + str(total_solutions))
             if total_solutions > 1000:
                 print("More than 1000 solutions obtained, plotting only the first 1000.")
@@ -298,7 +305,8 @@ def main(input_file="", input_type="", force_mode=""):
             # solution_list is empty
             # no solution survived selection of valid solutions
             print("No valid complex solution formula has been found in " + input_file + ".") 
-                    
+
+    return pdf_file
 if __name__ == '__main__':
     # start main() function when the py-file is executed
     main()

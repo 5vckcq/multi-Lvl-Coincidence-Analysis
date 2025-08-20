@@ -12,6 +12,7 @@ import re                          # regex for complex search patterns in string
 import jinja2                      # Latex interface
 import codecs                      # for en- and decoding of strings (esp. to write tex-files in utf-8)
 from pathlib import Path           # navigating paths
+from datetime import datetime
 
 from utils import get_components_from_formula, get_factor_level, get_factor_order, get_formula_level, get_formula_order
 
@@ -460,7 +461,7 @@ def print_structure_in_tikz_plot(level_factor_list_order: list, level_equiv_list
     
     return tex_code   
       
-def create_pdf(tex_code_table: list, latex_template_file: str, total_solutions: int) -> None:
+def create_pdf(tex_code_table: list, latex_template_file: str, total_solutions: int) -> str:
     """Creates a pdf from the list tex_code_table.
     The Latex template assumes that tex_code_table is a list of pairs of a number (used to reference the index of the element) and
     a string that contains valid TikZ code.
@@ -473,9 +474,18 @@ def create_pdf(tex_code_table: list, latex_template_file: str, total_solutions: 
         path to the template file
     total_solutions: int
         number of possible causal-mechanistic models
+
+    Returns
+    _______
+    str
+        name of created pdf file
     """
-   
-    output_file = "output_graph.tex"
+    now = datetime.now()
+    time_stamp = now.strftime("%Y_%m_%d_%H_%M_%S")
+    output_file = "output_graph_" + time_stamp + ".tex"
+
+    name = ""
+
     # defining the template (already prepared file)
     template = latex_jinja_env.get_template(latex_template_file)
     if total_solutions != len(tex_code_table):
@@ -498,7 +508,8 @@ def create_pdf(tex_code_table: list, latex_template_file: str, total_solutions: 
         letter.write(render);
         letter.close();
         os.system("pdflatex -interaction=batchmode " + str(output_file_path))
-        print('File ' + str(output_file[:-4]) + '.pdf created.')
+        name = str(output_file[:-4]) + '.pdf'
+        print('File ' + name + " created.")
     
     # remove automatically generated log files
     file_extensions = ['log', 'pdf', 'aux']
@@ -509,3 +520,5 @@ def create_pdf(tex_code_table: list, latex_template_file: str, total_solutions: 
                 file.unlink()
             else:
                 file.replace(output_path.joinpath(file.name))
+
+    return name

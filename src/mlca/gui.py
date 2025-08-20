@@ -81,6 +81,7 @@ class NotebookGridApp:
         self.root = root
         self.root.title("mLCA " + mlca.__version__)
         
+        self.pdf_file = ""
         self.current_page = 0
         self.numPages = None
         self.fileisopen = None
@@ -388,14 +389,14 @@ class NotebookGridApp:
             self.export_to_csv(file_path)
             time.sleep(1) # wait a second for writting csv file to disk
             # run mLCA in csv-mode
-            cli.main(input_file=file_path, input_type='csv', force_mode=force_mode)
+            self.pdf_file = cli.main(input_file=file_path, input_type='csv', force_mode=force_mode)
             
         elif self.notebook.index("current") == 1:
             # work with csv file from drive
-            cli.main(input_file=self.label_file_csv.cget("text"), input_type='csv', force_mode=force_mode)
+            self.pdf_file = cli.main(input_file=self.label_file_csv.cget("text"), input_type='csv', force_mode=force_mode)
         elif self.notebook.index("current") == 2:
             # use R-output file
-            cli.main(input_file=self.label_file_cna.cget("text"), input_type='R', force_mode=force_mode)
+            self.pdf_file = cli.main(input_file=self.label_file_cna.cget("text"), input_type='R', force_mode=force_mode)
         
         # now display pdf
         time.sleep(1) # wait a second
@@ -489,7 +490,7 @@ class NotebookGridApp:
         
     # function for opening pdf files
     def open_file(self):
-        filepath = str(Path('..').joinpath('..').joinpath('output').joinpath("output_graph.pdf"))
+        filepath = str(Path('..').joinpath('..').joinpath('output').joinpath(self.pdf_file))
         # checking if the file exists
         if filepath:
             # declaring the path

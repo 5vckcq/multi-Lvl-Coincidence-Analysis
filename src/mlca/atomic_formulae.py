@@ -129,7 +129,7 @@ def find_effects(formula: list, factor_list: list) -> list:
                         break
         if cond:
             # delete the causal factor if either of the three exclusion criteria is true
-            print(effect_list[i] + " discarded. It has no causal relevance for any other causal factor.")
+            #print(effect_list[i] + " discarded. It has no causal relevance for any other causal factor.")
             del effect_list[i]
 
     return effect_list
