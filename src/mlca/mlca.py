@@ -40,7 +40,7 @@ __version__ = "0.3"
 
 from utils import powerset, sort_by_second, list_comparison, flatten_nested_list, find_causal_factors, \
     get_causal_prefactors, get_equiv_formula, get_components_from_formula, get_formula_level, \
-        get_factor_order, get_ordered_dnf, get_clusters, count_true, get_coextensive_factors
+        get_factor_order, get_ordered_dnf_string, get_clusters, count_true, get_coextensive_factors
 
 def is_transitive(formula_list: list, factor_list: list) -> tuple[list, bool]:
     """Function that checks whether the list of causal relations is transitive for the causal factors
@@ -1371,7 +1371,7 @@ def find_structures(in_level_factor_list: list, in_level_equiv_list: list, mode=
                                     formula_left = formula_left + cause + "*"
                                 formula_left = formula_left[:-1] # remove the trailing "*"
                                 # formula_left will be ordered to facilitate later comparison for duplicates
-                                formula_left = get_ordered_dnf(formula_left)
+                                formula_left = get_ordered_dnf_string(formula_left)
                                 formula = (formula_left, effect)
                                 new_circular_list[num].append(formula)
                             

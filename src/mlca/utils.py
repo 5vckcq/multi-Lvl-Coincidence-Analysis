@@ -67,6 +67,36 @@ def list_comparison(list1: list, list2: list) -> bool:
     list2.sort()
     return list1 == list2
 
+def contains_term(original_term: str, comparison_term: str) -> bool:
+    """Checks whether original_term contains all substrings of comparison_term,
+    possibly not in one piece, but spaced out over original_term.
+
+    Parameters
+    __________
+    original_term: str
+        string in which is searched for comparison_term
+    comparison_term: str
+        string which is searched for
+
+    Returns
+    _______
+    bool
+        truth value of whether original_term contains comparison_term
+    """
+
+    #Contains may mean that e.g. "A*C" is contained in "A*B*C".
+    if original_term == "":
+        return False
+    else:
+        aux_list = string_to_list(original_term)
+        all_found = True
+        for fac in aux_list[0]:
+            if not(fac in string_to_list(comparison_term)[0]):
+                all_found = False
+                break
+
+        return all_found
+
 def flatten_nested_list(in_list: list) -> list:
     """Flattens an homogenous list up to two times in case that it is a nested list.
 
@@ -158,6 +188,53 @@ def get_causal_prefactors(factor: str, formula_list: list, factor_list: list) ->
     return_list = list(set(return_list))  # get rid of duplicates
     return return_list
 
+def list_to_string(in_list):
+    """Converts a nested list of the form in_list[DISJUNCT][CONJUNCT] or
+    a list simple list of the form in_list[CONJUNCT] into a string
+    which connects disjuncts by " + " and conjuncts by "*"
+
+    Parameters
+    __________
+    in_list: list of lists of str or list of str
+
+    Returns
+    _______
+    str
+        String elements of list of lowest order are connected by '*',
+        sublists by ' + ', if in_list is empty, return ''
+
+    """
+
+    if in_list: # list is not empty
+        if type(in_list[0]) == list: # list is nested
+            return ' + '.join(['*'.join(disj) for disj in in_list])
+        else: # list of strings
+            return "*".join(in_list)
+    else:
+        return ""
+
+
+def string_to_list(st):
+    """Converts a string into nested list:
+    ' + ' separates sublists, '*' elements of the sublists
+
+    Parameters
+    __________
+    st: str
+        String, expected to express a DNF with disjunctor ' + ' and
+        conjunctor '*'
+
+    Returns
+    _______
+    list of lists of str
+        nested list of form out_list[DISJUNCT][CONJUNCT]
+    """
+    out_list = []
+    disj_list = re.split(r'\s*\+\s*', st)
+    for disj in disj_list:
+        out_list.extend([re.split(r'\*', disj)])
+
+    return out_list
     
 def get_equiv_formula(st: str) -> tuple:
     """Transforms a string into a tuple of strings (a,b) with the following characteristics:
@@ -449,7 +526,7 @@ def get_formula_order(formula: str, factor_list: list) -> int:
     return order
     
     
-def get_ordered_dnf(formula: str) -> str:
+def get_ordered_dnf_string(formula: str) -> str:
     """Alphabetically orders all disjuncts and conjuncts in a string, assuming
     ' + ' as disjunctor and '*' as conjunctor. Returns the string with the
     ordered formula. If formula is not a string, return ''.
@@ -498,6 +575,38 @@ def get_ordered_dnf(formula: str) -> str:
     new_formula = new_formula[:-3]
     return new_formula
 
+
+def get_ordered_dnf_list(formula: list) -> list:
+    """Alphabetically orders all disjuncts and conjuncts in a list, assuming
+    a nested list whose elements on the first level are disjuncts and elements
+    on the second level are conjuncts.
+
+    Parameters
+    __________
+    formula : list of list of str
+         nested list of string
+
+    Returns
+    _______
+    list of list of str
+        alphabetically ordered list with alphabetically ordered sublists
+    """
+
+    if not(type(formula) == list):
+        # if formula is not of a list, return the empty list
+        return []
+    elif len(formula) < 1: # formula is empty
+        return []
+    elif any(type(element) != list for element in formula):
+        formula.sort()
+        return formula
+    else:
+        for sublist in formula:
+            # sort each disjunct
+            sublist.sort()
+        # sort the whole disjunction
+        formula.sort()
+        return formula
 
 def get_clusters(formula_list: list, factor_list: list) -> list:
     """Determines clusters of elements from factor_list that are connected via formulae
@@ -698,57 +807,76 @@ def get_truthvalue(formula: list, assignment: dict) -> bool:
     # (2b) right side term is atomic
     # (3) if formula is a string, it is a disjunctive normal form with disjunctor ' + ',
     #     conjunctor '*' and negator '~'
-    if type(formula) == list and len(formula) > 1:
-        # case (1) -> conjunction
-        truthvalue = get_truthvalue(formula[0], assignment) and get_truthvalue(formula[1:], assignment)
-    elif type(formula) == list and len(formula) == 1:
-        # case (2) -- list with only one element, assumed to be a tuple
-        if type(formula[0]) == tuple and len(formula[0]) == 2:
-            # -> logical equivalence
-            truthvalue = get_truthvalue(formula[0][0], assignment) == get_truthvalue(formula[0][1], assignment)
-        else:
-            # type error
-            print('syntax/type error')
-            truthvalue = False
-    elif type(formula) == tuple and len(formula) == 2:
-        # case (2) -- 2-tuple -> logical equivalence
-        truthvalue = get_truthvalue(formula[0], assignment) == get_truthvalue(formula[1], assignment)
-    elif type(formula) == str and len(formula) == 1:
-        # case (2a) - atomic term
-        if type(assignment) == dict:
-            if formula in assignment:
-                if type(assignment[formula]) == bool:
-                    truthvalue = assignment[formula]
-                else: 
-                    print('type error in dictionary')
-                    truthvalue = False
+    if type(assignment) == dict:
+        if type(formula) == list and len(formula) > 1:
+            # case (1) -> conjunction
+            truthvalue = get_truthvalue(formula[0], assignment) and get_truthvalue(formula[1:], assignment)
+        elif type(formula) == list and len(formula) == 1:
+            # case (2) -- list with only one element, assumed to be a tuple
+            if type(formula[0]) == tuple and len(formula[0]) == 2:
+                # -> logical equivalence
+                truthvalue = get_truthvalue(formula[0][0], assignment) == get_truthvalue(formula[0][1], assignment)
             else:
-                print('missing key in dictionary')
+                # type error
+                print('syntax/type error')
                 truthvalue = False
-        else: 
-            print('type error: no dict')
-            truthvalue = False
-    elif type(formula) == str and len(formula) > 1:        
-        # case (2b) - complex string
-        if formula.find(' + ') > -1:
-            # split disjunction
-            terms = formula.split(' + ', 1)
-            truthvalue = get_truthvalue(terms[0], assignment) or get_truthvalue(terms[1], assignment)
-        elif formula.find('*') > -1:
-            # split conjunction
-            terms = formula.split('*', 1)
-            truthvalue = get_truthvalue(terms[0], assignment) and get_truthvalue(terms[1], assignment)
-        elif formula.find('~') == 0:
-            # negator (as main operator) can only be in the first position
-            truthvalue = not(get_truthvalue(formula[1:], assignment))
+        elif type(formula) == tuple and len(formula) == 2:
+            # case (2) -- 2-tuple -> logical equivalence
+            truthvalue = get_truthvalue(formula[0], assignment) == get_truthvalue(formula[1], assignment)
+        elif type(formula) == str and formula in assignment:
+            # case (2a) - atomic term
+            if type(assignment[formula]) == bool:
+                truthvalue = assignment[formula]
+            else:
+                print('type error in dictionary')
+                truthvalue = False
+
+        elif type(formula) == str and len(formula) > 1:
+            # case (2b) - complex string
+            if formula.find(' + ') > -1:
+                # split disjunction
+                terms = formula.split(' + ', 1)
+                truthvalue = get_truthvalue(terms[0], assignment) or get_truthvalue(terms[1], assignment)
+            elif formula.find('*') > -1:
+                # split conjunction
+                terms = formula.split('*', 1)
+                truthvalue = get_truthvalue(terms[0], assignment) and get_truthvalue(terms[1], assignment)
+            elif formula.find('~') == 0:
+                # negator (as main operator) can only be in the first position
+                truthvalue = not(get_truthvalue(formula[1:], assignment))
+            else:
+                # syntax error
+                truthvalue = False
         else:
-            # syntax error
-            truthvalue = False            
-    else:
-        # syntax/type error
-        truthvalue = False
+            # syntax/type error
+            truthvalue = False
         
+    else:
+        print('type error: no dict')
+        truthvalue = False
     return truthvalue
+
+def create_assignments(variable_list: list) -> list:
+    """Creates a list of all possible truth value assignments for variable_list.
+    Truth value assignments are stored in dictionaries whose keys are the
+    variable names and whose values their truth values.
+
+    Parameters
+    __________
+    variable_list : list of str
+        list of variables
+
+    Returns
+    _______
+    list of dict
+        list of value assignments in form of dictionaries whose keys are the
+        variable names and whose values their truth values
+    """
+    # generate all cases for Boolean variables
+    assignment_list = []
+    for bool_value in itertools.product([True, False], repeat = len(variable_list)):
+        assignment_list.append(dict(zip(variable_list, bool_value)))
+    return assignment_list
     
 def count_true(function_list: list, factor_list: list) -> int:
     """Counts the number of truth value assignments to the variables in factor_list that make the logical
@@ -791,9 +919,7 @@ def count_true(function_list: list, factor_list: list) -> int:
     variable_list = get_components_from_formula(st, factor_list)
     
     # generate all cases for Boolean variables
-    assignment_list = []
-    for bool_value in itertools.product([True, False], repeat = len(variable_list)):
-        assignment_list.append(dict(zip(variable_list, bool_value)))
+    assignment_list = create_assignments(variable_list)
     
     for assignment in assignment_list:
         if get_truthvalue(function_list, assignment):

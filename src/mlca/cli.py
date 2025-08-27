@@ -26,7 +26,7 @@ import time                        # for measuring the run time
 
 __all__ = ("main")
 
-from utils import get_formula_level, get_components_from_formula
+from utils import get_formula_level, get_components_from_formula, get_causal_prefactors, flatten_nested_list
 # further file that contains functions for deriving equivalence formulae from a given truth table:
 from atomic_formulae import read_data_from_csv
 # functions for plotting the results:
@@ -95,6 +95,7 @@ def main(input_file="", input_type="", force_mode="") -> str:
                     if not(abort):
                         # classify the equivalence relations into causal relations (level_equiv_list) subdivided by constitutive level
                         # or into constitution relations
+                        print(str(round(time.time() - start_time,2)) + " seconds needed to find " + str(len(equiv_list)) + " equivalences.")
                         level_equiv_list, constitution_relation_list = mlca.categorise_formulae(equiv_list, level_factor_list)
 
                     else:
@@ -160,6 +161,7 @@ def main(input_file="", input_type="", force_mode="") -> str:
          
         # step 3 generate all possible solutions for the underlying causal structure
         solution_term_list = mlca.find_structures(level_factor_list, level_equiv_list, mode)
+
         # step 4: determine the causal order
         complete_sol_list = []
         for sol in solution_term_list:
@@ -255,14 +257,26 @@ def main(input_file="", input_type="", force_mode="") -> str:
                 
                 for lvl in range(len(order_relations)):
                     # check whether there are any re-specified causal order information
-                    if lvl <= len(order_input_information) and order_input_information:
+                    # the input information has to be consistent with the obtained causal order of the particular solution
+                    for pre_order_rel in order_input_information[lvl]:
+                        if pre_order_rel[1] in get_causal_prefactors(pre_order_rel[0], sol[1][lvl], flatten_nested_list(sol[0][lvl])):
+                            # pre_order_rel expresses that element [1] must not be a cause of element [0]
+                            # thus, remove sol, if it does not conform to this
+                            order_preserved = False
+                            total_solutions = total_solutions - 1 # do not count this solution
+                            break # break from for-loop over predefined order relations
+                    if not(order_preserved):
+                        break # break from for-loop over levels
+
+
+                        """ removed
                         # the input information is consistent with the obtained causal order of the particular solution
                         # iff the set of the input order relations is a subset of the obtained order relations (per level)
                         if not(set(order_input_information[lvl]).issubset(order_relations[lvl])):
                             order_preserved = False
                             total_solutions = total_solutions - 1 # do not count this solution
                             break
-                
+                        """
                 
                 # limiting the output to 1000 solutions
                 max_solutions_plot = 1000
@@ -283,6 +297,7 @@ def main(input_file="", input_type="", force_mode="") -> str:
                     # counter enumerates the solutions
                     entry = (sol_counter, st, subtitle)
                     tex_table.append(entry)
+
             
         # after one entry for each solution has been generated in tex_table compile the pdf
         if tex_table:

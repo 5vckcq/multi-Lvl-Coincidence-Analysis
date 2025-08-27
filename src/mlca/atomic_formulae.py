@@ -8,55 +8,7 @@ import re                 # regex for complex search patterns in strings
 import pandas as pd       # for reading csv files that contain truth tables
 import itertools          # itertools provides functions to obtain all permutations of a string and Cartesian products of lists
 import multiprocessing    # multiprocessing and functools for multicore usage
-from utils import get_components_from_formula, get_factor_level, get_factor_order, get_equiv_formula
-
-def list_to_string(in_list):
-    """Converts a nested list of the form in_list[DISJUNCT][CONJUNCT] or
-    a list simple list of the form in_list[CONJUNCT] into a string
-    which connects disjuncts by " + " and conjuncts by "*"
-
-    Parameters
-    __________
-    in_list: list of lists of str or list of str
-
-    Returns
-    _______
-    str
-        String elements of list of lowest order are connected by '*',
-        sublists by ' + ', if in_list is empty, return ''
-
-    """
-
-    if in_list: # list is not empty
-        if type(in_list[0]) == list: # list is nested
-            return ' + '.join(['*'.join(disj) for disj in in_list])
-        else: # list of strings
-            return "*".join(in_list)
-    else:
-        return ""
-
-
-def string_to_list(st):
-    """Converts a string into nested list:
-    ' + ' separates sublists, '*' elements of the sublists
-
-    Parameters
-    __________
-    st: str
-        String, expected to express a DNF with disjunctor ' + ' and
-        conjunctor '*'
-
-    Returns
-    _______
-    list of lists of str
-        nested list of form out_list[DISJUNCT][CONJUNCT]
-    """
-    out_list = []
-    disj_list = re.split(r'\s*\+\s*', st)
-    for disj in disj_list:
-        out_list.extend([re.split(r'\*', disj)])
-
-    return out_list
+from utils import get_components_from_formula, get_factor_level, get_factor_order, get_equiv_formula, list_to_string, string_to_list, contains_term
 
 def find_effects(formula: list, factor_list: list) -> list:
     """Determines which elements from factor_list are dependent variables (effects)
@@ -264,36 +216,6 @@ def reduce_term_by(term: str, literal: str) -> str:
             # then cut string of conjunctions to the left
             st = "*" + literal
         return term.replace(st,"")
-
-def contains_term(original_term: str, comparison_term: str) -> bool:
-    """Checks whether original_term contains all substrings of comparison_term,
-    possibly not in one piece, but spaced out over original_term.
-
-    Parameters
-    __________
-    original_term: str
-        string in which is searched for comparison_term
-    comparison_term: str
-        string which is searched for
-
-    Returns
-    _______
-    bool
-        truth value of whether original_term contains comparison_term
-    """
-
-    #Contains may mean that e.g. "A*C" is contained in "A*B*C".
-    if original_term == "":
-        return False
-    else:
-        aux_list = string_to_list(original_term)
-        all_found = True
-        for fac in aux_list[0]:
-            if not(fac in string_to_list(comparison_term)[0]):
-                all_found = False
-                break
-
-        return all_found
 
 def absorb_terms(arg: tuple) -> list:
     """Applies the absorption rule a*b*c*d*e + a*c*d <-> a*c*d to simplify a DNF which is
