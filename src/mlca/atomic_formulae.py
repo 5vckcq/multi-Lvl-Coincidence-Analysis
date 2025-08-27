@@ -77,7 +77,7 @@ def find_effects(formula: list, factor_list: list) -> list:
                         if sec_cond:
                             break
                     if sec_cond:
-                        cond = sec_cond
+                        cond = True
                         break
         if cond:
             # delete the causal factor if either of the three exclusion criteria is true
