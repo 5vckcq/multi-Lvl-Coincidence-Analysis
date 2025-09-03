@@ -36,7 +36,7 @@ __all__ = ("is_transitive",
            "find_structures",
            "create_separate_formula_list")
 
-__version__ = "0.3"
+__version__ = "0.3.1"
 
 from operator import itemgetter
 from utils import powerset, list_comparison, flatten_nested_list, find_causal_factors, \
