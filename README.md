@@ -12,7 +12,7 @@ multi-Lvl-Coincidence-Analysis (mLCA) is a Python package for causal-mechanistic
 
 ## Installation
 
-We recommend to install the required Python packages from environment.yml using mamba or conda. 
+We recommend to install the required Python packages from environment.yml using mamba or conda. If you use the latter replace "mamba" by "conda" in the following line:
 ```
 $ mamba env create -f environment.yml
 ```
@@ -51,6 +51,7 @@ Further optional arguments can be appended:
 * "-bw" (alternatively "--blackwhite") changes the output from colored graphs into black/white. The argument "-c" (resp. "--color") forces the color mode, which is currently set as default.
 * If the tex-formated formulae should be exported into a separate file, the optional argument "-fl" (or "--fulllist") should be set.
 * By default complex relations between co-extensive variables are excluded, which makes mLCA for single level models comparable to cna. If all possible models should be generated, this can be done by adding the argument "-c" or "--complex".
+* "-bu" to use an alternative bottom up method for deriving atomic solution formulae. The default option is to use the conventional top down approach based on Petrick's algorithm. With the "-bu" option, the atomic solution formulae are instead constructed by stepwise constructing DNF formulae out of the list of factors.
 
 ### Preparing the data tables
 

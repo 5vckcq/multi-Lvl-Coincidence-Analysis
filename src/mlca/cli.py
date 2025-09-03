@@ -53,6 +53,51 @@ def main(input_file="", input_type="", force_mode="") -> str:
     
     # sys.argv is the list of arguments given when executing the script.
     # e.g. "python script.py --csv" contains two arguments "script.py" (the script name ifself is one element of sys.argv) and "--csv"
+    # check whether special options like color mode or output of the full list of formulae has been activated
+    mode = []  # list of special output modes depending on optional parameters (see below)
+    # prepare these special modes
+    # there are two plot modes possible:
+    # "bw" - black/white
+    # "color" - in color
+    # The plot mode can be specified when running the script by adding "-c" or "-bw" respectively.
+    mode.append("color") # Standard mode is color.
+
+    if any(arg == "-c" or arg == "--color" for arg in sys.argv) or "color" in force_mode:
+        # sys.argv is the list of arguments given when executing the script.
+        if not("color" in mode):
+            mode.append("color")                          # e.g. python script.py -c (The script ifself is one element of sys.argv.)
+    elif any(arg == "-bw" or arg == "--blackwhite" for arg in sys.argv) :
+        # further case for black/white
+        if not("bw" in mode):
+            mode.append("bw")
+            # remove the standard mode
+            mode.remove("color")
+
+
+    # further option: Exports a second pdf-file containing the full list of possible causal structures as formulae
+    if any(arg == "-fl" or arg == "--fulllist" for arg in sys.argv) or "fulllist" in force_mode:
+        # sys.argv is the list of arguments given when executing the script.
+        mode.append("fulllist")                       # e.g. python script.py -c -fl (The script ifself is one element of sys.argv.)
+        separate_formula_list = []                    # list of formulae in tex-code
+
+    # simple mode does not derive complex structures between co-extensive factors
+    # results of simple mode should be the same as those of cna
+    if any(arg == "-c" or arg == "--complex" for arg in sys.argv) or "complex" in force_mode:
+        pass                                          # e.g. python script.py -c (The script ifself is one element of sys.argv.)
+    else:                                             # default behaviour: simple mode without complex structures between
+        mode.append("simple")                         # co-extensive factors
+
+    # selecting mode of deriving asf, either "td" (default) or "bu"
+    mode.append("td")
+    if any(arg == "-td" for arg in sys.argv) or "td" in force_mode:
+        if not("td" in mode):
+            mode.append("td")
+    elif any(arg == "-bu" for arg in sys.argv) or "bu" in force_mode:
+        if not("bu" in mode):
+            mode.append("bu")
+            # remove the standard mode
+            mode.remove("td")
+
     for i in range(len(sys.argv)):
         if sys.argv[i] == "--r-import" or input_type == "R":
             # "--r-import" is the command to use the text output of a r-script (cna or QCA) 
@@ -90,7 +135,10 @@ def main(input_file="", input_type="", force_mode="") -> str:
                     input_file = sys.argv[i+1] # assume that the next argument is path to the csv table
                 if os.path.exists(input_file):
                     # execute function from obtain_equivalence_formulae.py
-                    abort, level_factor_list, equiv_list, order_input_information = read_data_from_csv(input_file)
+                    if "bu" in mode:
+                        abort, level_factor_list, equiv_list, order_input_information = read_data_from_csv(input_file, mode="bu")
+                    else:
+                        abort, level_factor_list, equiv_list, order_input_information = read_data_from_csv(input_file)
                         
                     if not(abort):
                         # classify the equivalence relations into causal relations (level_equiv_list) subdivided by constitutive level
@@ -122,43 +170,9 @@ def main(input_file="", input_type="", force_mode="") -> str:
         print("Error: Expected input data not found\n Use either \"--csv FILEPATH_TO_CSV_TABLE\" or \"--r-import FILEPATH_TO_R_OUTPUT\" to specify the path to the input data.")    
     
     if not(abort) :                
-        # check whether special options like color mode or output of the full list of formulae has been activated
-        mode = []  # list of special output modes depending on optional parameters (see below)
-        # prepare these special modes
-        # there are two plot modes possible:
-        # "bw" - black/white
-        # "color" - in color
-        # The plot mode can be specified when running the script by adding "-c" or "-bw" respectively.
-        mode.append("color") # Standard mode is color.
-            
-        if any(arg == "-c" or arg == "--color" for arg in sys.argv) or "color" in force_mode: 
-            # sys.argv is the list of arguments given when executing the script.
-            if not("color" in mode):
-                mode.append("color")                          # e.g. python script.py -c (The script ifself is one element of sys.argv.)
-        elif any(arg == "-bw" or arg == "--blackwhite" for arg in sys.argv) : 
-            # further case for black/white
-            if not("bw" in mode):
-                mode.append("bw")
-                # remove the standard mode
-                mode.remove("color")
-                
-            
-        # further option: Exports a second pdf-file containing the full list of possible causal structures as formulae            
-        if any(arg == "-fl" or arg == "--fulllist" for arg in sys.argv) or "fulllist" in force_mode: 
-            # sys.argv is the list of arguments given when executing the script.
-            mode.append("fulllist")                       # e.g. python script.py -c -fl (The script ifself is one element of sys.argv.)
-            separate_formula_list = []                    # list of formulae in tex-code
-                
-        # simple mode does not derive complex structures between co-extensive factors
-        # results of simple mode should be the same as those of cna
-        if any(arg == "-c" or arg == "--complex" for arg in sys.argv) or "complex" in force_mode: 
-            pass                                          # e.g. python script.py -c (The script ifself is one element of sys.argv.)
-        else:                                             # default behaviour: simple mode without complex structures between
-            mode.append("simple")                         # co-extensive factors
-
         # prepare the list for the tex-code        
         tex_table = []
-         
+
         # step 3 generate all possible solutions for the underlying causal structure
         solution_term_list = mlca.find_structures(level_factor_list, level_equiv_list, mode)
 
@@ -193,7 +207,7 @@ def main(input_file="", input_type="", force_mode="") -> str:
         sol_counter = 0
         total_solutions = len(complete_sol_list)
 
-        for sol in complete_sol_list:            
+        for sol in complete_sol_list:
             # prepare a local version of level_equiv_list
             new_level_equiv_list = []
             for i in range(len(level_factor_list)) :

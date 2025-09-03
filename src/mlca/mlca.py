@@ -38,9 +38,10 @@ __all__ = ("is_transitive",
 
 __version__ = "0.3"
 
-from utils import powerset, sort_by_second, list_comparison, flatten_nested_list, find_causal_factors, \
+from operator import itemgetter
+from utils import powerset, list_comparison, flatten_nested_list, find_causal_factors, \
     get_causal_prefactors, get_equiv_formula, get_components_from_formula, get_formula_level, \
-        get_factor_order, get_ordered_dnf_string, get_clusters, count_true, get_coextensive_factors
+        get_factor_order, get_ordered_dnf_string, get_clusters, count_true
 
 def is_transitive(formula_list: list, factor_list: list) -> tuple[list, bool]:
     """Function that checks whether the list of causal relations is transitive for the causal factors
@@ -223,7 +224,8 @@ def is_transitive(formula_list: list, factor_list: list) -> tuple[list, bool]:
     
     return not(circular), order_factor_list          
                 
-def reduce_structural_redundancy(factor_list: list, formula_list: list, reduced_solutions_list = [], already_tested = []) -> tuple[bool, list]:
+def reduce_structural_redundancy(factor_list: list, formula_list: list, reduced_solutions_list: list = [], \
+                                 already_tested: list = []) -> tuple[bool, list]:
     """Reduces the list of equivalence relations to dissolve structural redundancies.
 
     All factors that are causally connected through formula_list remain causally connected,
@@ -313,7 +315,8 @@ def reduce_structural_redundancy(factor_list: list, formula_list: list, reduced_
         return True, reduced_solutions_list 
 
 
-def minimise_constitution_relations(level_factor_list_order: list, level: int, level_equiv_list: list, constitution_relation_list: list, color_map: dict, color_index: int, mode = []) -> tuple:
+def minimise_constitution_relations(level_factor_list_order: list, level: int, level_equiv_list: list, constitution_relation_list: list, \
+                                    color_map: dict, color_index: int, mode: list = []) -> tuple:
     """Transforms constitution relations and discards inaccurate constitution relations.
 
     Constitution relations are inaccurate if the lower order factors are in fact constituents of an upstream higher order factor
@@ -499,7 +502,7 @@ def minimise_constitution_relations(level_factor_list_order: list, level: int, l
     return return_list, color_map, color_index
 
 
-def arrange_factors(level_factor_list_order: list, level_equiv_list: list, constitution_relation_list: list, mode = []) -> tuple:
+def arrange_factors(level_factor_list_order: list, level_equiv_list: list, constitution_relation_list: list, mode: list = []) -> tuple:
     """Prepares the factor list for plotting such that the nodes are arranged to minimise crossings of vertices in the hypergraph.
 
     A) factors of same level and order zero are grouped when belonging to the same constitution relation
@@ -1162,7 +1165,8 @@ def convert_tuple_list_to_nested_list(in_list: list) -> list:
         counter = counter + 1  
     return aux_list
     
-def find_structures(in_level_factor_list: list, in_level_equiv_list: list, mode=["bw","simple"], pos_caus_cond=[], neg_caus_cond=[]) -> list:
+def find_structures(in_level_factor_list: list, in_level_equiv_list: list, mode: list = ["bw","simple"], \
+                    pos_caus_cond: list = [], neg_caus_cond: list = []) -> list:
     """This functions combines the causal relations to solutions for the underlying multi-level structure.
     Each solution consists of a minimal set of causal relations to causally connect every causal factor.
     find_structures returns a list with all valid solutions in form of a list of solutions, which are nested lists of causal relations
@@ -1589,10 +1593,10 @@ def find_structures(in_level_factor_list: list, in_level_equiv_list: list, mode=
             # add additional terms without duplicates to new_circular_list          
             # reconstruct new
             for sol in new_circular_list:
-                sol.sort(key=sort_by_second)
+                sol.sort(key=itemgetter(1)) # sort by second element of the tuple sol
                 
             for sol in additional_circular:
-                sol.sort(key=sort_by_second)
+                sol.sort(key=itemgetter(1)) # sort by second element of the tuple sol
                 if not(sol in new_circular_list):
                     new_circular_list.append(sol)
                                 

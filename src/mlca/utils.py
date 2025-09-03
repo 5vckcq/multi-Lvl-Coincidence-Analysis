@@ -31,20 +31,6 @@ def powerset(in_set: set) -> set:
         sec_aux_list.append(sub_list)
     return sec_aux_list
 
-def sort_by_second(in_tuple: tuple):
-    """Function that returns the second element of a tuple.
-
-    Parameters
-    __________
-    in_tuple : tuple
-
-    Returns
-    _______
-    value = in_tuple[1]
-    """
-    # returns the second element of tuple (used for sort function by second tuple-element)
-    return in_tuple[1]
-
 def list_comparison(list1: list, list2: list) -> bool:
     """Compares two nested lists. Returns True iff the sorted lists with sorted sublists are equal.
 
@@ -68,15 +54,15 @@ def list_comparison(list1: list, list2: list) -> bool:
     return list1 == list2
 
 def contains_term(original_term: str, comparison_term: str) -> bool:
-    """Checks whether original_term contains all substrings of comparison_term,
+    """Checks whether comparison_term contains all substrings of original_term,
     possibly not in one piece, but spaced out over original_term.
 
     Parameters
     __________
     original_term: str
-        string in which is searched for comparison_term
-    comparison_term: str
         string which is searched for
+    comparison_term: str
+        string in which is searched for comparison_term
 
     Returns
     _______
@@ -121,15 +107,17 @@ def flatten_nested_list(in_list: list) -> list:
             return in_list
         else:
             if type(in_list[0]) == list:
-                in_list = [x for sub_list in in_list for x in sub_list]
-                if type(in_list[0]) == list:
-                    in_list = [x for sub_list in in_list for x in sub_list]
-            return in_list
+                flat_list = [x for sub_list in in_list for x in sub_list]
+                if type(flat_list[0]) == list:
+                    flat_list = [x for sub_list in flat_list for x in sub_list]
+                return flat_list
+            else:
+                return [x for x in in_list]
     else:
         # in_list is not a list
         return []
     
-def find_causal_factors(st):
+def find_causal_factors(st: str) -> list:
     """Returns all substrings of st that are separated by ", " or " < ".
 
     Parameters
@@ -188,7 +176,83 @@ def get_causal_prefactors(factor: str, formula_list: list, factor_list: list) ->
     return_list = list(set(return_list))  # get rid of duplicates
     return return_list
 
-def list_to_string(in_list):
+def find_effects(formula: list, factor_list: list) -> list:
+    """Determines which elements from factor_list are dependent variables (effects)
+    given the dependencies expressed in formula.
+
+    Causal factors are effects only if they do not satisfy either of three conditions:
+
+    1) the causal factor is one in every line of the configuration table (in this case they are irrelevant)
+    2) it is zero in every line of the configuration table (same as 1)
+    3) two lines in the table differ only by the value of the factor (this means they might only be first causes)
+
+    These conditions follow M. Baumgartner (2009) "Uncovering deterministic causal structures: a Boolean
+    approach", p. 83.
+
+    Returns the list of effects.
+
+    Parameters
+    __________
+    formula: list of str
+        list of string, it is assumed that each element is a conjunctive formula of
+        the factors appearing from factor_list
+    factor_list: list of str
+        list of the potential variables of formula
+
+    Returns
+    _______
+    list of str
+        list of elements from factor_list that do not satisfy any of the conditions 1)-3)
+    """
+
+    # start with the full list of causal factors and reduce it accordingly to 1)-3) until only effects remain
+    effect_list = [x for x in factor_list]
+    for i in range(len(effect_list)-1,-1,-1):
+        cond = True
+        # first test: appears effect_list[i] in every formula (and its negation nowhere)?
+        for term in formula:
+            if not(effect_list[i] in term):
+                cond = False
+                break
+
+        if not(cond):
+            cond = True
+            # second test: appears the negation of effect_list[i] in every formula?
+            st = "~" + effect_list[i]
+            for term in formula:
+                if not(st in term):
+                    cond = False
+                    break
+
+            if not(cond):
+                for term in formula:
+                    for sec_term in formula:
+                        if sec_term == term:
+                            sec_cond = False
+                        else:
+                            sec_cond = True
+                            for fac in term:
+                                # check whether all conditions are not satisfied for fac from term:
+                                # (i) fac is effect_list[i] and sec_term its negation
+                                # (ii) sec_term contains effect_list[i] and fac is its negation
+                                # (iii) fac is contained in sec_term
+                                if not((fac == effect_list[i] and st in sec_term) or (fac == st and effect_list[i] in sec_term) or fac in sec_term):
+                                    sec_cond = False
+                                    break
+
+                        if sec_cond:
+                            break
+                    if sec_cond:
+                        cond = True
+                        break
+        if cond:
+            # delete the causal factor if either of the three exclusion criteria is true
+            #print(effect_list[i] + " discarded. It has no causal relevance for any other causal factor.")
+            del effect_list[i]
+
+    return effect_list
+
+def list_to_string(in_list: list) -> str:
     """Converts a nested list of the form in_list[DISJUNCT][CONJUNCT] or
     a list simple list of the form in_list[CONJUNCT] into a string
     which connects disjuncts by " + " and conjuncts by "*"
@@ -202,7 +266,6 @@ def list_to_string(in_list):
     str
         String elements of list of lowest order are connected by '*',
         sublists by ' + ', if in_list is empty, return ''
-
     """
 
     if in_list: # list is not empty
@@ -214,7 +277,7 @@ def list_to_string(in_list):
         return ""
 
 
-def string_to_list(st):
+def string_to_list(st: str) -> list:
     """Converts a string into nested list:
     ' + ' separates sublists, '*' elements of the sublists
 
@@ -926,70 +989,94 @@ def count_true(function_list: list, factor_list: list) -> int:
             counter = counter + 1
     return counter
 
-def get_coextensive_factors(formula_list: list, factor_list: list) -> list:
-    """Determines which factors from factor_list are coextensive. Two factors A, B are coextensive
-    if formula_list contains any of the following formulae: A <-> B, B <-> A, ~A <-> B or ~B <-> A.
-    Returns the list of clusters of coextensive factors.
+def get_coextensive_factors(factor_list: list, formula: list, respect_levels: bool = False) -> list:
+    """Determines clusters of coextensive factors by invoking the function determine_coextensive_clusters.
+    If respect_levels is set to True, it will be executed for each level separately, and factors from
+    different level will not be put into the same cluster of coextensive factors.
 
     Parameters
     __________
-    formula_list : list of 2 tuples of str
-        list of tuples of strings, expected to be composed of elements from factor_list,
-        the second component of each tuple is assumed to be an atomic term, the first
-        can be complex
-
-    factor_list : list of str or list of lists of str or list of lists of lists of str
-        possibly nested list of factors
+    factor_list: list of str or list of lists of lists of str
+        possibly nested list of factors, it is assumed that the list is nested if
+        respect_levels is set to True
+    formula: list of list of str
+        nested list representing a DNF, first level list contains disjuncts,
+        second level the conjuncts of each disjunct, it is assumed that
+        the string elements are either the factors from factor_list or their negations
+    respect_levels: bool, optional
+        determines whether coextensive factors of different levels are still clustered
+        together (respect_levels=False) or not (respect_levels=True)
 
     Returns
     _______
-    list
-        nested list of clusters with coextensive variables
-        empty list if there are no coextensive variables
+    list of lists of str
+        a nested list with one sublist per cluster of coextensive factors, the sublists
+        contain all factors that are coextensive with each other
     """
 
-    factor_list = flatten_nested_list(factor_list)
+    if respect_levels and factor_list and isinstance(factor_list[0], list) and \
+       isinstance(factor_list[0][0], list):
+        level_list = []
+        for index, lvl in enumerate(factor_list):
+            level_list.append([])
+            level_list[index] = determine_coextensive_clusters(flatten_nested_list(lvl), formula)
+        return level_list
+    elif factor_list:
+        return determine_coextensive_clusters(flatten_nested_list(factor_list), formula)
+    else:
+        return []
 
-    coextensive_list = []
-    for formula in formula_list:
-        if len(get_components_from_formula(formula[0], factor_list)) == 1:
-            #candidates are formulae of the form A<->B or ~A<->B
-            if not coextensive_list:
-                #coextensive_list is empty
-                # create a new cluster
-                coextensive_list.append([])
-                # add both factors from formula to this cluster
-                coextensive_list[0].append(formula[1])
-                coextensive_list[0].append(get_components_from_formula(formula[0], factor_list)[0])
-            else:
-                # there exists at least one cluster
-                cluster_effect = ''
-                cluster_cause = ''
-                for cluster in coextensive_list:
-                    if formula[1] in cluster:
-                        cluster_effect = cluster
-                    if get_components_from_formula(formula[0], factor_list)[0] in cluster:
-                        cluster_cause = cluster
+def determine_coextensive_clusters(factor_list: list, formula: list) -> list:
+    """Determines clusters of coextensive factors in factor_list from a DNF-formula.
+    Returns a nested list of clusters of coextensive factors.
 
-                if cluster_effect == '' and cluster_cause == '':
-                    #both factors are not elements in a cluster
-                    # create a new cluster
-                    coextensive_list.append([])
-                    # add both factors from formula to this cluster
-                    coextensive_list[0].append(formula[1])
-                    coextensive_list[0].append(get_components_from_formula(formula[0], factor_list)[0])
-                elif cluster_effect == '' and cluster_cause != '':
-                    #add effect to cluster of cause
-                    cluster_cause.append(formula[1])
-                elif cluster_effect != '' and cluster_cause == '':
-                    #add cause to cluster of effect
-                    cluster_effect.append(get_components_from_formula(formula[0], factor_list)[0])
-                elif cluster_effect != cluster_cause:
-                    #effect and cause are elements in different clusters
-                    #merge them
-                    for fac in cluster_effect:
-                        cluster_cause.append(fac)
-                    coextensive_list.remove(cluster_effect)
+    Parameters
+    __________
+    factor_list: list of str
+        list of factors
+    formula: list of list of str
+        nested list representing a DNF, first level list contains disjuncts,
+        second level the conjuncts of each disjunct, it is assumed that
+        the string elements are either the factors from factor_list or their negations
 
+    Returns
+    _______
+    list of lists of str
+        a nested list with one sublist per cluster of coextensive factors, the sublists
+        contain all factors that are coextensive with each other
+    """
+    list_of_coextensives = [] # this becomes a nested list: every sublist contains factors that are mutually coextensive
 
-    return coextensive_list
+    for i in range(len(factor_list)-1):
+        for j in range(i+1,len(factor_list)):
+            co_ext = True
+            for disj in formula:
+                neg_i = "~" + factor_list[i]
+                neg_j = "~" + factor_list[j]
+                if (((factor_list[i] in disj) and not(factor_list[j] in disj)) or \
+                   ((factor_list[j] in disj) and not(factor_list[i] in disj)) or \
+                   ((neg_i in disj) and not(neg_j in disj)) or ((neg_j in disj) and not(neg_i in disj))):
+                    co_ext = False # two factors are not coextensive if one or its negation appears in one disjunct but the other
+                    break          # does not
+
+            if co_ext:
+                if not(list_of_coextensives): # if list of coextensives is still empty
+                    list_of_coextensives.append([]) # append an empty sublist
+                    list_of_coextensives[0].append(factor_list[i])
+                    list_of_coextensives[0].append(factor_list[j])
+                else: # list is non-empty search for a sublist that contains factor_list[i]
+                    new_list = True
+                    for sublist in list_of_coextensives:
+                        if ((factor_list[i] in sublist) or (factor_list[j] in sublist)):
+                            # at least one of both factors is already contained in one sublist of coextensive factors
+                            new_list = False
+                            if not(factor_list[i] in sublist): # and factor_list[i] is not,
+                                sublist.append(factor_list[i]) # then add factor_list[i] to sublist
+                            elif not(factor_list[j] in sublist): # other case factor_list[j] is not contained,
+                                sublist.append(factor_list[j]) # then add it to sublist
+                            break
+                    if new_list: # neither factor is already contained in any sublist
+                        list_of_coextensives.append([]) # create a new sublist
+                        list_of_coextensives[-1].append(factor_list[i]) # append factor_list[i]
+                        list_of_coextensives[-1].append(factor_list[j]) # and factor_list[j]
+    return list_of_coextensives

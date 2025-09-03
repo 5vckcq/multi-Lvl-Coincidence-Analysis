@@ -338,7 +338,14 @@ class NotebookGridApp:
 
         self.var_export_list = BooleanVar(value=False)
         checkbox_export_list = Checkbutton(frame_run, text='export list of solutions',variable=self.var_export_list, onvalue=True, offvalue=False)
-        checkbox_export_list.grid(row=0, column=3, pady=10, padx=10, sticky=W+E)   
+        checkbox_export_list.grid(row=0, column=3, pady=10, padx=10, sticky=W+E)
+
+        self.var_asf_mode = BooleanVar(value=True)
+        radiobutton_classic = Radiobutton(frame_run, text='conventional asf search',variable=self.var_asf_mode, value=True)
+        radiobutton_classic.grid(row=0, column=4, pady=10, padx=10, sticky=W+E)
+
+        radiobutton_treesearch = Radiobutton(frame_run, text='tree search for asf',variable=self.var_asf_mode, value=False)
+        radiobutton_treesearch.grid(row=0, column=5, pady=10, padx=10, sticky=W+E)
 
     def export_to_csv(self, file_path):
         if file_path:
@@ -372,6 +379,10 @@ class NotebookGridApp:
             force_mode.append("fulllist")
         else:
             pass
+        if self.var_asf_mode:
+            force_mode.append("td")
+        else:
+            force_mode.append("bu")
         
         # check which notebook is opened to run with the appropriate data import
         if self.notebook.index("current") == 0:

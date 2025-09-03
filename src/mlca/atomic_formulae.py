@@ -4,87 +4,14 @@
 """
 Functions to derive atomic solution formulae from Boolean coincidence data tables
 """
+import copy               # for deep-copy of lists
 import re                 # regex for complex search patterns in strings
 import pandas as pd       # for reading csv files that contain truth tables
 import itertools          # itertools provides functions to obtain all permutations of a string and Cartesian products of lists
 import multiprocessing    # multiprocessing and functools for multicore usage
-from utils import get_components_from_formula, get_factor_level, get_factor_order, get_equiv_formula, list_to_string, string_to_list, contains_term
-
-def find_effects(formula: list, factor_list: list) -> list:
-    """Determines which elements from factor_list are dependent variables (effects)
-    given the dependencies expressed in formula.
-
-    Causal factors are effects only if they do not satisfy either of three conditions:
-
-    1) the causal factor is one in every line of the configuration table (in this case they are irrelevant)
-    2) it is zero in every line of the configuration table (same as 1)
-    3) two lines in the table differ only by the value of the factor (this means they might only be first causes)
-
-    These conditions follow M. Baumgartner (2009) "Uncovering deterministic causal structures: a Boolean
-    approach", p. 83.
-
-    Returns the list of effects.
-
-    Parameters
-    __________
-    formula: list of str
-        list of string, it is assumed that each element is a conjunctive formula of
-        the factors appearing from factor_list
-    factor_list: list of str
-        list of the potential variables of formula
-
-    Returns
-    _______
-    list of str
-        list of elements from factor_list that do not satisfy any of the conditions 1)-3)
-    """
-
-    # start with the full list of causal factors and reduce it accordingly to 1)-3) until only effects remain
-    effect_list = [x for x in factor_list]
-    for i in range(len(effect_list)-1,-1,-1):
-        cond = True
-        # first test: appears effect_list[i] in every formula (and its negation nowhere)?
-        for term in formula:
-            if not(effect_list[i] in term):
-                cond = False
-                break
-
-        if not(cond):
-            cond = True
-            # second test: appears the negation of effect_list[i] in every formula?
-            st = "~" + effect_list[i]
-            for term in formula:
-                if not(st in term):
-                    cond = False
-                    break
-
-            if not(cond):
-                for term in formula:
-                    for sec_term in formula:
-                        if sec_term == term:
-                            sec_cond = False
-                        else:
-                            sec_cond = True
-                            for fac in term:
-                                # check whether all conditions are not satisfied for fac from term:
-                                # (i) fac is effect_list[i] and sec_term its negation
-                                # (ii) sec_term contains effect_list[i] and fac is its negation
-                                # (iii) fac is contained in sec_term
-                                if not((fac == effect_list[i] and st in sec_term) or (fac == st and effect_list[i] in sec_term) or fac in sec_term):
-                                    sec_cond = False
-                                    break
-
-                        if sec_cond:
-                            break
-                    if sec_cond:
-                        cond = True
-                        break
-        if cond:
-            # delete the causal factor if either of the three exclusion criteria is true
-            #print(effect_list[i] + " discarded. It has no causal relevance for any other causal factor.")
-            del effect_list[i]
-
-    return effect_list
+import suspension_search as ss
+from utils import get_components_from_formula, get_factor_level, get_factor_order, get_equiv_formula, list_to_string, \
+                  string_to_list, contains_term, flatten_nested_list, find_effects, get_coextensive_factors
 
 def get_instance_formula_to_factor(in_formula: list, factor: str, level_factor_list_order: list) -> dict:
     """Derives the instance function for factor from the formula in_formula.
@@ -639,8 +566,273 @@ def get_truth_table_from_file(file_path: str) -> tuple:
     formula = formula[1:-3]
     return level_factor_order_list, factor_list, formula
 
+def create_factor_ordering(level_factor_order_list: list) -> list:
+    # create level_factor_list
+    output = []
+    for lvl in range(len(level_factor_order_list)):
+        output.append([])
+        for order in level_factor_order_list[lvl]:
+            output[lvl].extend(order)
+    return output
 
-def read_data_from_csv(file_path: str) -> tuple:
+def suspension_search_asf(level_factor_order_list: list, formula_st: str) -> list:
+    """Determines the list of atomic solution formulae using a breadth first
+    suspension tree search.
+
+    Parameters
+    __________
+    level_factor_order_list: list of lists of lists of str
+        nested list of factors by levels and by causal orders,
+        form: level_factor_order_list[LEVEL][ORDER][FACTOR]
+    formula_st: str
+        logical formula from which the atomic solution formulae
+        are to be derived,
+
+        notation: "*" - conjunctor, "~" - negator,
+        " + " - disjunctor
+
+    Returns
+    _______
+    list of tuple (str, str)
+        list of equivalence relations in form of 2-tuples
+        element[0] - DNF formula; element[1] - atomic
+    """
+
+    data_table = []
+    for index, line in enumerate(string_to_list(formula_st)):
+        data_table.append({})
+        for factor in flatten_nested_list(level_factor_order_list):
+            if "~" + factor in line:
+                data_table[index][factor] = False
+            elif factor in line:
+                data_table[index][factor] = True
+
+    coextensive_factor_list = get_coextensive_factors(level_factor_order_list, string_to_list(formula_st), respect_levels=True)
+
+    coextensive_list_ignore_levels = get_coextensive_factors(level_factor_order_list, string_to_list(formula_st), respect_levels=False)
+    constitution_coextensive_list = [(x, y) for cluster in coextensive_list_ignore_levels for x in cluster for y in cluster \
+        if get_factor_level(x, level_factor_order_list)+1==get_factor_level(y, level_factor_order_list)]
+    # list of pairs (x,y) with x being an coextensive factor to y and level(x)+1==level(y)
+
+    effects_list = find_effects(string_to_list(formula_st),flatten_nested_list(level_factor_order_list))
+
+    nested_effects_list = [] # create a nested list
+    for lvl_index, lvl in enumerate(level_factor_order_list):
+        nested_effects_list.append([])
+        nested_effects_list[lvl_index].append([])
+        for fac in flatten_nested_list(lvl):
+            if fac in effects_list:
+                nested_effects_list[lvl_index][0].append(fac)
+
+    causes_list = [] # list of first causes
+    for lvl_index, lvl in enumerate(level_factor_order_list):
+        if lvl_index > 0:
+            remove_list = [x for level in level_factor_order_list for order in level for x in order if lvl != level ]
+            reduced_data_table = ss.reduce_data_table(data_table, remove_list)
+            new_formula = []
+            for line_index, line in enumerate(string_to_list(formula_st)):
+                new_formula.append([])
+                for lit in line:
+                    if any(fac == lit or "~" + fac == lit for fac in flatten_nested_list(level_factor_order_list[lvl_index])):
+                        new_formula[line_index].append(lit)
+
+            nested_effects_list[lvl_index][0] = find_effects(new_formula, flatten_nested_list(level_factor_order_list[lvl_index]))
+
+        else:
+            reduced_data_table = copy.deepcopy(data_table) # deepcopy makes also copies of the elements which are dictionaries
+        stop = False
+        counter = 0
+        causes_list.append([])
+
+        if len(flatten_nested_list(lvl)) == 1:
+            nested_effects_list[lvl_index][0].append(flatten_nested_list(lvl)[0])
+            stop = True
+            causes_list[lvl_index].append([])
+
+        while not(stop):
+            causes_list[lvl_index].append([])
+
+            for fac in flatten_nested_list(lvl):
+                if not(fac in nested_effects_list[lvl_index][counter]):
+                    causes_list[lvl_index][counter].append(fac)
+
+
+            if len(causes_list[lvl_index][counter]) == 0 or (counter > 0 and ([x for x in causes_list[lvl_index][counter] if x not in causes_list[lvl_index][counter-1]] == [])):
+                # if there are no first causes
+                if counter == 0:
+                    causes_list[lvl_index] = [flatten_nested_list(level_factor_order_list[lvl_index])]
+                else:
+                    del causes_list[lvl_index][-1] # remove last element
+                    del causes_list[lvl_index][-1] # remove second-last element
+                    del nested_effects_list[lvl_index][-1]
+                    del nested_effects_list[lvl_index][-1]
+                stop = True
+            else:
+                remove_list = [x for x in causes_list[lvl_index][counter]]
+                for i in range(len(level_factor_order_list)):
+                    if i != lvl_index:
+                        remove_list.extend(nested_effects_list[i][0])
+                reduced_data_table = ss.reduce_data_table(data_table, remove_list)
+                nested_effects_list[lvl_index].append([])
+                new_formula = []
+                for line_index, line in enumerate(string_to_list(formula_st)):
+                    new_formula.append([])
+                    for lit in line:
+                        if any(fac == lit or "~" + fac == lit for fac in nested_effects_list[lvl_index][counter]):
+                            new_formula[line_index].append(lit)
+                nested_effects_list[lvl_index][counter+1] = find_effects(new_formula, nested_effects_list[lvl_index][counter])
+
+            counter += 1
+
+    # remove all coextensive factors but one
+    reduced_factor_list = copy.deepcopy(level_factor_order_list) # deepcopy makes also copies of the elements which are lists
+    for lvl_index, lvl in enumerate(coextensive_factor_list):
+        for cluster in lvl:
+            for ind in range(1,len(cluster)):
+                for i in range(len(nested_effects_list[lvl_index])):
+                    if cluster[ind] in nested_effects_list[lvl_index][i]:
+                        nested_effects_list[lvl_index][i].remove(cluster[ind])
+                    for level in reduced_factor_list:
+                        for order in level:
+                            if cluster[ind] in order:
+                                order.remove(cluster[ind])
+
+    max_conj = len(flatten_nested_list(causes_list))
+    max_disj = len(data_table)
+    suspension_acc = 0.2
+
+    equiv_relations = {}
+
+    for lvl in range(len(nested_effects_list)):
+        for i in range(len(nested_effects_list[lvl])):
+
+            for target_factor in nested_effects_list[lvl][i]:
+                # Create a root node to start with
+                root_value = []
+                root = ss.Node(root_value, level=-1)
+
+                # adapt max_disj and max_conj for target_factor
+                # max_disj should not be larger than the number of cases in which target_factor
+                # is True
+                true_cases = len([x for x in data_table if x[target_factor] == True])
+                if true_cases < max_disj:
+                    local_max_disj = true_cases
+                else:
+                    local_max_disj = max_disj
+
+                #number_factors
+                #if
+                local_max_conj = max_conj
+
+                #"""
+                successful, found_nodes, last_find = ss.suspension_bfs(root, target_factor, reduced_factor_list, data_table, \
+                    target_factor_level=get_factor_level(target_factor, level_factor_order_list), active=causes_list[lvl][i], \
+                        max_disj=local_max_disj, max_conj=local_max_conj, max_depth=500, suspension_acc=suspension_acc)
+
+                solutions_list = []
+                if successful:
+                    for node in found_nodes:
+                        solutions_list.append(node.value)
+                elif found_nodes:
+                    for node in found_nodes:
+                        solutions_list.append(node.value)
+
+                else:
+                    pass
+
+                if not target_factor in equiv_relations:
+                    # if it is the first run for target_factor
+                    equiv_relations[target_factor] = solutions_list
+                else:
+                    # if there already exists an entry for target_factor
+                    equiv_relations[target_factor].extend(solutions_list)
+
+
+
+    # remove empty keys whose value is [] from equiv_relations
+    remove_list = [key for key in equiv_relations if equiv_relations[key]==[]]
+    for key in remove_list:
+        del equiv_relations[key]
+
+    # introduce relations for coextensive factors
+    # 1) add DNF <-> B for all DNF <-> A if level(B)==level(A)
+    # 2) add DNF <-> B for all DNF <-> A if ((level(B)+1==level(A) and level(DNF)==level(B)) OR level(B)==level(A)+1 and level(DNF)==level(A))
+    # 3) go through every DNF and replace any combination of instances of "A" by "B" if level(A) == level(B)
+    # 4) add B <-> A if level(A)==level(B)
+    # 5) add B <-> A if level(A)==level(B)+1
+
+    for lvl in coextensive_factor_list:
+        for cluster in lvl:
+            for fac_a in cluster:
+                # case 1)
+                if fac_a in equiv_relations:
+                    for fac_b in cluster:
+                        if get_factor_level(fac_a, level_factor_order_list) == get_factor_level(fac_b, level_factor_order_list):
+                            equiv_relations[fac_b] = equiv_relations[fac_a]
+                # case 4)
+                for fac_b in cluster:
+                    if get_factor_level(fac_a, level_factor_order_list) == get_factor_level(fac_b, level_factor_order_list) and \
+                       fac_a != fac_b:
+                        if not(fac_a in equiv_relations):
+                            equiv_relations[fac_a] = []
+                        if not [[fac_b]] in equiv_relations[fac_a]:
+                            equiv_relations[fac_a].append([[fac_b]])
+
+
+    # case 2)
+    for pair in constitution_coextensive_list:
+        if pair[0] in equiv_relations:
+            for formula in equiv_relations[pair[0]]:
+                if get_components_from_formula(list_to_string(formula), level_factor_order_list):
+                    if get_factor_level(get_components_from_formula(list_to_string(formula), level_factor_order_list)[0], level_factor_order_list) == \
+                       get_factor_level(pair[0], level_factor_order_list):
+                        if not pair[1] in equiv_relations:
+                            equiv_relations[pair[1]] = []
+                        if not formula in equiv_relations[pair[1]] and not(list_to_string(formula) == pair[1]):
+                            equiv_relations[pair[1]].append(formula)
+
+        if pair[1] in equiv_relations:
+            for formula in equiv_relations[pair[1]]:
+                if get_components_from_formula(list_to_string(formula), level_factor_order_list):
+                    if get_factor_level(get_components_from_formula(list_to_string(formula), level_factor_order_list)[0], level_factor_order_list) == \
+                       get_factor_level(pair[0], level_factor_order_list):
+                        if not pair[0] in equiv_relations:
+                            equiv_relations[pair[0]] = []
+                        if not formula in equiv_relations[pair[0]] and not(list_to_string(formula) == pair[0]):
+                            equiv_relations[pair[0]].append(formula)
+        # case 5)
+        if not(pair[1] in equiv_relations):
+            equiv_relations[pair[1]] = []
+        if not([[pair[0]]]) in equiv_relations[pair[1]]:
+            equiv_relations[pair[1]].append([[pair[0]]])
+
+
+    # case 3)
+    add_list = []
+    for lvl in coextensive_factor_list:
+        for cluster in lvl:
+            for fac_a in cluster:
+                for fac_b in cluster:
+                    if fac_a != fac_b:
+                        for key in equiv_relations:
+                            if key != fac_a and key != fac_b:
+                                for formula in equiv_relations[key]:
+                                    # construct every combination of instances of fac_a replaced by fac_b in formula
+                                    new_formula_list = ss.replace_instances_all_combs(list_to_string(formula), fac_a, fac_b)
+                                    for new_formula in new_formula_list:
+                                        if not(string_to_list(new_formula) in equiv_relations[key]):
+                                            pair = (new_formula, key)
+                                            if not pair in add_list:
+                                                # add new combinations to add_list
+                                                add_list.append(pair)
+
+    output_list = ss.convert_dict_to_pair_list(equiv_relations)
+    output_list.extend(add_list)
+
+    return output_list
+
+
+def read_data_from_csv(file_path: str, mode: str = "td") -> tuple:
     """Main function of atomic_formulae.py.
 
     (1) reads the csv file under file_path
@@ -654,6 +846,10 @@ def read_data_from_csv(file_path: str) -> tuple:
     __________
     file_path: str
         path to csv-file
+    mode: str, optional
+        specifies the method of deriving the atomic solution formulae,
+        If mode="bu", the bottom-up approach using the suspension tree search
+        algorithm is used, otherwise the traditional Petrick algorithm (top down).
 
     Returns
     _______
@@ -670,12 +866,10 @@ def read_data_from_csv(file_path: str) -> tuple:
     """
     list_equiv_formula = []
     list_equiv_tuple = []
-    level_factor_list = []
     order_input_information = []
 
     # determine the list of causal factors and the min-term formula from the truth table
     level_factor_order_list, factor_list, formula_st = get_truth_table_from_file(file_path)
-
 
     # translate the information on the causal ordering within each level into the nested list order_input_information
     for lvl in range(len(level_factor_order_list)):
@@ -688,137 +882,112 @@ def read_data_from_csv(file_path: str) -> tuple:
                         new_pair = (fac, fac_2)
                         order_input_information[lvl].append(new_pair)
 
+    if mode == "td":
+        # top down approach using Petrick's algorithm
 
-    if factor_list and formula_st != "":
-        # transform the formula from string into a nested list
-        # elements are the disjuncts of the min-term formula as lists of the conjuncts each disjunct
-        # formula[DISJUNCT][CONJUNCT]
-        formula = string_to_list(formula_st)
+        if factor_list and formula_st != "":
+            # transform the formula from string into a nested list
+            # elements are the disjuncts of the min-term formula as lists of the conjuncts each disjunct
+            # formula[DISJUNCT][CONJUNCT]
+            formula = string_to_list(formula_st)
 
-        # determine which causal factors might be effects
-        effects_list = find_effects(string_to_list(formula_st),factor_list)
+            # determine which causal factors might be effects
+            effects_list = find_effects(string_to_list(formula_st),factor_list)
 
-        # check for co-extensive factors - only for one factor of each set of co-extensive factors,
-        # the prime implicants have to be determined
-        list_of_coextensives = [] # this becomes a nested list: every sublist contains factors that are mutually coextensive
-        for i in range(len(effects_list)-1):
-            for j in range(i+1,len(effects_list)):
-                co_ext = True
-                for disj in formula:
-                    neg_i = "~" + effects_list[i]
-                    neg_j = "~" + effects_list[j]
-                    if (((effects_list[i] in disj) and not(effects_list[j] in disj)) or
-                    ((effects_list[j] in disj) and not(effects_list[i] in disj)) or
-                    ((neg_i in disj) and not(neg_j in disj)) or ((neg_j in disj) and not(neg_i in disj))):
-                        co_ext = False # two factors are not coextensive if one or its negation appears in one disjunct but the other
-                        break          # does not
+            # check for co-extensive factors - only for one factor of each set of co-extensive factors,
+            # the prime implicants have to be determined
+            list_of_coextensives = get_coextensive_factors(effects_list, formula)
 
-                if co_ext:
-                    if not(list_of_coextensives): # if list of coextensives is still empty
-                        list_of_coextensives.append([]) # append an empty sublist
-                        list_of_coextensives[0].append(effects_list[i])
-                        list_of_coextensives[0].append(effects_list[j])
-                    else: # list is non-empty search for a sublist that contains effects_list[i]
-                        new_list = True
-                        for sublist in list_of_coextensives:
-                            if ((effects_list[i] in sublist) or (effects_list[j] in sublist)):
-                                # at least one of both factors is already contained in one sublist of coextensive factors
-                                new_list = False
-                                if not(effects_list[i] in sublist): # and effects_list[i] is not,
-                                    sublist.append(effects_list[i]) # then add effects_list[i] to sublist
-                                elif not(effects_list[j] in sublist): # other case effects_list[j] is not contained,
-                                    sublist.append(effects_list[j]) # then add it to sublist
-                                break
-                        if new_list: # neither factor is already contained in any sublist
-                            list_of_coextensives.append([]) # create a new sublist
-                            list_of_coextensives[-1].append(effects_list[i]) # append effects_list[i]
-                            list_of_coextensives[-1].append(effects_list[j]) # and effects_list[j]
-
-        # keep only one factor per level of each set of coextensive factors
-        # only keep the last element (will be factor of highest order within that level)
-        if list_of_coextensives: # list is not empty
-            for sublist in list_of_coextensives:
-                if len(sublist) > 1:
-                    for level in level_factor_order_list:
-                        found_one = False
-                        for order in reversed(level):
-                            for factor in order:
-                                if factor in sublist:
-                                    if not(found_one):
-                                        found_one = True
-                                    else:
-                                        effects_list.remove(factor)
-
-        for fac in effects_list:
-            # for each of these factors:
-            # determine its instance formula (the min-term equivalence formula to fac)
-            i_formula = get_instance_formula_to_factor(string_to_list(formula_st), fac, level_factor_order_list)
-
-
-            # determine the prime implicants of this instance formula
-            pi_list = get_prime_implicants(i_formula, fac, level_factor_order_list)
-
-            if pi_list:
-                # list of prime implicants is non-empty
-                # obtain all possible transformations of the instance formula into the reduced disjunctive normal form
-                for sol in get_rdnf(pi_list, i_formula, level_factor_order_list):
-                    # since sol is equivalent to fac, append the equivalence-operator and the second equivalent (fac)
-                    sol = sol + " <-> " + fac
-                    list_equiv_formula.append(sol)
-
-        # add equivalence relations for coextensive factors
-        if list_of_coextensives:
-            for effect in effects_list:
+            # keep only one factor per level of each set of coextensive factors
+            # only keep the last element (will be factor of highest order within that level)
+            if list_of_coextensives: # list is not empty
                 for sublist in list_of_coextensives:
-                    if effect in sublist:
-                        for fac in sublist:
-                            if not(fac in effects_list) and not (fac == effect) and (get_factor_level(fac, level_factor_order_list) == get_factor_level(effect, level_factor_order_list)):
-                                # replace effect by fac and vice versa in the equivalence formulae for effect
-                                for formula in list_equiv_formula:
-                                    lgth = len(effect)
-                                    if formula.endswith(effect):
-                                        # skip formula if cause-term contains factor of higher causal order than fac
-                                        skip = False
-                                        # case 1: fac is cause and effect of higher order than fac
-                                        if (formula.find(fac) > -1) and (get_factor_order(fac, level_factor_order_list) < get_factor_order(effect, level_factor_order_list)):
-                                            skip = True
-                                        # case 2: another factor of higher order than fac is among causes
-                                        if not(skip):
-                                            for index, order in enumerate(level_factor_order_list[get_factor_level(fac, level_factor_order_list)]):
-                                                if index > get_factor_order(fac, level_factor_order_list):
-                                                    for f in order:
-                                                        if (f != effect) and (formula.find(f) > -1):
-                                                            skip = True
-                                                            break # break from for-loop over factors
-                                                if skip:
-                                                    break # break from for-loop over orders
+                    if len(sublist) > 1:
+                        for level in level_factor_order_list:
+                            found_one = False
+                            for order in reversed(level):
+                                for factor in order:
+                                    if factor in sublist:
+                                        if not(found_one):
+                                            found_one = True
+                                        else:
+                                            effects_list.remove(factor)
 
-                                        if not(skip):
-                                            st = formula[:-lgth].replace(fac,effect) # the new formula is the old one without the last
-                                            st = st + fac # expression and with all occurences of fac replaced by effect
-                                            # then append fac as second equivalent of the equivalence formula
-                                            list_equiv_formula.append(st) # add the new formula to the formulae list
-                        break # break from for-loop over sublists
+            for fac in effects_list:
+                # for each of these factors:
+                # determine its instance formula (the min-term equivalence formula to fac)
+                i_formula = get_instance_formula_to_factor(string_to_list(formula_st), fac, level_factor_order_list)
 
-        if list_equiv_formula:
-            abort = False
-            # transform the list of strings into a list of pairs, such that element[0] <-> element[1]
-            list_equiv_tuple = [get_equiv_formula(formula) for formula in list_equiv_formula]
+
+                # determine the prime implicants of this instance formula
+                pi_list = get_prime_implicants(i_formula, fac, level_factor_order_list)
+
+                if pi_list:
+                    # list of prime implicants is non-empty
+                    # obtain all possible transformations of the instance formula into the reduced disjunctive normal form
+                    for sol in get_rdnf(pi_list, i_formula, level_factor_order_list):
+                        # since sol is equivalent to fac, append the equivalence-operator and the second equivalent (fac)
+                        sol = sol + " <-> " + fac
+                        list_equiv_formula.append(sol)
+
+            # add equivalence relations for coextensive factors
+            if list_of_coextensives:
+                for effect in effects_list:
+                    for sublist in list_of_coextensives:
+                        if effect in sublist:
+                            for fac in sublist:
+                                if not(fac in effects_list) and not (fac == effect) and (get_factor_level(fac, level_factor_order_list) == get_factor_level(effect, level_factor_order_list)):
+                                    # replace effect by fac and vice versa in the equivalence formulae for effect
+                                    for formula in list_equiv_formula:
+                                        lgth = len(effect)
+                                        if formula.endswith(effect):
+                                            # skip formula if cause-term contains factor of higher causal order than fac
+                                            skip = False
+                                            # case 1: fac is cause and effect of higher order than fac
+                                            if (formula.find(fac) > -1) and (get_factor_order(fac, level_factor_order_list) < get_factor_order(effect, level_factor_order_list)):
+                                                skip = True
+                                            # case 2: another factor of higher order than fac is among causes
+                                            if not(skip):
+                                                for index, order in enumerate(level_factor_order_list[get_factor_level(fac, level_factor_order_list)]):
+                                                    if index > get_factor_order(fac, level_factor_order_list):
+                                                        for f in order:
+                                                            if (f != effect) and (formula.find(f) > -1):
+                                                                skip = True
+                                                                break # break from for-loop over factors
+                                                    if skip:
+                                                        break # break from for-loop over orders
+
+                                            if not(skip):
+                                                st = formula[:-lgth].replace(fac,effect) # the new formula is the old one without the last
+                                                st = st + fac # expression and with all occurences of fac replaced by effect
+                                                # then append fac as second equivalent of the equivalence formula
+                                                list_equiv_formula.append(st) # add the new formula to the formulae list
+                            break # break from for-loop over sublists
+
+            if list_equiv_formula:
+                abort = False
+                # transform the list of strings into a list of pairs, such that element[0] <-> element[1]
+                list_equiv_tuple = [get_equiv_formula(formula) for formula in list_equiv_formula]
+            else:
+                # obtained list of equivalence formulae is empty
+                abort = True
+
+            level_factor_list = create_factor_ordering(level_factor_order_list)
+
         else:
-            # obtained list of equivalence formulae is empty
+            # factor_list is empty
             abort = True
 
+        return abort, level_factor_list, list_equiv_tuple, order_input_information
 
-        # create level_factor_list
-        for lvl in range(len(level_factor_order_list)):
-            level_factor_list.append([])
-            for order in level_factor_order_list[lvl]:
-                level_factor_list[lvl].extend(order)
-    else:
-        # factor_list is empty
-        abort = True
+    elif mode=="bu":
+        # alternative mode: suspension tree search
 
-    return abort, level_factor_list, list_equiv_tuple, order_input_information
+        list_equiv_tuple = suspension_search_asf(level_factor_order_list, formula_st)
+        abort = len(list_equiv_tuple) == 0
+        level_factor_list = create_factor_ordering(level_factor_order_list)
+
+        return abort, level_factor_list, list_equiv_tuple, order_input_information
 
 if __name__ == '__main__':
     # when executing this script file
